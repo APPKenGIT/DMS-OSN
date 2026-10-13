@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oliesmeernippel — Droge-oliesmering voor lineaire geleidingen | De Meester Industries</title>
+  <meta name="description" content="De Oliesmeernippel van De Meester Industries dicht het rietje van uw olie-aerosol perfect af voor gerichte smering van lineaire geleidingen met droge olie. RVS304 & RVS316 met metaaldetecteerbare dop.">
+  <meta name="theme-color" content="#181B1F">
+
+  <!-- Open Graph / Meta -->
+  <meta property="og:title" content="Oliesmeernippel — De Meester Industries">
+  <meta property="og:description" content="Droge-oliesmering voor lineaire geleidingen. Perfecte afdichting voor aerosol-rietjes.">
+  <meta property="og:type" content="website">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Three.js & OrbitControls via CDN for Interactive 3D Model -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <div class="wrap">
+      <div class="top-bar-badge">
+        <span>Gepatenteerde afdichting · Direct uit voorraad leverbaar in M5, M6, M8 & M10</span>
+      </div>
+      <div class="top-bar-links">
+        <a href="mailto:demeestersolutions@gmail.com">demeestersolutions@gmail.com</a>
+        <span>·</span>
+        <a href="#bestellen">Vraag staffelofferte aan</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <a href="#" class="brand" aria-label="Oliesmeernippel home">
+        <svg class="mark" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#181B1F" stroke-width="2"/>
+          <circle cx="12" cy="12" r="3.2" fill="#E5A024"/>
+        </svg>
+        <span class="brand-text">
+          Oliesmeernippel
+          <small>De Meester Industries</small>
+        </span>
+      </a>
+
+      <nav id="siteNav" aria-label="Hoofdnavigatie">
+        <a href="#werking">Werking</a>
+        <a href="#kenmerken">Kenmerken</a>
+        <a href="#toepassingen">Toepassingen</a>
+        <a href="#specificaties">Specificaties</a>
+        <a href="#bestellen">Offerte</a>
+      </nav>
+
+      <div class="header-right">
+        <a class="header-cta" href="#bestellen">
+          <span>Offerte aanvragen</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu openen" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke="#181B1F" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section with Interactive 3D Viewer -->
+  <section class="hero" id="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <div class="tag tag-signal">
+          <span>Industriële precisie · Food-Safe afsluitdop</span>
+        </div>
+        
+        <h1>
+          Eén insteekpunt voor het rietje. <span class="highlight">Perfecte afdichting</span> bij elke druk op de aerosol.
+        </h1>
+
+        <p class="lead">
+          De Oliesmeernippel neemt het rietje van uw olie-aerosol op en dicht perfect af. Hierdoor worden lineaire geleidingen, zwaluwstaartgeleidingen en geslepen assen gericht gesmeerd met <strong>droge olie</strong> — een hechtende smeerfilm zonder dikker, in plaats van vet waarvan vuil en stof de slijtage juist versnellen.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn-primary" href="#bestellen">
+            <span>Offerte aanvragen</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a class="btn-secondary" href="#specificaties">
+            <span>Datasheet bekijken</span>
+          </a>
+        </div>
+
+        <div class="hero-meta">
+          <span><i class="dot"></i>RVS304 of RVS316</span>
+          <span><i class="dot"></i>Voor droge olie (geen vet)</span>
+          <span><i class="dot"></i>Metaaldetecteerbare dop (polyamide)</span>
+        </div>
+      </div>
+
+      <!-- 3D Interactive Viewer Component -->
+      <div class="viewer-container">
+        <div class="viewer-header">
+          <span class="viewer-status">
+            <span class="live-indicator"></span>
+            <span id="viewerLabel">FIG. 01 — 3D ISOMETRISCH (VRIJ ROTEREN)</span>
+          </span>
+          <span style="font-size:0.7rem; color:var(--steel-400);">INTERACTIEF MODEL</span>
+        </div>
+
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <canvas id="threeCanvas"></canvas>
+          <img id="fallbackImage" alt="2D Render weergave van de oliesmeernippel">
+
+          <!-- Hint Overlay -->
+          <div class="viewer-overlay-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            <span>Draai met muis / vinger · Zoom met scroll</span>
+          </div>
+
+          <!-- Tools in viewer top-right -->
+          <div class="viewer-tools">
+            <button class="viewer-tool-btn" id="btnResetView" title="Reset camerazicht" aria-label="Reset zicht">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+              </svg>
+            </button>
+            <button class="viewer-tool-btn" id="btnFullscreen" title="Volledig scherm" aria-label="Volledig scherm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Viewer Controls -->
+        <div class="viewer-controls">
+          <div class="viewer-buttons-row">
+            <button class="viewer-btn active" data-view="iso">3D Vrij</button>
+            <button class="viewer-btn" data-view="side">Zijaanzicht</button>
+            <button class="viewer-btn" data-view="top">Bovenaanzicht</button>
+            <button class="viewer-btn" data-view="cap" id="btnToggleCap">Met Afsluitdop</button>
+            <button class="viewer-btn" data-view="straw" id="btnToggleStraw">Rietje-Insteek</button>
+          </div>
+
+          <div class="viewer-toggle-row">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:600; color:var(--steel-600); font-size:0.76rem;">MATERIAAL:</span>
+              <div class="toggle-group">
+                <button class="toggle-opt active" data-material="rvs304">RVS304</button>
+                <button class="toggle-opt" data-material="rvs316">RVS316</button>
+              </div>
+            </div>
+
+            <button id="btnToggle2D" style="background:none; border:none; color:var(--steel-600); font-size:0.75rem; text-decoration:underline; cursor:pointer;">
+              Bekijk 2D Renders
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem vs Solution Comparison Section -->
+  <section class="comparison-section" id="werking">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="index">00 — PRINCIPE & WERKING</span>
+        <h2>Waarom lineaire geleidingen kapot gaan op vet.</h2>
+        <p>Lineaire kogelomloopwagens hebben een minuscule tolerantie. Traditionele vetten bevatten zeepverdikkers die vuil en spanen binden tot een schurende pasta. Droge olie voorkomt dit.</p>
+      </div>
+
+      <div class="comparison-grid">
+        <!-- Problem Card -->
+        <div class="comp-card problem">
+          <span class="comp-badge">Traditionele Vetnippel</span>
+          <h3>De gevaren van vetdosering</h3>
+          <p>Vet trekt stof, metaalspanen en schuursel aan. Binnen enkele weken vormt zich een stroperige massa die kogelbanen blokkeert.</p>
+          <ul class="comp-list">
+            <li>
+              <span class="icon-cross">✕</span>
+              <span><strong>Verdikker blijft achter:</strong> bindt spanen en stof tot schuurmiddel.</span>
+            </li>
+            <li>
+              <span class="icon-cross">✕</span>
+              <span><strong>Onnauwkeurige dosering:</strong> vet dringt niet diep genoeg door in kogelkanalen.</span>
+            </li>
+            <li>
+              <span class="icon-cross">✕</span>
+              <span><strong>Overmatige wrijving:</strong> verhoogt motorbelasting en veroorzaakt stick-slip.</span>
+            </li>
+            <li>
+              <span class="icon-cross">✕</span>
+              <span><strong>Vettige werkplek:</strong> trekt omgevingsvuil aan op productielijnen.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Solution Card -->
+        <div class="comp-card solution">
+          <span class="comp-badge">Oliesmeernippel + Droge Olie</span>
+          <h3>Schoon, hechtend en slijtvast</h3>
+          <p>De Oliesmeernippel dicht het rietje hermetisch af. De aerosol perst droge olie tot diep in de kogellopen waar het opdroogt tot een ultradunne beschermfilm.</p>
+          <ul class="comp-list">
+            <li>
+              <span class="icon-check">✓</span>
+              <span><strong>Geen vuilhechting:</strong> drager verdampt, micro-smeerfilm stoot stof en spanen af.</span>
+            </li>
+            <li>
+              <span class="icon-check">✓</span>
+              <span><strong>100% lekdichte aansluiting:</strong> geen morsen of nevel in de schakelkast of machine.</span>
+            </li>
+            <li>
+              <span class="icon-check">✓</span>
+              <span><strong>Interne inbusmontage:</strong> vlak en compact in te bouwen op krappe wagens.</span>
+            </li>
+            <li>
+              <span class="icon-check">✓</span>
+              <span><strong>Food & Pharma safe:</strong> geleverd met metaaldetecteerbare afsluitdop.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="kenmerken">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="index">01 — TECHNISCHE KENMERKEN</span>
+        <h2>Gemaakt om het rietje op te vangen, niet om vet te doseren.</h2>
+        <p>Droge olie vraagt om een ander smeerpunt dan vet. De Oliesmeernippel is specifiek berekend op de druk en afmetingen van spuitbus-rietjes.</p>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature">
+          <div class="feature-top">
+            <span class="num">01</span>
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="9"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <h3>Perfecte afdichting rond het rietje</h3>
+          <p>De nauwkeurig gekalibreerde boring sluit naadloos aan op het rietje van een olie-aerosol. Geen spatten, geen lekkage en geen drukverlies bij het inspuiten.</p>
+        </div>
+
+        <div class="feature">
+          <div class="feature-top">
+            <span class="num">02</span>
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+            </svg>
+          </div>
+          <h3>Voor droge olie, niet voor vet</h3>
+          <p>Droge olie droogt direct op tot een ultradunne smeerfilm zonder verdikker. Hierdoor blijft de geleiding schoon en wordt voortijdige slijtage vermeden.</p>
+        </div>
+
+        <div class="feature">
+          <div class="feature-top">
+            <span class="num">03</span>
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"/>
+            </svg>
+          </div>
+          <h3>Interne inbus-zeskant</h3>
+          <p>Voorzien van een inwendig inbusprofiel. Geen uitstekende zeskantkop, waardoor de nippel eenvoudig en stevig gemonteerd kan worden op krappe posities.</p>
+        </div>
+
+        <div class="feature">
+          <div class="feature-top">
+            <span class="num">04</span>
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="16" y2="6"/>
+              <line x1="7" y1="12" x2="17" y2="12"/>
+              <line x1="8" y1="18" x2="16" y2="18"/>
+            </svg>
+          </div>
+          <h3>Geribbelde persschacht & schroefdraad</h3>
+          <p>De ringvormige weerhaken op de persschacht zetten zich muurvast in het boorgat of schroefdraad. Volledig bestand tegen constante trillingen en schokken.</p>
+        </div>
+
+        <div class="feature">
+          <div class="feature-top">
+            <span class="num">05</span>
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3>RVS304 of RVS316 kwaliteit</h3>
+          <p>Hoogwaardig roestvast staal. RVS304 voor algemene machinebouw en RVS316 voor veeleisende farmaceutische, maritieme of chemische cleanroomomgevingen.</p>
+        </div>
+
+        <div class="feature">
+          <div class="feature-top">
+            <span class="num">06</span>
+            <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="5" y="4" width="14" height="16" rx="3"/>
+              <line x1="9" y1="9" x2="15" y2="9"/>
+            </svg>
+          </div>
+          <h3>Metaaldetecteerbare afsluitdop</h3>
+          <p>Standaard meegeleverd bij elke nippel: een robuuste dop in metaaldetecteerbaar polyamide. Voorkomt vervuiling van het smeerpunt en voldoet aan voedselveiligheidseisen.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Applications Section -->
+  <section id="toepassingen" style="background:var(--card);">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="index">02 — TOEPASSINGEN</span>
+        <h2>Overal waar geleidend of glijdend contact droog moet blijven lopen.</h2>
+        <p>Compatibel met alle gangbare merken lineaire geleidingen (o.a. THK, Hiwin, Rexroth, NSK, Rollon, Schneeberger) en precisie-assen.</p>
+      </div>
+
+      <div class="app-grid">
+        <div class="app-card">
+          <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="3" y1="9" x2="21" y2="9"/>
+            <line x1="9" y1="21" x2="9" y2="9"/>
+          </svg>
+          <div class="app-title">Lineaire kogelomlooprails & wagens</div>
+          <div class="app-desc">Voor smeerpoorten van CNC-freesmachines, pick-and-place robots en handling-units.</div>
+        </div>
+
+        <div class="app-card">
+          <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 22 22 22"/>
+          </svg>
+          <div class="app-title">Zwaluwstaartgeleidingen</div>
+          <div class="app-desc">Precisiesledes en optische positioneertafels waar speling en vetweerstand funest zijn.</div>
+        </div>
+
+        <div class="app-card">
+          <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <circle cx="12" cy="12" r="8"/>
+          </svg>
+          <div class="app-title">Geslepen assen & lineaire bussen</div>
+          <div class="app-desc">Geharde assen waar droge microfilm wrijving minimaliseert zonder stof aan te trekken.</div>
+        </div>
+
+        <div class="app-card">
+          <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <div class="app-title">Kogelomloopspindels</div>
+          <div class="app-desc">Rechtstreekse voeding van de kogelmoer voor een gelijkmatige koppeloverdracht.</div>
+        </div>
+
+        <div class="app-card">
+          <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <div class="app-title">Voedingsmiddelen & Farmacie</div>
+          <div class="app-desc">Dankzij metaaldetecteerbare doppen direct inzetbaar in HACCP- en IFS-omgevingen.</div>
+        </div>
+
+        <div class="app-card">
+          <svg class="app-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+          <div class="app-title">Cleanroom & Semicon</div>
+          <div class="app-desc">RVS316 uitvoering voor deeltjesarme productie en frequente CIP-reinigingscycli.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Specifications & Datasheet Section -->
+  <section id="specificaties">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="index">03 — SPECIFICATIES & DATASHEET</span>
+        <h2>Technische gegevens & maattabel.</h2>
+        <p>Standaarduitvoering uit voorraad leverbaar. Afwijkende draadsoorten of specials op klantspecificatie mogelijk.</p>
+      </div>
+
+      <div class="spec-container">
+        <!-- Main Properties Table -->
+        <div class="spec-wrap">
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>Eigenschap</th>
+                <th>Waarde / Specificatie</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Materiaal nippel</td>
+                <td>RVS304 (1.4301) of RVS316 (1.4404)</td>
+              </tr>
+              <tr>
+                <td>Materiaal afsluitdop</td>
+                <td>Polyamide (PA), blauw, metaaldetecteerbaar</td>
+              </tr>
+              <tr>
+                <td>Aandrijving</td>
+                <td>Inbus-zeskant (inwendig)</td>
+              </tr>
+              <tr>
+                <td>Montagewijze</td>
+                <td>Geribbelde persschacht / schroefdraad montage</td>
+              </tr>
+              <tr>
+                <td>Insteekdiameter</td>
+                <td>Geschikt voor aerosol-rietjes van 1,5 tot 2,2 mm</td>
+              </tr>
+              <tr>
+                <td>Toegestane smeermiddelen</td>
+                <td>Droge olie / Aerosol met oplosmiddel (niet voor vet)</td>
+              </tr>
+              <tr>
+                <td>Standaard levering</td>
+                <td>Compleet geleverd inclusief afsluitdop</td>
+              </tr>
+              <tr>
+                <td>Verpakkingseenheden</td>
+                <td>10, 50, 100, 500 of 1000 stuks per verpakking</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Thread Dimensions Table & Callout -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          <div class="spec-wrap">
+            <table class="spec-table">
+              <thead>
+                <tr>
+                  <th>Draadmaat</th>
+                  <th>Spoed</th>
+                  <th>Toepassing</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>M5</strong></td>
+                  <td>0,8 mm</td>
+                  <td>Compacte sledes & micro-rails</td>
+                </tr>
+                <tr>
+                  <td><strong>M6</strong></td>
+                  <td>1,0 mm</td>
+                  <td>Standaard lineaire wagens (maat 15-25)</td>
+                </tr>
+                <tr>
+                  <td><strong>M8</strong></td>
+                  <td>1,0 mm</td>
+                  <td>Fijne spoed geleidingen (maat 30-45)</td>
+                </tr>
+                <tr>
+                  <td><strong>M8</strong></td>
+                  <td>1,25 mm</td>
+                  <td>Standaard metrische schroefdraad</td>
+                </tr>
+                <tr>
+                  <td><strong>M10</strong></td>
+                  <td>1,5 mm</td>
+                  <td>Zware lineaire lagers & assen</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="spec-info-card">
+            <h4>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              Afwijkende draad of perspassing?
+            </h4>
+            <p style="font-size:0.88rem; color:var(--steel-600);">
+              Heeft u een afwijkende inch-maat (bijv. 1/4"-28 UNF, 1/8" NPT) of een specifieke perspassing voor uw gietstuk? Vermeld dit in het offerteformulier, dan adviseren wij u direct.
+            </p>
+            <div class="spec-callout">
+              <strong>Tip voor montage:</strong> Draai de nippel in met een passende inbussleutel. Handvast + 1/4 slag is ruim voldoende dankzij de geribbelde borgschacht.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Quote Request Section (GitHub Pages & FormSubmit Ready) -->
+  <section class="cta-strip" id="bestellen">
+    <div class="wrap cta-grid">
+      <div class="cta-info">
+        <div class="tag tag-signal" style="background:rgba(229,160,36,0.2); color:#F3B745;">
+          <span>Snelle B2B offerte binnen 24 uur</span>
+        </div>
+
+        <h2 style="margin-top:16px;">Vraag direct een offerte aan voor uw gewenste aantal & maat.</h2>
+        
+        <p>
+          Levering direct uit voorraad voor alle standaardmaten. De afsluitdop wordt altijd standaard bijgeleverd bij de nippel. Losse doppen zijn apart na te bestellen per 50 stuks.
+        </p>
+
+        <div class="cta-highlights">
+          <div class="cta-highlight-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Staffelkortingen bij 50, 100, 500 en 1000+ stuks</span>
+          </div>
+          <div class="cta-highlight-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Verzending binnen 24 uur in Nederland & België</span>
+          </div>
+          <div class="cta-highlight-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Facturatie op rekening mogelijk voor bedrijven</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Container -->
+      <div class="cta-form-container">
+        <!-- Main Form (GitHub Pages + FormSubmit AJAX) -->
+        <form class="cta-form" id="quoteForm" action="https://formsubmit.co/demeestersolutions@gmail.com" method="POST">
+          <!-- FormSubmit Configuration -->
+          <input type="hidden" name="_subject" value="Nieuwe offerteaanvraag — Oliesmeernippel (De Meester Industries)">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
+          <label for="orderType">Wat wilt u bestellen?</label>
+          <select id="orderType" name="Type bestelling">
+            <option value="nippel">Oliesmeernippel (inclusief afsluitdop)</option>
+            <option value="caps">Losse afsluitdoppen (nabestelling)</option>
+          </select>
+
+          <!-- Nipple Fields -->
+          <div id="nippelFields">
+            <div class="form-row">
+              <div>
+                <label for="qty">Gewenste verpakking</label>
+                <select id="qty" name="Verpakking">
+                  <option value="10 stuks">10 stuks</option>
+                  <option value="50 stuks" selected>50 stuks</option>
+                  <option value="100 stuks">100 stuks</option>
+                  <option value="500 stuks">500 stuks</option>
+                  <option value="1000 stuks">1000 stuks</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="thread">Draadmaat / Passing</label>
+                <select id="thread" name="Maat">
+                  <option value="M5 x 0,8">M5 x 0,8</option>
+                  <option value="M6 x 1" selected>M6 x 1</option>
+                  <option value="M8 x 1">M8 x 1</option>
+                  <option value="M8 x 1,25">M8 x 1,25</option>
+                  <option value="M10 x 1,5">M10 x 1,5</option>
+                  <option value="Anders / onbekend">Anders / onbekend</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Conditional custom thread remarks -->
+            <div id="threadRemarksField" style="display:none;">
+              <label for="threadRemarks">Gewenste speciale maat of specificatie</label>
+              <textarea id="threadRemarks" name="Opmerkingen maat" rows="2" placeholder="Geef hier de gewenste maat, spoed of machine-type door…"></textarea>
+            </div>
+
+            <label for="material">Materiaaluitvoering</label>
+            <select id="material" name="Materiaal">
+              <option value="RVS304" selected>RVS304 (Standaard industrieel roestvast staal)</option>
+              <option value="RVS316">RVS316 (Cleanroom, chemisch & maritiem)</option>
+            </select>
+          </div>
+
+          <!-- Cap Only Fields -->
+          <div id="capFields" style="display:none;">
+            <label for="capQty">Aantal losse afsluitdoppen (per 50 stuks)</label>
+            <select id="capQty" name="Aantal losse doppen">
+              <option value="50 stuks">50 stuks</option>
+              <option value="100 stuks">100 stuks</option>
+              <option value="150 stuks">150 stuks</option>
+              <option value="200 stuks">200 stuks</option>
+              <option value="500 stuks">500 stuks</option>
+            </select>
+          </div>
+
+          <!-- Contact details -->
+          <div class="form-row">
+            <div>
+              <label for="company">Bedrijfsnaam (optioneel)</label>
+              <input id="company" name="Bedrijfsnaam" type="text" placeholder="Uw bedrijfsnaam">
+            </div>
+
+            <div>
+              <label for="email">E-mailadres <span style="color:var(--signal);">*</span></label>
+              <input id="email" name="E-mailadres aanvrager" type="email" placeholder="naam@bedrijf.be" required>
+            </div>
+          </div>
+
+          <label for="notes">Aanvullende opmerkingen of referentie (optioneel)</label>
+          <textarea id="notes" name="Aanvullende opmerkingen" rows="2" placeholder="Eventueel projectreferentie, inkoopordernummer of specifieke leveringswensen…"></textarea>
+
+          <!-- Live Configuration Summary Box -->
+          <div class="live-config-summary">
+            <div class="live-config-title">Configuratie-overzicht:</div>
+            <div class="live-config-text" id="liveConfigText">
+              Laden…
+            </div>
+          </div>
+
+          <button type="submit" id="quoteSubmitBtn">
+            <span>Offerte aanvragen</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+
+          <p class="form-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 14 14"></polyline>
+            </svg>
+            Reactie binnen één werkdag · Vrijblijvend prijsvoorstel
+          </p>
+        </form>
+
+        <!-- In-page Success Confirmation Overlay -->
+        <div class="form-status-overlay" id="formStatusOverlay">
+          <div class="status-icon-circle">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h3>Aanvraag succesvol ontvangen!</h3>
+          <p>
+            Bedankt voor uw aanvraag. We hebben uw specificaties ontvangen en sturen binnen één werkdag een gespecificeerd voorstel naar <strong id="confirmedEmail" style="color:var(--paper-light);">uw e-mailadres</strong>.
+          </p>
+          <button class="btn-reset-form" id="btnNewQuote">Nog een aanvraag doen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="index">04 — VEELGESTELDE VRAGEN</span>
+        <h2>Vragen van ingenieurs & onderhoudsteams.</h2>
+        <p>Alles wat u moet weten over compatibiliteit, montage en smeermiddelkeuze.</p>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>Welke spuitbussen zijn geschikt voor de Oliesmeernippel?</h4>
+          <p>Elke aerosol spuitbus met een standaard verlengrietje (ca. 1,5 tot 2,2 mm buitendiameter) gevuld met droge olie, PTFE-spray of micronized wax-smeermiddel. De conische zitting sluit rond het rietje hermetisch af.</p>
+        </div>
+
+        <div class="faq-item">
+          <h4>Kan ik toch vet inspuiten als ik dat wil?</h4>
+          <p>Nee, de Oliesmeernippel is <strong>uitdrukkelijk niet bedoeld voor vetten</strong>. Het interne kanaal is berekend op vloeibare aerosols. Voor vet heeft u een conventionele conus- of platkopvetnippel nodig.</p>
+        </div>
+
+        <div class="faq-item">
+          <h4>Hoe werkt de metaaldetecteerbare afsluitdop?</h4>
+          <p>De dop is vervaardigd uit polyamide vermengd met microscopische metaaldeeltjes. Zelfs als een dop per ongeluk in een voedsel- of verpakkingslijn valt, wordt deze direct gedetecteerd door industriële metaaldetectoren of röntgensystemen.</p>
+        </div>
+
+        <div class="faq-item">
+          <h4>Wat is de levertijd voor bestellingen?</h4>
+          <p>Standaardmaten (M5, M6, M8, M10) in RVS304 en RVS316 worden direct vanuit ons magazijn verstuurd. Bestellingen geplaatst voor 15:00 uur worden dezelfde werkdag verzonden.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand">
+            <svg class="mark" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="#181B1F" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3.2" fill="#E5A024"/>
+            </svg>
+            <span class="brand-text">
+              Oliesmeernippel
+              <small>De Meester Industries</small>
+            </span>
+          </div>
+          <p>
+            De toonaangevende specialist in gerichte droge-oliesmering voor precisiegeleidingen, machinebouw en automatisering.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <div class="footer-col">
+            <h5>Navigatie</h5>
+            <ul>
+              <li><a href="#werking">Werking</a></li>
+              <li><a href="#kenmerken">Kenmerken</a></li>
+              <li><a href="#toepassingen">Toepassingen</a></li>
+              <li><a href="#specificaties">Datasheet</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h5>Contact & Offerte</h5>
+            <ul>
+              <li><a href="mailto:demeestersolutions@gmail.com">demeestersolutions@gmail.com</a></li>
+              <li><a href="#bestellen">Offerteformulier</a></li>
+              <li><a href="#faq">Veelgestelde vragen</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 Oliesmeernippel — een merk van De Meester Industries. Alle rechten voorbehouden.</span>
+        <span>RVS304 / RVS316 Technische Precisie-componenten</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/viewer3d.js"></script>
+  <script src="js/form.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
