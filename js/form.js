@@ -16,6 +16,9 @@
   const qtySelect = document.getElementById('qty');
   const materialSelect = document.getElementById('material');
   const capQtySelect = document.getElementById('capQty');
+  const capThreadSelect = document.getElementById('capThread');
+  const capThreadRemarksField = document.getElementById('capThreadRemarksField');
+  const capThreadRemarksInput = document.getElementById('capThreadRemarks');
   const threadRemarksField = document.getElementById('threadRemarksField');
   const threadRemarksInput = document.getElementById('threadRemarks');
   const nippelFields = document.getElementById('nippelFields');
@@ -35,7 +38,7 @@
     updateSummary();
   }
 
-  // 2. Toggle custom thread remarks
+  // 2. Toggle custom thread remarks for nipple
   function updateThreadRemarks(value) {
     const isOther = (value === 'Anders / onbekend');
     if (threadRemarksField) {
@@ -43,6 +46,19 @@
       if (threadRemarksInput) {
         threadRemarksInput.required = isOther;
         if (!isOther) threadRemarksInput.value = '';
+      }
+    }
+    updateSummary();
+  }
+
+  // 2b. Toggle custom thread remarks for caps
+  function updateCapThreadRemarks(value) {
+    const isOther = (value === 'Anders / onbekend');
+    if (capThreadRemarksField) {
+      capThreadRemarksField.style.display = isOther ? 'block' : 'none';
+      if (capThreadRemarksInput) {
+        capThreadRemarksInput.required = isOther;
+        if (!isOther) capThreadRemarksInput.value = '';
       }
     }
     updateSummary();
@@ -57,7 +73,8 @@
 
     if (orderType === 'caps') {
       const capQty = capQtySelect ? capQtySelect.value : '50 stuks';
-      text = `<strong>${capQty}</strong> losse afsluitdoppen (metaaldetecteerbaar polyamide)`;
+      const capThread = capThreadSelect ? capThreadSelect.value : 'M6 x 1';
+      text = `<strong>${capQty}</strong> losse afsluitdoppen voor oliesmeernippel maat <strong>${capThread}</strong> (metaaldetecteerbaar polyamide).`;
     } else {
       const qty = qtySelect ? qtySelect.value : '50 stuks';
       const thread = threadSelect ? threadSelect.value : 'M6 x 1';
@@ -74,6 +91,9 @@
   }
   if (threadSelect) {
     threadSelect.addEventListener('change', (e) => updateThreadRemarks(e.target.value));
+  }
+  if (capThreadSelect) {
+    capThreadSelect.addEventListener('change', (e) => updateCapThreadRemarks(e.target.value));
   }
   if (qtySelect) qtySelect.addEventListener('change', updateSummary);
   if (materialSelect) materialSelect.addEventListener('change', updateSummary);
@@ -166,6 +186,7 @@
       form.reset();
       updateOrderType('nippel');
       updateThreadRemarks('M6 x 1');
+      updateCapThreadRemarks('M6 x 1');
       if (statusOverlay) statusOverlay.classList.remove('active');
       form.style.display = 'block';
     });

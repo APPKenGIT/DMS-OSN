@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3B745"/>
+      <stop offset="100%" stop-color="#BE8011"/>
+    </linearGradient>
+    <linearGradient id="steelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D343E"/>
+      <stop offset="100%" stop-color="#14171A"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded Base Card -->
+  <rect x="4" y="4" width="92" height="92" rx="22" fill="#16191D" stroke="#2D343E" stroke-width="2"/>
+  
+  <!-- Outer Technical Ring -->
+  <circle cx="50" cy="50" r="36" fill="none" stroke="#3E4550" stroke-width="1.5" stroke-dasharray="4 2"/>
+  
+  <!-- Signal Gold Ring -->
+  <circle cx="50" cy="50" r="30" fill="none" stroke="url(#goldGrad)" stroke-width="3.5"/>
+  
+  <!-- Inner Flange -->
+  <circle cx="50" cy="50" r="25" fill="url(#steelGrad)" stroke="#4E5766" stroke-width="1.2"/>
+  
+  <!-- Hexagon Inbus Socket -->
+  <polygon points="50,33 64.7,41.5 64.7,58.5 50,67 35.3,58.5 35.3,41.5" fill="#0F1113" stroke="#E5A024" stroke-width="1.6"/>
+  
+  <!-- Central Orifice / Straw Guide -->
+  <circle cx="50" cy="50" r="7.5" fill="url(#goldGrad)" stroke="#9A6506" stroke-width="1"/>
+  <circle cx="50" cy="50" r="2.8" fill="#16191D"/>
+</svg>

@@ -26,8 +26,8 @@
   function init() {
     // 1. Scene setup
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x181B1F);
-    scene.fog = new THREE.Fog(0x181B1F, 12, 28);
+    scene.background = new THREE.Color(0xFFFFFF);
+    scene.fog = new THREE.Fog(0xFFFFFF, 14, 32);
 
     // 2. Camera setup
     const aspect = container.clientWidth / container.clientHeight;
@@ -85,12 +85,12 @@
   }
 
   function setupLighting() {
-    // Ambient / Fill light
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x22262C, 0.85);
+    // Ambient / Fill light for clean metallic contrast on white
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc0c8d4, 0.95);
     scene.add(hemiLight);
 
     // Key Light (warm metallic reflection)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
     keyLight.position.set(6, 9, 6);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
@@ -100,14 +100,14 @@
     keyLight.shadow.bias = -0.0005;
     scene.add(keyLight);
 
-    // Rim / Back light (accents the ribbed shank edges)
-    const rimLight = new THREE.DirectionalLight(0xE5A024, 0.7);
-    rimLight.position.set(-6, 4, -6);
+    // Rim / Back light (accents edges)
+    const rimLight = new THREE.DirectionalLight(0xE5A024, 0.5);
+    rimLight.position.set(-6, 5, -6);
     scene.add(rimLight);
 
-    // Soft Front Fill
-    const fillLight = new THREE.DirectionalLight(0xD8E0EA, 0.6);
-    fillLight.position.set(0, -3, 6);
+    // Soft Fill Light
+    const fillLight = new THREE.DirectionalLight(0x8A96A6, 0.55);
+    fillLight.position.set(0, -2, 6);
     scene.add(fillLight);
   }
 
@@ -275,7 +275,7 @@
 
     // K. Ground Shadow Plane
     const shadowGeo = new THREE.PlaneGeometry(10, 10);
-    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.35 });
+    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.12 });
     shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
     shadowMesh.rotation.x = -Math.PI / 2;
     shadowMesh.position.y = -3.2;
@@ -363,7 +363,7 @@
       case 'side':
         toggleCap(false);
         toggleStraw(false);
-        if (viewerLabel) viewerLabel.textContent = 'FIG. 01 — ZIJAANZICHT (SCHACHT & PROFIEL)';
+        if (viewerLabel) viewerLabel.textContent = 'FIG. 01 — ZIJAANZICHT (SCHROEFDRAAD & PROFIEL)';
         tweenCamera(new THREE.Vector3(0, 0, 7.5), new THREE.Vector3(0, -0.6, 0));
         break;
 
