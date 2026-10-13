@@ -563,85 +563,18 @@
           <input type="hidden" name="_captcha" value="false">
           <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
 
-          <label for="orderType">Wat wilt u bestellen?</label>
-          <select id="orderType" name="Type bestelling">
-            <option value="nippel">Oliesmeernippel (inclusief afsluitdop)</option>
-            <option value="caps">Losse afsluitdoppen (nabestelling)</option>
-          </select>
-
-          <!-- Nipple Fields -->
-          <div id="nippelFields">
-            <div class="form-row">
-              <div>
-                <label for="qty">Gewenste verpakking</label>
-                <select id="qty" name="Verpakking">
-                  <option value="10 stuks">10 stuks</option>
-                  <option value="50 stuks" selected>50 stuks</option>
-                  <option value="100 stuks">100 stuks</option>
-                  <option value="500 stuks">500 stuks</option>
-                  <option value="1000 stuks">1000 stuks</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="thread">Draadmaat</label>
-                <select id="thread" name="Maat">
-                  <option value="M5 x 0,8">M5 x 0,8</option>
-                  <option value="M6 x 1" selected>M6 x 1</option>
-                  <option value="M8 x 1">M8 x 1</option>
-                  <option value="M8 x 1,25">M8 x 1,25</option>
-                  <option value="M10 x 1,5">M10 x 1,5</option>
-                  <option value="Anders / onbekend">Anders / onbekend</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Conditional custom thread remarks -->
-            <div id="threadRemarksField" style="display:none;">
-              <label for="threadRemarks">Gewenste speciale maat of specificatie</label>
-              <textarea id="threadRemarks" name="Opmerkingen maat" rows="2" placeholder="Geef hier de gewenste maat, spoed of machine-type door…"></textarea>
-            </div>
-
-            <label for="material">Materiaaluitvoering</label>
-            <select id="material" name="Materiaal">
-              <option value="RVS304" selected>RVS304 (Standaard industrieel roestvast staal)</option>
-              <option value="RVS316">RVS316 (Cleanroom, chemisch & maritiem)</option>
-            </select>
+          <!-- Dynamic Multi-Articles Container -->
+          <div id="articlesList" class="articles-list">
+            <!-- Articles rendered dynamically by js/form.js -->
           </div>
 
-          <!-- Cap Only Fields (With thread selection & remarks) -->
-          <div id="capFields" style="display:none;">
-            <div class="form-row">
-              <div>
-                <label for="capQty">Aantal losse afsluitdoppen</label>
-                <select id="capQty" name="Aantal losse doppen">
-                  <option value="50 stuks" selected>50 stuks</option>
-                  <option value="100 stuks">100 stuks</option>
-                  <option value="150 stuks">150 stuks</option>
-                  <option value="200 stuks">200 stuks</option>
-                  <option value="500 stuks">500 stuks</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="capThread">Voor welke maat oliesmeernippel?</label>
-                <select id="capThread" name="Maat nippel voor doppen">
-                  <option value="M5 x 0,8">M5 x 0,8</option>
-                  <option value="M6 x 1" selected>M6 x 1</option>
-                  <option value="M8 x 1">M8 x 1</option>
-                  <option value="M8 x 1,25">M8 x 1,25</option>
-                  <option value="M10 x 1,5">M10 x 1,5</option>
-                  <option value="Anders / onbekend">Anders / onbekend</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Conditional custom thread remarks for caps -->
-            <div id="capThreadRemarksField" style="display:none;">
-              <label for="capThreadRemarks">Gewenste speciale maat of specificatie van de nippel</label>
-              <textarea id="capThreadRemarks" name="Opmerking maat doppen" rows="2" placeholder="Geef hier de gewenste maat of toepassing van de nippel door…"></textarea>
-            </div>
-          </div>
+          <button type="button" id="btnAddArticle" class="btn-add-article">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Extra artikel toevoegen</span>
+          </button>
 
           <!-- Contact details -->
           <div class="form-row">
