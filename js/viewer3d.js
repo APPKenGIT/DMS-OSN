@@ -1,38 +1,56 @@
 /**
  * Oliesmeernippel — Interactive 3D WebGL Viewer (Three.js)
  * De Meester Industries
+ * Real CAD 3D Model integration with Assembly, Isolation & Exploded View
  */
 
 (function () {
   'use strict';
 
+  // Constants & Scale
+  const MODEL_SCALE = 0.35;        // CAD mm to Three.js units (14mm -> ~4.9 units)
+  const MAX_EXPLODE_MM = 14.0;      // Max separation in CAD mm
+  const NIPPLE_TOP_Y_MM = 8.0;      // CAD Y coord of nipple top face
+  const CAP_BASE_MOUNTED_Y_MM = 1.5;// CAD Y coord of cap bottom face when mounted
+  const CAP_CENTER_MM = 5.0;        // CAD Y center of cap
+
+  // Scene state
   let scene, camera, renderer, controls;
-  let nippleGroup, capGroup, strawGroup, shadowMesh;
+  let modelRootGroup, nippelGroup, capGroup, strawGroup, shadowMesh, guideLine;
   let matRVS304, matRVS316, matCap, matDark, matStraw;
+  
   let currentMaterialType = 'rvs304';
-  let isCapVisible = false;
+  let currentComponentMode = 'assembly'; // 'assembly' | 'nippel' | 'cap'
+  let currentExplodePercent = 0;        // 0 to 100
   let isStrawVisible = false;
   let isAutoRotating = true;
   let lastUserInteraction = Date.now();
-  let animationFrameId;
+  let animationFrameId = null;
+  let explodeAnimFrame = null;
 
+  // DOM elements
   const container = document.getElementById('canvasWrapper');
   const canvas = document.getElementById('threeCanvas');
   const fallbackImg = document.getElementById('fallbackImage');
   const viewerLabel = document.getElementById('viewerLabel');
+  const viewerExplodeBar = document.getElementById('viewerExplodeBar');
+  const explodeSlider = document.getElementById('explodeSlider');
+  const explodePercent = document.getElementById('explodePercent');
+  const btnExplodeToggle = document.getElementById('btnExplodeToggle');
+  const materialToggleWrap = document.getElementById('materialToggleWrap');
 
   if (!container || !canvas) return;
 
   function init() {
-    // 1. Scene setup
+    // 1. Scene setup — pure white technical background
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xFFFFFF);
-    scene.fog = new THREE.Fog(0xFFFFFF, 14, 32);
+    scene.fog = new THREE.Fog(0xFFFFFF, 18, 40);
 
     // 2. Camera setup
     const aspect = container.clientWidth / container.clientHeight;
-    camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 100);
-    camera.position.set(4.8, 3.2, 5.8);
+    camera = new THREE.PerspectiveCamera(38, aspect, 0.1, 100);
+    camera.position.set(5.2, 3.4, 6.2);
 
     // 3. Renderer setup
     renderer = new THREE.WebGLRenderer({
@@ -53,10 +71,10 @@
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.06;
-      controls.minDistance = 3.2;
-      controls.maxDistance = 14;
+      controls.minDistance = 2.8;
+      controls.maxDistance = 16.0;
       controls.maxPolarAngle = Math.PI * 0.88;
-      controls.target.set(0, 0, 0);
+      controls.target.set(0, 1.25 * MODEL_SCALE, 0);
 
       controls.addEventListener('start', () => {
         isAutoRotating = false;
@@ -73,41 +91,62 @@
     // 6. Materials
     setupMaterials();
 
-    // 7. Procedural 3D Geometry
-    build3DModel();
+    // 7. Base groups & ground shadow
+    modelRootGroup = new THREE.Group();
+    scene.add(modelRootGroup);
 
-    // 8. Event listeners
+    nippelGroup = new THREE.Group();
+    capGroup = new THREE.Group();
+    strawGroup = new THREE.Group();
+
+    nippelGroup.scale.setScalar(MODEL_SCALE);
+    capGroup.scale.setScalar(MODEL_SCALE);
+    strawGroup.scale.setScalar(MODEL_SCALE);
+
+    modelRootGroup.add(nippelGroup);
+    modelRootGroup.add(capGroup);
+    modelRootGroup.add(strawGroup);
+
+    setupGroundShadow();
+    setupGuideLine();
+    setupStrawDemo();
+
+    // 8. Load Real CAD OBJ Models (with procedural fallback)
+    loadCADModels();
+
+    // 9. Event listeners & UI bindings
     window.addEventListener('resize', onWindowResize);
     setupUIControls();
 
-    // 9. Animation loop
+    // 10. Start Animation Loop
     animate();
   }
 
   function setupLighting() {
-    // Ambient / Fill light for clean metallic contrast on white
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xc0c8d4, 0.95);
+    // Hemispheric fill light
+    const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xC8D0DC, 1.05);
+    hemiLight.position.set(0, 20, 0);
     scene.add(hemiLight);
 
-    // Key Light (warm metallic reflection)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
-    keyLight.position.set(6, 9, 6);
+    // Key directional light with sharp soft shadow
+    const keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.35);
+    keyLight.position.set(7, 11, 7);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
     keyLight.shadow.mapSize.height = 1024;
     keyLight.shadow.camera.near = 0.5;
-    keyLight.shadow.camera.far = 25;
-    keyLight.shadow.bias = -0.0005;
+    keyLight.shadow.camera.far = 30;
+    keyLight.shadow.bias = -0.0004;
     scene.add(keyLight);
 
-    // Rim / Back light (accents edges)
-    const rimLight = new THREE.DirectionalLight(0xE5A024, 0.5);
-    rimLight.position.set(-6, 5, -6);
+    // Rim highlight light (warm metallic edge)
+    const rimLight = new THREE.DirectionalLight(0xE5A024, 0.45);
+    rimLight.position.set(-7, 6, -6);
     scene.add(rimLight);
 
-    // Soft Fill Light
-    const fillLight = new THREE.DirectionalLight(0x8A96A6, 0.55);
-    fillLight.position.set(0, -2, 6);
+    // Front soft fill light
+    const fillLight = new THREE.DirectionalLight(0x94A3B8, 0.55);
+    fillLight.position.set(0, -3, 8);
     scene.add(fillLight);
   }
 
@@ -115,151 +154,103 @@
     // RVS 304 - Brushed stainless steel
     matRVS304 = new THREE.MeshStandardMaterial({
       color: 0xDCE0E5,
-      metalness: 0.86,
+      metalness: 0.88,
       roughness: 0.28,
       envMapIntensity: 1.0
     });
 
-    // RVS 316 - Marine grade stainless steel (slightly deeper tone, higher lustre)
+    // RVS 316 - Marine grade stainless steel (slightly deeper lustre)
     matRVS316 = new THREE.MeshStandardMaterial({
-      color: 0xC8CFD7,
-      metalness: 0.92,
-      roughness: 0.20,
+      color: 0xC6CCD4,
+      metalness: 0.94,
+      roughness: 0.18,
       envMapIntensity: 1.2
     });
 
-    // Metal-detectable Polyamide Cap (Signal Safety Blue)
+    // Polyamide Metal-Detectable Cap (Signal Safety Blue)
     matCap = new THREE.MeshStandardMaterial({
-      color: 0x1E67B6,
+      color: 0x1A6BC4,
       metalness: 0.08,
-      roughness: 0.42,
-      clearcoat: 0.3,
+      roughness: 0.38,
+      clearcoat: 0.35,
       clearcoatRoughness: 0.25
     });
 
-    // Internal socket cavity (shadowed bore)
+    // Internal dark bore cavity
     matDark = new THREE.MeshStandardMaterial({
       color: 0x1A1C1F,
-      metalness: 0.7,
-      roughness: 0.6
+      metalness: 0.6,
+      roughness: 0.5
     });
 
-    // Aerosol straw (Technical Red)
+    // Straw (Technical Red)
     matStraw = new THREE.MeshStandardMaterial({
       color: 0xDE3628,
       metalness: 0.05,
-      roughness: 0.35
+      roughness: 0.32
     });
   }
 
-  function build3DModel() {
-    nippleGroup = new THREE.Group();
-    scene.add(nippleGroup);
+  function setupGroundShadow() {
+    const shadowGeo = new THREE.PlaneGeometry(12, 12);
+    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.14 });
+    shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+    shadowMesh.rotation.x = -Math.PI / 2;
+    shadowMesh.position.y = -6.0 * MODEL_SCALE - 0.05; // Placed right under bottom of nipple
+    shadowMesh.receiveShadow = true;
+    scene.add(shadowMesh);
+  }
 
-    const activeMat = (currentMaterialType === 'rvs304') ? matRVS304 : matRVS316;
+  function setupGuideLine() {
+    const lineGeo = new THREE.BufferGeometry();
+    const linePositions = new Float32Array([
+      0, NIPPLE_TOP_Y_MM * MODEL_SCALE, 0,
+      0, CAP_BASE_MOUNTED_Y_MM * MODEL_SCALE, 0
+    ]);
+    lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+    const lineMat = new THREE.LineDashedMaterial({
+      color: 0x1A6BC4,
+      dashSize: 0.15,
+      gapSize: 0.10,
+      linewidth: 2,
+      transparent: true,
+      opacity: 0.75
+    });
+    guideLine = new THREE.Line(lineGeo, lineMat);
+    guideLine.computeLineDistances();
+    guideLine.frustumCulled = false;
+    guideLine.visible = false;
+    scene.add(guideLine);
+  }
 
-    // A. Main Hexagonal Head (Zeskant kraag)
-    const hexRadius = 1.75;
-    const hexHeight = 1.35;
-    const hexGeo = new THREE.CylinderGeometry(hexRadius, hexRadius, hexHeight, 6);
-    const hexMesh = new THREE.Mesh(hexGeo, activeMat);
-    hexMesh.position.y = 0.9;
-    hexMesh.castShadow = true;
-    hexMesh.receiveShadow = true;
-    nippleGroup.add(hexMesh);
-
-    // B. Beveled Transition Collar (Conische afdichtingsrand)
-    const collarGeo = new THREE.CylinderGeometry(1.72, 1.38, 0.45, 32);
-    const collarMesh = new THREE.Mesh(collarGeo, activeMat);
-    collarMesh.position.y = 0.05;
-    collarMesh.castShadow = true;
-    nippleGroup.add(collarMesh);
-
-    // C. Internal Hex Socket Cavity (Inbus uitsparing)
-    const inbusGeo = new THREE.CylinderGeometry(0.85, 0.85, 0.7, 6);
-    const inbusMesh = new THREE.Mesh(inbusGeo, matDark);
-    inbusMesh.position.y = 1.35;
-    nippleGroup.add(inbusMesh);
-
-    // D. Central Injection Bore for Straw (Rietje-insteekopening)
-    const boreGeo = new THREE.CylinderGeometry(0.35, 0.35, 3.8, 24);
-    const boreMesh = new THREE.Mesh(boreGeo, matDark);
-    boreMesh.position.y = 0.3;
-    nippleGroup.add(boreMesh);
-
-    // E. Entrance Chamfer (Conische insteekhoek)
-    const coneGeo = new THREE.ConeGeometry(0.65, 0.35, 24, 1, true);
-    const coneMesh = new THREE.Mesh(coneGeo, matDark);
-    coneMesh.position.y = 1.55;
-    coneMesh.rotation.x = Math.PI;
-    nippleGroup.add(coneMesh);
-
-    // F. Ribbed Press Shank (Geribbelde persschacht)
-    const shankLength = 2.6;
-    const shankRadius = 1.26;
-    const shankGeo = new THREE.CylinderGeometry(shankRadius, shankRadius * 0.98, shankLength, 32);
-    const shankMesh = new THREE.Mesh(shankGeo, activeMat);
-    shankMesh.position.y = -1.4;
-    shankMesh.castShadow = true;
-    shankMesh.receiveShadow = true;
-    nippleGroup.add(shankMesh);
-
-    // G. Concentric Retention Ribs (Anti-trilling ribbels)
-    const ribCount = 4;
-    const ribSpacing = 0.52;
-    for (let i = 0; i < ribCount; i++) {
-      const ribGeo = new THREE.TorusGeometry(shankRadius + 0.02, 0.12, 12, 32);
-      const ribMesh = new THREE.Mesh(ribGeo, activeMat);
-      ribMesh.rotation.x = Math.PI / 2;
-      ribMesh.position.y = -0.65 - (i * ribSpacing);
-      ribMesh.castShadow = true;
-      nippleGroup.add(ribMesh);
+  function updateGuideLine(explodeMm) {
+    if (!guideLine) return;
+    if (currentComponentMode !== 'assembly' || explodeMm < 0.3) {
+      guideLine.visible = false;
+      return;
     }
+    guideLine.visible = true;
+    const positions = guideLine.geometry.attributes.position.array;
+    positions[0] = 0;
+    positions[1] = NIPPLE_TOP_Y_MM * MODEL_SCALE;
+    positions[2] = 0;
+    positions[3] = 0;
+    positions[4] = (CAP_BASE_MOUNTED_Y_MM + explodeMm) * MODEL_SCALE;
+    positions[5] = 0;
+    guideLine.geometry.attributes.position.needsUpdate = true;
+    guideLine.computeLineDistances();
+  }
 
-    // H. Shank Tip Chamfer (Insteekzoekrand onderzijde)
-    const tipGeo = new THREE.CylinderGeometry(shankRadius * 0.98, 0.9, 0.3, 32);
-    const tipMesh = new THREE.Mesh(tipGeo, activeMat);
-    tipMesh.position.y = -2.85;
-    tipMesh.castShadow = true;
-    nippleGroup.add(tipMesh);
-
-    // I. Safety Cap (Polyamide Metaaldetecteerbare Afsluitdop)
-    capGroup = new THREE.Group();
-    
-    // Cap main sleeve
-    const capBodyGeo = new THREE.CylinderGeometry(1.88, 1.88, 1.6, 32);
-    const capBody = new THREE.Mesh(capBodyGeo, matCap);
-    capBody.position.y = 0.95;
-    capBody.castShadow = true;
-    capGroup.add(capBody);
-
-    // Cap domed top
-    const capDomeGeo = new THREE.SphereGeometry(1.88, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.35);
-    const capDome = new THREE.Mesh(capDomeGeo, matCap);
-    capDome.position.y = 1.65;
-    capDome.castShadow = true;
-    capGroup.add(capDome);
-
-    // Cap pull tab / grip ring
-    const tabGeo = new THREE.BoxGeometry(0.35, 0.9, 0.8);
-    const tabMesh = new THREE.Mesh(tabGeo, matCap);
-    tabMesh.position.set(1.9, 1.2, 0);
-    tabMesh.castShadow = true;
-    capGroup.add(tabMesh);
-
-    capGroup.visible = isCapVisible;
-    nippleGroup.add(capGroup);
-
-    // J. Straw Demo (Aerosol rietje passing)
-    strawGroup = new THREE.Group();
-    const strawTubeGeo = new THREE.CylinderGeometry(0.24, 0.24, 4.8, 24);
+  function setupStrawDemo() {
+    // Straw entering top bore
+    const strawTubeGeo = new THREE.CylinderGeometry(0.8, 0.8, 14, 24);
     const strawTube = new THREE.Mesh(strawTubeGeo, matStraw);
-    strawTube.position.y = 2.4;
+    strawTube.position.y = 12.0;
     strawTube.castShadow = true;
     strawGroup.add(strawTube);
 
     // Aerosol spray cone indicator
-    const sprayGeo = new THREE.ConeGeometry(0.8, 1.4, 16, 1, true);
+    const sprayGeo = new THREE.ConeGeometry(2.2, 4.0, 16, 1, true);
     const matSpray = new THREE.MeshBasicMaterial({
       color: 0xFFFAEE,
       transparent: true,
@@ -267,66 +258,263 @@
       side: THREE.DoubleSide
     });
     const sprayMesh = new THREE.Mesh(sprayGeo, matSpray);
-    sprayMesh.position.y = -0.8;
+    sprayMesh.position.y = 4.0;
     strawGroup.add(sprayMesh);
 
-    strawGroup.visible = isStrawVisible;
-    nippleGroup.add(strawGroup);
-
-    // K. Ground Shadow Plane
-    const shadowGeo = new THREE.PlaneGeometry(10, 10);
-    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.12 });
-    shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-    shadowMesh.rotation.x = -Math.PI / 2;
-    shadowMesh.position.y = -3.2;
-    shadowMesh.receiveShadow = true;
-    scene.add(shadowMesh);
+    strawGroup.visible = false;
   }
 
+  // Load CAD OBJ Models with graceful fallback
+  function loadCADModels() {
+    let nippelLoaded = false;
+    let capLoaded = false;
+
+    if (typeof THREE.OBJLoader !== 'undefined') {
+      const loader = new THREE.OBJLoader();
+
+      // 1. Nipple CAD Model
+      loader.load(
+        'assets/models/osn_nippel.obj',
+        (obj) => {
+          const activeMat = (currentMaterialType === 'rvs304') ? matRVS304 : matRVS316;
+          obj.traverse((child) => {
+            if (child.isMesh) {
+              child.geometry.computeVertexNormals();
+              child.material = activeMat;
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          // Clear any fallback meshes in nippelGroup
+          while (nippelGroup.children.length > 0) {
+            nippelGroup.remove(nippelGroup.children[0]);
+          }
+          nippelGroup.add(obj);
+          nippelLoaded = true;
+        },
+        undefined,
+        (err) => {
+          console.warn('CAD Nipple OBJ could not be loaded, using procedural fallback:', err);
+          if (!nippelLoaded) buildProceduralNipple();
+        }
+      );
+
+      // 2. Cap CAD Model
+      loader.load(
+        'assets/models/osn_cap_mounted.obj',
+        (obj) => {
+          obj.traverse((child) => {
+            if (child.isMesh) {
+              child.geometry.computeVertexNormals();
+              child.material = matCap;
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          // Clear any fallback meshes in capGroup
+          while (capGroup.children.length > 0) {
+            capGroup.remove(capGroup.children[0]);
+          }
+          capGroup.add(obj);
+          capLoaded = true;
+          updateComponentMode(currentComponentMode);
+        },
+        undefined,
+        (err) => {
+          console.warn('CAD Cap OBJ could not be loaded, using procedural fallback:', err);
+          if (!capLoaded) buildProceduralCap();
+        }
+      );
+    } else {
+      console.warn('OBJLoader not available, building procedural models.');
+      buildProceduralNipple();
+      buildProceduralCap();
+    }
+  }
+
+  // Procedural geometry fallbacks
+  function buildProceduralNipple() {
+    const activeMat = (currentMaterialType === 'rvs304') ? matRVS304 : matRVS316;
+    const bodyGeo = new THREE.CylinderGeometry(3.0, 3.0, 4.0, 6);
+    const body = new THREE.Mesh(bodyGeo, activeMat);
+    body.position.y = 5.0;
+    body.castShadow = true;
+    body.receiveShadow = true;
+    nippelGroup.add(body);
+
+    const threadGeo = new THREE.CylinderGeometry(2.5, 2.5, 8.0, 32);
+    const thread = new THREE.Mesh(threadGeo, activeMat);
+    thread.position.y = -1.0;
+    thread.castShadow = true;
+    thread.receiveShadow = true;
+    nippelGroup.add(thread);
+
+    const boreGeo = new THREE.CylinderGeometry(1.2, 1.2, 10.0, 24);
+    const bore = new THREE.Mesh(boreGeo, matDark);
+    bore.position.y = 3.5;
+    nippelGroup.add(bore);
+  }
+
+  function buildProceduralCap() {
+    const capBodyGeo = new THREE.CylinderGeometry(5.8, 5.8, 5.0, 32);
+    const capBody = new THREE.Mesh(capBodyGeo, matCap);
+    capBody.position.y = 4.5;
+    capBody.castShadow = true;
+    capGroup.add(capBody);
+
+    const capDomeGeo = new THREE.SphereGeometry(5.8, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.35);
+    const capDome = new THREE.Mesh(capDomeGeo, matCap);
+    capDome.position.y = 7.0;
+    capDome.castShadow = true;
+    capGroup.add(capDome);
+  }
+
+  // Exploded View Slider & Animation
+  function setExplodePercent(percent, animate = false) {
+    currentExplodePercent = Math.max(0, Math.min(100, percent));
+    const explodeMm = (currentExplodePercent / 100) * MAX_EXPLODE_MM;
+
+    if (explodeSlider) explodeSlider.value = currentExplodePercent;
+    if (explodePercent) explodePercent.textContent = `${Math.round(currentExplodePercent)}%`;
+
+    if (btnExplodeToggle) {
+      btnExplodeToggle.textContent = currentExplodePercent > 50 ? 'Samenvoegen' : 'Explodeer';
+    }
+
+    if (currentComponentMode === 'assembly') {
+      capGroup.position.set(0, explodeMm * MODEL_SCALE, 0);
+      updateGuideLine(explodeMm);
+
+      // Adjust controls target slightly upward during explosion to keep assembly centered
+      if (controls && !animate) {
+        controls.target.y = (1.25 + (explodeMm * 0.45)) * MODEL_SCALE;
+      }
+    }
+  }
+
+  function animateExplodeTo(targetPercent, duration = 500) {
+    if (explodeAnimFrame) cancelAnimationFrame(explodeAnimFrame);
+
+    const startPercent = currentExplodePercent;
+    const diff = targetPercent - startPercent;
+    const startTime = performance.now();
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutCubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const val = startPercent + diff * ease;
+
+      setExplodePercent(val, true);
+
+      if (progress < 1) {
+        explodeAnimFrame = requestAnimationFrame(step);
+      } else {
+        explodeAnimFrame = null;
+      }
+    }
+    explodeAnimFrame = requestAnimationFrame(step);
+  }
+
+  function toggleExplode() {
+    if (currentExplodePercent > 50) {
+      animateExplodeTo(0);
+    } else {
+      animateExplodeTo(100);
+    }
+  }
+
+  // Component Mode Switcher: Assembly / Nipple / Cap
+  function updateComponentMode(mode) {
+    currentComponentMode = mode;
+
+    // Update Mode Tabs UI
+    document.querySelectorAll('[data-component-mode]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-component-mode') === mode);
+    });
+
+    if (mode === 'assembly') {
+      // 1. Assembly Mode: both visible, explode bar active
+      nippelGroup.visible = true;
+      capGroup.visible = true;
+      if (viewerExplodeBar) viewerExplodeBar.style.display = 'flex';
+      if (materialToggleWrap) materialToggleWrap.style.display = 'flex';
+
+      // Restore cap position based on current explode slider
+      const explodeMm = (currentExplodePercent / 100) * MAX_EXPLODE_MM;
+      capGroup.position.set(0, explodeMm * MODEL_SCALE, 0);
+      updateGuideLine(explodeMm);
+
+      if (shadowMesh) shadowMesh.position.y = -6.0 * MODEL_SCALE - 0.05;
+
+      if (viewerLabel) {
+        viewerLabel.textContent = 'FIG. 01 — SAMENSTELLING (ASSEMBLY & EXPLODED VIEW)';
+      }
+      tweenCamera(
+        new THREE.Vector3(5.2, 3.4, 6.2),
+        new THREE.Vector3(0, (1.25 + (explodeMm * 0.45)) * MODEL_SCALE, 0)
+      );
+
+    } else if (mode === 'nippel') {
+      // 2. Nipple Only: rotate freely around nipple
+      nippelGroup.visible = true;
+      capGroup.visible = false;
+      if (viewerExplodeBar) viewerExplodeBar.style.display = 'none';
+      if (materialToggleWrap) materialToggleWrap.style.display = 'flex';
+      if (guideLine) guideLine.visible = false;
+
+      if (shadowMesh) shadowMesh.position.y = -6.0 * MODEL_SCALE - 0.05;
+
+      if (viewerLabel) {
+        viewerLabel.textContent = 'FIG. 02 — OLIESMEERNIPPEL (RVS · SCHROEFDRAAD & INBUS)';
+      }
+      tweenCamera(
+        new THREE.Vector3(4.6, 2.6, 5.6),
+        new THREE.Vector3(0, 1.0 * MODEL_SCALE, 0)
+      );
+
+    } else if (mode === 'cap') {
+      // 3. Cap Only: rotate freely around cap at origin (0, 0, 0)
+      nippelGroup.visible = false;
+      capGroup.visible = true;
+      if (viewerExplodeBar) viewerExplodeBar.style.display = 'none';
+      if (materialToggleWrap) materialToggleWrap.style.display = 'none';
+      if (guideLine) guideLine.visible = false;
+
+      // Center cap around origin (Y CAD center was ~5.0mm)
+      capGroup.position.set(0, -CAP_CENTER_MM * MODEL_SCALE, 0);
+
+      if (shadowMesh) shadowMesh.position.y = (-CAP_CENTER_MM + 1.5) * MODEL_SCALE - 0.05;
+
+      if (viewerLabel) {
+        viewerLabel.textContent = 'FIG. 03 — AFSLUITDOP (POLYAMIDE METAALDETECTEERBAAR)';
+      }
+      tweenCamera(
+        new THREE.Vector3(3.8, 2.4, 4.6),
+        new THREE.Vector3(0, 0, 0)
+      );
+    }
+  }
+
+  // Material Toggle
   function setMaterial(type) {
     currentMaterialType = type;
     const newMat = (type === 'rvs304') ? matRVS304 : matRVS316;
 
-    nippleGroup.traverse(child => {
-      if (child.isMesh && child.material !== matDark && child.material !== matCap && child.material !== matStraw) {
+    nippelGroup.traverse(child => {
+      if (child.isMesh && child.material !== matDark) {
         child.material = newMat;
       }
     });
 
-    // Update active button state
     document.querySelectorAll('[data-material]').forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-material') === type);
     });
   }
 
-  function toggleCap(visible) {
-    isCapVisible = (visible !== undefined) ? visible : !isCapVisible;
-    if (capGroup) {
-      capGroup.visible = isCapVisible;
-    }
-    const capBtn = document.getElementById('btnToggleCap');
-    if (capBtn) {
-      capBtn.classList.toggle('active', isCapVisible);
-    }
-    if (viewerLabel) {
-      viewerLabel.textContent = isCapVisible 
-        ? 'FIG. 03 — MET METAALDETECTEERBARE DOP' 
-        : 'FIG. 01 — 3D ZIJAANZICHT';
-    }
-  }
-
-  function toggleStraw(visible) {
-    isStrawVisible = (visible !== undefined) ? visible : !isStrawVisible;
-    if (strawGroup) {
-      strawGroup.visible = isStrawVisible;
-    }
-    const strawBtn = document.getElementById('btnToggleStraw');
-    if (strawBtn) {
-      strawBtn.classList.toggle('active', isStrawVisible);
-    }
-  }
-
-  function tweenCamera(targetPos, targetLookAt, duration = 800) {
+  // Camera presets
+  function tweenCamera(targetPos, targetLookAt, duration = 750) {
     isAutoRotating = false;
     lastUserInteraction = Date.now();
 
@@ -334,8 +522,7 @@
     const startTarget = controls.target.clone();
     const startTime = performance.now();
 
-    function update() {
-      const now = performance.now();
+    function update(now) {
       const progress = Math.min((now - startTime) / duration, 1);
       const ease = 0.5 - 0.5 * Math.cos(progress * Math.PI);
 
@@ -351,7 +538,6 @@
   }
 
   function setView(viewName) {
-    // Hide 2D fallback if active
     if (fallbackImg) fallbackImg.style.display = 'none';
     if (canvas) canvas.style.display = 'block';
 
@@ -359,40 +545,40 @@
     const btn = document.querySelector(`[data-view="${viewName}"]`);
     if (btn) btn.classList.add('active');
 
+    // Turn off straw if switching away
+    if (viewName !== 'straw' && isStrawVisible) {
+      isStrawVisible = false;
+      strawGroup.visible = false;
+    }
+
+    const currentTargetY = controls.target.y;
+
     switch (viewName) {
       case 'side':
-        toggleCap(false);
-        toggleStraw(false);
-        if (viewerLabel) viewerLabel.textContent = 'FIG. 01 — ZIJAANZICHT (SCHROEFDRAAD & PROFIEL)';
-        tweenCamera(new THREE.Vector3(0, 0, 7.5), new THREE.Vector3(0, -0.6, 0));
+        if (viewerLabel) viewerLabel.textContent = 'ZIJAANZICHT (SCHROEFDRAAD & PROFIEL)';
+        tweenCamera(new THREE.Vector3(0, currentTargetY, 7.8), new THREE.Vector3(0, currentTargetY, 0));
         break;
 
       case 'top':
-        toggleCap(false);
-        toggleStraw(false);
-        if (viewerLabel) viewerLabel.textContent = 'FIG. 02 — BOVENAANZICHT (INBUS & RIETJE-OPENING)';
-        tweenCamera(new THREE.Vector3(0, 7.2, 0.05), new THREE.Vector3(0, 0.9, 0));
-        break;
-
-      case 'cap':
-        toggleCap(true);
-        toggleStraw(false);
-        if (viewerLabel) viewerLabel.textContent = 'FIG. 03 — MET AFSLUITDOP (POLYAMIDE DETECTEERBAAR)';
-        tweenCamera(new THREE.Vector3(4.2, 3.2, 5.2), new THREE.Vector3(0, 0, 0));
+        if (viewerLabel) viewerLabel.textContent = 'BOVENAANZICHT (INBUS & RIETJE-BORING)';
+        tweenCamera(new THREE.Vector3(0, currentTargetY + 7.5, 0.05), new THREE.Vector3(0, currentTargetY, 0));
         break;
 
       case 'straw':
-        toggleCap(false);
-        toggleStraw(true);
-        if (viewerLabel) viewerLabel.textContent = 'FIG. 04 — WERKING: RIETJE-DOSERING';
-        tweenCamera(new THREE.Vector3(4.5, 2.5, 5.0), new THREE.Vector3(0, 0.8, 0));
+        isStrawVisible = true;
+        strawGroup.visible = true;
+        // Ensure nipple is visible for straw demo
+        if (currentComponentMode === 'cap') {
+          updateComponentMode('assembly');
+        }
+        if (viewerLabel) viewerLabel.textContent = 'DEMO: RIETJE-INVOER & AFSLUITING';
+        tweenCamera(new THREE.Vector3(4.5, 3.2, 5.2), new THREE.Vector3(0, 2.5 * MODEL_SCALE, 0));
         break;
 
       case 'iso':
       default:
-        toggleStraw(false);
-        if (viewerLabel) viewerLabel.textContent = 'FIG. 01 — 3D ISOMETRISCH (VRIJ ROTEREN)';
-        tweenCamera(new THREE.Vector3(4.8, 3.2, 5.8), new THREE.Vector3(0, 0, 0));
+        if (viewerLabel) viewerLabel.textContent = '3D ISOMETRISCH (VRIJ ROTEREN)';
+        tweenCamera(new THREE.Vector3(5.2, 3.4, 6.2), new THREE.Vector3(0, currentTargetY, 0));
         break;
     }
   }
@@ -417,8 +603,34 @@
     }
   }
 
+  // Setup UI event listeners
   function setupUIControls() {
-    // Camera presets
+    // Mode tabs: Assembly / Nipple / Cap
+    document.querySelectorAll('[data-component-mode]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        updateComponentMode(tab.getAttribute('data-component-mode'));
+      });
+    });
+
+    // Explode slider
+    if (explodeSlider) {
+      explodeSlider.addEventListener('input', (e) => {
+        isAutoRotating = false;
+        lastUserInteraction = Date.now();
+        setExplodePercent(parseFloat(e.target.value));
+      });
+    }
+
+    // Explode toggle button
+    if (btnExplodeToggle) {
+      btnExplodeToggle.addEventListener('click', () => {
+        isAutoRotating = false;
+        lastUserInteraction = Date.now();
+        toggleExplode();
+      });
+    }
+
+    // Camera preset buttons
     document.querySelectorAll('[data-view]').forEach(btn => {
       btn.addEventListener('click', () => {
         setView(btn.getAttribute('data-view'));
@@ -432,22 +644,14 @@
       });
     });
 
-    // Cap toggle button
-    const btnToggleCap = document.getElementById('btnToggleCap');
-    if (btnToggleCap) {
-      btnToggleCap.addEventListener('click', () => toggleCap());
-    }
-
-    // Straw toggle button
-    const btnToggleStraw = document.getElementById('btnToggleStraw');
-    if (btnToggleStraw) {
-      btnToggleStraw.addEventListener('click', () => toggleStraw());
-    }
-
     // Reset View button
     const btnResetView = document.getElementById('btnResetView');
     if (btnResetView) {
-      btnResetView.addEventListener('click', () => setView('iso'));
+      btnResetView.addEventListener('click', () => {
+        setExplodePercent(0);
+        updateComponentMode('assembly');
+        setView('iso');
+      });
     }
 
     // Fullscreen viewer button
@@ -467,7 +671,6 @@
     if (btnToggle2D) {
       btnToggle2D.addEventListener('click', () => {
         if (canvas.style.display === 'none') {
-          // Switch back to 3D
           setView('iso');
           btnToggle2D.textContent = 'Bekijk 2D Renders';
         } else {
@@ -490,13 +693,13 @@
   function animate() {
     animationFrameId = requestAnimationFrame(animate);
 
-    // Auto rotate gently when user has not interacted for 4 seconds
+    // Auto-rotate model slowly when idle for > 4 seconds
     if (controls) {
       if (Date.now() - lastUserInteraction > 4000) {
         isAutoRotating = true;
       }
       if (isAutoRotating) {
-        nippleGroup.rotation.y += 0.007;
+        modelRootGroup.rotation.y += 0.007;
       }
       controls.update();
     }
@@ -511,12 +714,13 @@
     init();
   }
 
-  // Export functions to window for quick testing
+  // Export functions to window
   window.NippleViewer = {
+    updateComponentMode,
+    setExplodePercent,
+    toggleExplode,
     setView,
     setMaterial,
-    toggleCap,
-    toggleStraw,
     show2DFallback
   };
 })();

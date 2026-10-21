@@ -547,6 +547,128 @@ nav a:hover::after, nav a.active::after {
   gap: 12px;
 }
 
+/* Component Selector Tabs */
+.viewer-mode-tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--paper-dim);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--steel-700);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mode-tab:hover {
+  color: var(--steel-950);
+}
+
+.mode-tab.active {
+  background: var(--steel-900);
+  color: var(--paper-light);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Explode Slider Bar */
+.viewer-explode-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.explode-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--steel-800);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.explode-slider-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.explode-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line);
+  outline: none;
+  cursor: pointer;
+}
+
+.explode-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--signal);
+  border: 2px solid var(--steel-900);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.explode-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.btn-explode-toggle {
+  background: var(--paper-dim);
+  border: 1px solid var(--line);
+  color: var(--steel-800);
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-explode-toggle:hover {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--steel-950);
+}
+
+.btn-explode-toggle.active {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--steel-950);
+}
+
 .viewer-buttons-row {
   display: flex;
   gap: 8px;

@@ -21,9 +21,10 @@
   <!-- Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Three.js & OrbitControls via CDN for Interactive 3D Model -->
+  <!-- Three.js, OrbitControls & OBJLoader via CDN for Interactive 3D Model -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
 </head>
 <body>
 
@@ -156,24 +157,57 @@
 
         <!-- Viewer Controls -->
         <div class="viewer-controls">
+          <!-- Component Modes: Assembly, Nipple only, Cap only -->
+          <div class="viewer-mode-tabs" role="tablist" aria-label="Component weergave">
+            <button type="button" class="mode-tab active" data-component-mode="assembly" id="tabAssembly">
+              Samenstelling (Assembly)
+            </button>
+            <button type="button" class="mode-tab" data-component-mode="nippel" id="tabNippel">
+              Oliesmeernippel
+            </button>
+            <button type="button" class="mode-tab" data-component-mode="cap" id="tabCap">
+              Afsluitdop
+            </button>
+          </div>
+
+          <!-- Explode Bar (Active in Assembly mode) -->
+          <div class="viewer-explode-bar" id="viewerExplodeBar">
+            <span class="explode-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="2" x2="12" y2="8"></line>
+                <line x1="12" y1="16" x2="12" y2="22"></line>
+                <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+                <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+              </svg>
+              Exploded View
+            </span>
+            <div class="explode-slider-wrap">
+              <input type="range" class="explode-slider" id="explodeSlider" min="0" max="100" value="0" title="Explodeer percentage">
+              <span id="explodePercent" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--steel-700); min-width:32px;">0%</span>
+            </div>
+            <button type="button" class="btn-explode-toggle" id="btnExplodeToggle">
+              Explodeer
+            </button>
+          </div>
+
+          <!-- Camera views -->
           <div class="viewer-buttons-row">
-            <button class="viewer-btn active" data-view="iso">3D Vrij</button>
-            <button class="viewer-btn" data-view="side">Zijaanzicht</button>
-            <button class="viewer-btn" data-view="top">Bovenaanzicht</button>
-            <button class="viewer-btn" data-view="cap" id="btnToggleCap">Met Afsluitdop</button>
-            <button class="viewer-btn" data-view="straw" id="btnToggleStraw">Rietje-Insteek</button>
+            <button type="button" class="viewer-btn active" data-view="iso">3D Vrij</button>
+            <button type="button" class="viewer-btn" data-view="side">Zijaanzicht</button>
+            <button type="button" class="viewer-btn" data-view="top">Bovenaanzicht</button>
+            <button type="button" class="viewer-btn" data-view="straw" id="btnToggleStraw">Rietje-Insteek</button>
           </div>
 
           <div class="viewer-toggle-row">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-weight:600; color:var(--steel-600); font-size:0.76rem;">MATERIAAL:</span>
+            <div id="materialToggleWrap" style="display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:600; color:var(--steel-600); font-size:0.76rem;">MATERIAAL NIPPEL:</span>
               <div class="toggle-group">
-                <button class="toggle-opt active" data-material="rvs304">RVS304</button>
-                <button class="toggle-opt" data-material="rvs316">RVS316</button>
+                <button type="button" class="toggle-opt active" data-material="rvs304">RVS304</button>
+                <button type="button" class="toggle-opt" data-material="rvs316">RVS316</button>
               </div>
             </div>
 
-            <button id="btnToggle2D" style="background:none; border:none; color:var(--steel-600); font-size:0.75rem; text-decoration:underline; cursor:pointer;">
+            <button type="button" id="btnToggle2D" style="background:none; border:none; color:var(--steel-600); font-size:0.75rem; text-decoration:underline; cursor:pointer;">
               Bekijk 2D Renders
             </button>
           </div>
