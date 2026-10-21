@@ -8,11 +8,11 @@
   'use strict';
 
   // Constants & Scale
-  const MODEL_SCALE = 0.35;        // CAD mm to Three.js units (14mm -> ~4.9 units)
-  const MAX_EXPLODE_MM = 14.0;      // Max separation in CAD mm
-  const NIPPLE_TOP_Y_MM = 8.0;      // CAD Y coord of nipple top face
-  const CAP_BASE_MOUNTED_Y_MM = 1.5;// CAD Y coord of cap bottom face when mounted
-  const CAP_CENTER_MM = 5.0;        // CAD Y center of cap
+  const MODEL_SCALE = 0.35;          // CAD mm to Three.js units (14mm -> ~4.9 units)
+  const MAX_EXPLODE_MM = 14.0;        // Max separation in CAD mm
+  const NIPPLE_TOP_Y_MM = 8.0;        // CAD Y coord of nipple top face
+  const CAP_BASE_MOUNTED_Y_MM = 2.0;  // CAD Y coord of cap open bottom rim when mounted
+  const CAP_CENTER_MM = 5.5;          // CAD Y center of cap (range: 2.0 to 9.0 mm)
 
   // Scene state
   let scene, camera, renderer, controls;
@@ -21,7 +21,7 @@
   
   let currentMaterialType = 'rvs304';
   let currentComponentMode = 'assembly'; // 'assembly' | 'nippel' | 'cap'
-  let currentExplodePercent = 0;        // 0 to 100
+  let currentExplodePercent = 0;          // 0 to 100
   let isStrawVisible = false;
   let isAutoRotating = true;
   let lastUserInteraction = Date.now();
@@ -31,7 +31,6 @@
   // DOM elements
   const container = document.getElementById('canvasWrapper');
   const canvas = document.getElementById('threeCanvas');
-  const fallbackImg = document.getElementById('fallbackImage');
   const viewerLabel = document.getElementById('viewerLabel');
   const viewerExplodeBar = document.getElementById('viewerExplodeBar');
   const explodeSlider = document.getElementById('explodeSlider');
@@ -45,7 +44,7 @@
     // 1. Scene setup — pure white technical background
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xFFFFFF);
-    scene.fog = new THREE.Fog(0xFFFFFF, 18, 40);
+    scene.fog = new THREE.Fog(0xFFFFFF, 18, 42);
 
     // 2. Camera setup
     const aspect = container.clientWidth / container.clientHeight;
@@ -74,7 +73,7 @@
       controls.minDistance = 2.8;
       controls.maxDistance = 16.0;
       controls.maxPolarAngle = Math.PI * 0.88;
-      controls.target.set(0, 1.25 * MODEL_SCALE, 0);
+      controls.target.set(0, 1.5 * MODEL_SCALE, 0);
 
       controls.addEventListener('start', () => {
         isAutoRotating = false;
@@ -225,7 +224,7 @@
 
   function updateGuideLine(explodeMm) {
     if (!guideLine) return;
-    if (currentComponentMode !== 'assembly' || explodeMm < 0.3) {
+    if (currentComponentMode !== 'assembly' || isStrawVisible || explodeMm < 0.3) {
       guideLine.visible = false;
       return;
     }
@@ -242,23 +241,27 @@
   }
 
   function setupStrawDemo() {
-    // Straw entering top bore
-    const strawTubeGeo = new THREE.CylinderGeometry(0.8, 0.8, 14, 24);
+    // Straw entering deep into top bore:
+    // Nipple top is Y=8.0, bore bottom is Y=-6.0.
+    // Straw reaches down to Y=0.5 (penetrates 7.5mm into the nipple),
+    // and extends up to Y=21.0mm (total length 20.5mm, center Y=10.75mm).
+    const strawTubeGeo = new THREE.CylinderGeometry(0.75, 0.75, 20.5, 24);
     const strawTube = new THREE.Mesh(strawTubeGeo, matStraw);
-    strawTube.position.y = 12.0;
+    strawTube.position.y = 10.75;
     strawTube.castShadow = true;
     strawGroup.add(strawTube);
 
-    // Aerosol spray cone indicator
-    const sprayGeo = new THREE.ConeGeometry(2.2, 4.0, 16, 1, true);
+    // Aerosol spray cone indicator emerging from bottom thread tip (Y = -6.0 down to Y = -11.0)
+    const sprayGeo = new THREE.ConeGeometry(2.0, 5.0, 16, 1, true);
     const matSpray = new THREE.MeshBasicMaterial({
-      color: 0xFFFAEE,
+      color: 0xFFFBF0,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.38,
       side: THREE.DoubleSide
     });
     const sprayMesh = new THREE.Mesh(sprayGeo, matSpray);
-    sprayMesh.position.y = 4.0;
+    sprayMesh.rotation.x = Math.PI; // Expands downward as spray leaves nozzle
+    sprayMesh.position.y = -8.5;
     strawGroup.add(sprayMesh);
 
     strawGroup.visible = false;
@@ -285,7 +288,6 @@
               child.receiveShadow = true;
             }
           });
-          // Clear any fallback meshes in nippelGroup
           while (nippelGroup.children.length > 0) {
             nippelGroup.remove(nippelGroup.children[0]);
           }
@@ -299,7 +301,7 @@
         }
       );
 
-      // 2. Cap CAD Model
+      // 2. Cap CAD Model (Correct orientation: open bottom, closed top)
       loader.load(
         'assets/models/osn_cap_mounted.obj',
         (obj) => {
@@ -311,7 +313,6 @@
               child.receiveShadow = true;
             }
           });
-          // Clear any fallback meshes in capGroup
           while (capGroup.children.length > 0) {
             capGroup.remove(capGroup.children[0]);
           }
@@ -381,13 +382,12 @@
       btnExplodeToggle.textContent = currentExplodePercent > 50 ? 'Samenvoegen' : 'Explodeer';
     }
 
-    if (currentComponentMode === 'assembly') {
+    if (currentComponentMode === 'assembly' && !isStrawVisible) {
       capGroup.position.set(0, explodeMm * MODEL_SCALE, 0);
       updateGuideLine(explodeMm);
 
-      // Adjust controls target slightly upward during explosion to keep assembly centered
       if (controls && !animate) {
-        controls.target.y = (1.25 + (explodeMm * 0.45)) * MODEL_SCALE;
+        controls.target.y = (1.5 + (explodeMm * 0.45)) * MODEL_SCALE;
       }
     }
   }
@@ -402,8 +402,7 @@
     function step(now) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // easeOutCubic
-      const ease = 1 - Math.pow(1 - progress, 3);
+      const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
       const val = startPercent + diff * ease;
 
       setExplodePercent(val, true);
@@ -429,19 +428,29 @@
   function updateComponentMode(mode) {
     currentComponentMode = mode;
 
+    // Reset straw demo if switching component modes
+    if (isStrawVisible) {
+      isStrawVisible = false;
+      strawGroup.visible = false;
+      // Reset active state from straw button to iso
+      const strawBtn = document.querySelector('[data-view="straw"]');
+      if (strawBtn) strawBtn.classList.remove('active');
+      const isoBtn = document.querySelector('[data-view="iso"]');
+      if (isoBtn) isoBtn.classList.add('active');
+    }
+
     // Update Mode Tabs UI
     document.querySelectorAll('[data-component-mode]').forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-component-mode') === mode);
     });
 
     if (mode === 'assembly') {
-      // 1. Assembly Mode: both visible, explode bar active
+      // 1. Assembly Mode: both visible, mounted, explode bar active
       nippelGroup.visible = true;
       capGroup.visible = true;
       if (viewerExplodeBar) viewerExplodeBar.style.display = 'flex';
       if (materialToggleWrap) materialToggleWrap.style.display = 'flex';
 
-      // Restore cap position based on current explode slider
       const explodeMm = (currentExplodePercent / 100) * MAX_EXPLODE_MM;
       capGroup.position.set(0, explodeMm * MODEL_SCALE, 0);
       updateGuideLine(explodeMm);
@@ -453,7 +462,7 @@
       }
       tweenCamera(
         new THREE.Vector3(5.2, 3.4, 6.2),
-        new THREE.Vector3(0, (1.25 + (explodeMm * 0.45)) * MODEL_SCALE, 0)
+        new THREE.Vector3(0, (1.5 + (explodeMm * 0.45)) * MODEL_SCALE, 0)
       );
 
     } else if (mode === 'nippel') {
@@ -482,10 +491,11 @@
       if (materialToggleWrap) materialToggleWrap.style.display = 'none';
       if (guideLine) guideLine.visible = false;
 
-      // Center cap around origin (Y CAD center was ~5.0mm)
+      // Center cap around origin (CAD Y center is 5.5mm)
       capGroup.position.set(0, -CAP_CENTER_MM * MODEL_SCALE, 0);
 
-      if (shadowMesh) shadowMesh.position.y = (-CAP_CENTER_MM + 1.5) * MODEL_SCALE - 0.05;
+      // Contact shadow directly beneath cap open rim
+      if (shadowMesh) shadowMesh.position.y = (-CAP_CENTER_MM + CAP_BASE_MOUNTED_Y_MM) * MODEL_SCALE - 0.05;
 
       if (viewerLabel) {
         viewerLabel.textContent = 'FIG. 03 — AFSLUITDOP (POLYAMIDE METAALDETECTEERBAAR)';
@@ -538,17 +548,47 @@
   }
 
   function setView(viewName) {
-    if (fallbackImg) fallbackImg.style.display = 'none';
-    if (canvas) canvas.style.display = 'block';
-
     document.querySelectorAll('.viewer-btn').forEach(b => b.classList.remove('active'));
     const btn = document.querySelector(`[data-view="${viewName}"]`);
     if (btn) btn.classList.add('active');
 
-    // Turn off straw if switching away
-    if (viewName !== 'straw' && isStrawVisible) {
+    // Handle Straw view specially
+    if (viewName === 'straw') {
+      isStrawVisible = true;
+      strawGroup.visible = true;
+
+      // Nipple must be visible
+      nippelGroup.visible = true;
+
+      // Crucial: Cap MUST be invisible during straw demo (a straw cannot penetrate the cap)
+      capGroup.visible = false;
+
+      // Hide explode controls & guideline during straw demo
+      if (viewerExplodeBar) viewerExplodeBar.style.display = 'none';
+      if (guideLine) guideLine.visible = false;
+
+      if (shadowMesh) shadowMesh.position.y = -6.0 * MODEL_SCALE - 0.05;
+
+      if (viewerLabel) {
+        viewerLabel.textContent = 'FIG. 04 — DEMO: RIETJE-DOSERING (DOP VERWIJDERD)';
+      }
+      tweenCamera(new THREE.Vector3(4.8, 3.2, 5.4), new THREE.Vector3(0, 1.2 * MODEL_SCALE, 0));
+      return;
+    }
+
+    // Leaving straw mode: turn straw off and restore cap visibility
+    if (isStrawVisible) {
       isStrawVisible = false;
       strawGroup.visible = false;
+      if (currentComponentMode === 'assembly') {
+        capGroup.visible = true;
+        if (viewerExplodeBar) viewerExplodeBar.style.display = 'flex';
+        const explodeMm = (currentExplodePercent / 100) * MAX_EXPLODE_MM;
+        updateGuideLine(explodeMm);
+      } else if (currentComponentMode === 'cap') {
+        capGroup.visible = true;
+        nippelGroup.visible = false;
+      }
     }
 
     const currentTargetY = controls.target.y;
@@ -564,42 +604,19 @@
         tweenCamera(new THREE.Vector3(0, currentTargetY + 7.5, 0.05), new THREE.Vector3(0, currentTargetY, 0));
         break;
 
-      case 'straw':
-        isStrawVisible = true;
-        strawGroup.visible = true;
-        // Ensure nipple is visible for straw demo
-        if (currentComponentMode === 'cap') {
-          updateComponentMode('assembly');
-        }
-        if (viewerLabel) viewerLabel.textContent = 'DEMO: RIETJE-INVOER & AFSLUITING';
-        tweenCamera(new THREE.Vector3(4.5, 3.2, 5.2), new THREE.Vector3(0, 2.5 * MODEL_SCALE, 0));
-        break;
-
       case 'iso':
       default:
-        if (viewerLabel) viewerLabel.textContent = '3D ISOMETRISCH (VRIJ ROTEREN)';
+        if (viewerLabel) {
+          if (currentComponentMode === 'assembly') {
+            viewerLabel.textContent = 'FIG. 01 — SAMENSTELLING (ASSEMBLY & EXPLODED VIEW)';
+          } else if (currentComponentMode === 'nippel') {
+            viewerLabel.textContent = 'FIG. 02 — OLIESMEERNIPPEL (RVS · SCHROEFDRAAD & INBUS)';
+          } else {
+            viewerLabel.textContent = 'FIG. 03 — AFSLUITDOP (POLYAMIDE METAALDETECTEERBAAR)';
+          }
+        }
         tweenCamera(new THREE.Vector3(5.2, 3.4, 6.2), new THREE.Vector3(0, currentTargetY, 0));
         break;
-    }
-  }
-
-  function show2DFallback(key) {
-    if (!fallbackImg) return;
-    const paths = {
-      side: 'assets/images/view-side.png',
-      top: 'assets/images/view-front.png',
-      cap: 'assets/images/view-cap.png'
-    };
-    fallbackImg.src = paths[key] || paths.side;
-    fallbackImg.style.display = 'block';
-    if (canvas) canvas.style.display = 'none';
-
-    document.querySelectorAll('.viewer-btn').forEach(b => b.classList.remove('active'));
-    const btn = document.querySelector(`[data-2d="${key}"]`);
-    if (btn) btn.classList.add('active');
-
-    if (viewerLabel) {
-      viewerLabel.textContent = `2D RENDER — ${key.toUpperCase()}`;
     }
   }
 
@@ -665,20 +682,6 @@
         }
       });
     }
-
-    // Toggle 2D / 3D fallback mode
-    const btnToggle2D = document.getElementById('btnToggle2D');
-    if (btnToggle2D) {
-      btnToggle2D.addEventListener('click', () => {
-        if (canvas.style.display === 'none') {
-          setView('iso');
-          btnToggle2D.textContent = 'Bekijk 2D Renders';
-        } else {
-          show2DFallback('side');
-          btnToggle2D.textContent = 'Terug naar 3D Viewer';
-        }
-      });
-    }
   }
 
   function onWindowResize() {
@@ -720,7 +723,6 @@
     setExplodePercent,
     toggleExplode,
     setView,
-    setMaterial,
-    show2DFallback
+    setMaterial
   };
 })();

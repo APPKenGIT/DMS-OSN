@@ -474,18 +474,6 @@ nav a:hover::after, nav a.active::after {
   display: block;
 }
 
-/* Fallback image if 2D mode is chosen */
-#fallbackImage {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: none;
-  background: #FFFFFF;
-}
-
 .viewer-overlay-hint {
   position: absolute;
   bottom: 12px;
