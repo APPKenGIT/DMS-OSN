@@ -61,6 +61,8 @@
         <a href="#kenmerken">Kenmerken</a>
         <a href="#toepassingen">Toepassingen</a>
         <a href="#specificaties">Specificaties</a>
+        <a href="#animaties">Montage & Smering</a>
+        <a href="#verdeler">Verdeler worden</a>
         <a href="#bestellen">Offerte</a>
       </nav>
 
@@ -543,6 +545,90 @@
     </div>
   </section>
 
+  <!-- 3D Instructional Videos / Sequences Section -->
+  <section class="instructions-section" id="animaties">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="index">04 — 3D MONTAGE- & SMEERINSTRUCTIES</span>
+        <h2>Bekijk stap-voor-stap hoe de Oliesmeernippel gemonteerd en gesmeerd wordt.</h2>
+        <p>Interactieve technische demonstraties op een industriële lineaire zwaluwstaartgeleiding. Draai en zoom vrij rondom tijdens de animatie om de inbussleutel maat 4 en de aerosol in actie te zien.</p>
+      </div>
+
+      <div class="instructions-player">
+        <!-- Player Header with Tabs -->
+        <div class="instructions-header">
+          <div class="instructions-tabs">
+            <button type="button" class="anim-tab active" id="tabAnimMontage">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+              </svg>
+              1. Montagehandleiding (Inbus 4 & Afsluitdop)
+            </button>
+            <button type="button" class="anim-tab" id="tabAnimSmering">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+              </svg>
+              2. Smeerinstructie (Aerosol & Rietje-Dosering)
+            </button>
+          </div>
+
+          <div style="font-size:0.75rem; color:var(--steel-600); font-family:var(--font-mono);">
+            INTERACTIEVE 3D ANIMATIE · INBUS METRISCH 4 MM
+          </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="instructions-canvas-wrap" id="instructionsCanvasWrap">
+          <canvas id="instructionsCanvas"></canvas>
+
+          <!-- Floating Live Step Banner -->
+          <div class="instructions-step-banner">
+            <div class="instruction-current-step" id="instructionStepLabel">
+              Stap 1: Positioneren
+            </div>
+
+            <!-- Step Badges (Montage) -->
+            <div class="instruction-badges-row" id="badgesMontage">
+              <span class="step-badge-pill active" id="stepM1">1. Positioneren</span>
+              <span class="step-badge-pill" id="stepM2">2. Inbus 4mm</span>
+              <span class="step-badge-pill" id="stepM3">3. Inschroeven</span>
+              <span class="step-badge-pill" id="stepM4">4. Sleutel eruit</span>
+              <span class="step-badge-pill" id="stepM5">5. Dop monteren</span>
+            </div>
+
+            <!-- Step Badges (Smering) -->
+            <div class="instruction-badges-row" id="badgesSmering" style="display:none;">
+              <span class="step-badge-pill active" id="stepS1">1. Dop afnemen</span>
+              <span class="step-badge-pill" id="stepS2">2. Rietje insteken (7.5mm)</span>
+              <span class="step-badge-pill" id="stepS3">3. Droge olie spuiten</span>
+              <span class="step-badge-pill" id="stepS4">4. Rietje terug</span>
+              <span class="step-badge-pill" id="stepS5">5. Dop sluiten</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="instructions-bar">
+          <button type="button" class="anim-play-btn" id="btnAnimPlayPause">Pauzeren ⏸</button>
+          <button type="button" class="anim-restart-btn" id="btnAnimRestart" title="Herstart animatie">Opnieuw ↺</button>
+          
+          <div class="anim-scrubber-wrap">
+            <input type="range" class="anim-scrubber" id="instructionScrubber" min="0" max="100" value="0" title="Sleep door animatie">
+          </div>
+
+          <div class="anim-speed-wrap">
+            <span>Snelheid:</span>
+            <select class="anim-speed-select" id="animSpeedSelect">
+              <option value="1.0" selected>1.0x Normaal</option>
+              <option value="0.5">0.5x Vertraagd</option>
+              <option value="1.5">1.5x Versneld</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA Quote Request Section (GitHub Pages & FormSubmit Ready) -->
   <section class="cta-strip" id="bestellen">
     <div class="wrap cta-grid">
@@ -629,6 +715,13 @@
             </div>
           </div>
 
+          <div style="margin-bottom:18px;">
+            <label style="display:flex; align-items:flex-start; gap:8px; font-size:0.8rem; color:var(--steel-400); cursor:pointer;">
+              <input type="checkbox" name="akkoord_voorwaarden" required style="width:auto; margin-top:3px; cursor:pointer;">
+              <span>Ik ga akkoord met de <a href="#termsModal" class="open-terms-modal" style="color:var(--signal); text-decoration:underline;">algemene verkoopsvoorwaarden</a> van De Meester Industries.</span>
+            </label>
+          </div>
+
           <button type="submit" id="quoteSubmitBtn">
             <span>Offerte aanvragen</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -663,6 +756,133 @@
     </div>
   </section>
 
+  <!-- Distributor / Dealership License Application Section -->
+  <section class="distributor-section" id="verdeler">
+    <div class="wrap">
+      <div class="distributor-grid">
+        <div class="distributor-info">
+          <div class="tag tag-signal" style="background:rgba(229,160,36,0.2); color:#F3B745;">
+            <span>Zakelijk Partnerschap</span>
+          </div>
+          <h2 style="margin-top:16px; font-size:2.1rem; color:#FFFFFF;">Word Erkend Verdeler of OEM-Licentiepartner</h2>
+          <p style="color:var(--steel-300); font-size:1.05rem; line-height:1.6; margin-top:12px;">
+            Vergroot uw technisch productaanbod met de gepatenteerde Oliesmeernippel voor droge-oliesmering. Wij bieden technische groothandels, MRO-distributeurs en machinebouwers een exclusief partnerprogramma met beschermde marktsegmenten en aantrekkelijke marges.
+          </p>
+
+          <div class="distributor-perks">
+            <div class="distributor-perk-card">
+              <h4>1. Aantrekkelijke B2B Marges</h4>
+              <p>Groothandelsprijzen met ruime marge en projectgebonden staffelkortingen voor seriematige afnames.</p>
+            </div>
+            <div class="distributor-perk-card">
+              <h4>2. Exclusiviteit per Regio</h4>
+              <p>Mogelijkheid tot gebiedsbescherming of industriesegment-exclusiviteit (o.a. food, pharma, semicon, OEM).</p>
+            </div>
+            <div class="distributor-perk-card">
+              <h4>3. Compleet Marketingpakket</h4>
+              <p>Fysieke demoboxen voor uw buitendienst, 3D CAD-modellen (STEP/DWG), TDS-fiches en promotiemateriaal.</p>
+            </div>
+            <div class="distributor-perk-card">
+              <h4>4. Directe OEM-Integratie</h4>
+              <p>Technische documentatie voor opname in productcatalogi van lineaire geleidingsfabrikanten en machinebouw.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="distributor-form-wrap">
+          <h3>Aanvraagformulier Verdelerlicentie</h3>
+          <p class="sub">Vul onderstaand formulier in. Wij nemen binnen 1 werkdag contact op voor een kennismaking.</p>
+
+          <form action="https://formsubmit.co/demeestersolutions@gmail.com" method="POST" id="distributorForm">
+            <input type="hidden" name="_subject" value="Nieuwe Aanvraag Verdelerlicentie — Oliesmeernippel">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_captcha" value="false">
+
+            <div class="form-row">
+              <div>
+                <label class="field-label" for="distCompany">Bedrijfsnaam *</label>
+                <input type="text" id="distCompany" name="Bedrijfsnaam" required placeholder="bv. ABC Technische Groothandel">
+              </div>
+              <div>
+                <label class="field-label" for="distVat">BTW-nummer / KVK *</label>
+                <input type="text" id="distVat" name="BTW_nummer" required placeholder="bv. BE 0123.456.789 / NL...">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div>
+                <label class="field-label" for="distName">Contactpersoon *</label>
+                <input type="text" id="distName" name="Contactpersoon" required placeholder="Voor- en achternaam">
+              </div>
+              <div>
+                <label class="field-label" for="distRole">Functie</label>
+                <input type="text" id="distRole" name="Functie" placeholder="bv. Zaakvoerder, Product Manager">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div>
+                <label class="field-label" for="distEmail">Zakelijk e-mailadres *</label>
+                <input type="email" id="distEmail" name="Email" required placeholder="naam@bedrijf.be">
+              </div>
+              <div>
+                <label class="field-label" for="distPhone">Telefoonnummer *</label>
+                <input type="tel" id="distPhone" name="Telefoon" required placeholder="+32 / +31 ...">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div>
+                <label class="field-label" for="distType">Type Organisatie *</label>
+                <select id="distType" name="Type_Organisatie" required>
+                  <option value="" disabled selected>Selecteer uw type onderneming</option>
+                  <option value="Technische Groothandel / MRO">Technische Groothandel / MRO</option>
+                  <option value="OEM Machinebouwer">OEM Machinebouwer</option>
+                  <option value="Lineaire Systeemintegrator">Lineaire Systeemintegrator</option>
+                  <option value="Smeermiddelenspecialist">Smeermiddelenspecialist / Verdeler</option>
+                  <option value="Anders">Anders</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label" for="distRegion">Actieve Regio / Werkgebied *</label>
+                <select id="distRegion" name="Regio" required>
+                  <option value="" disabled selected>Selecteer regio</option>
+                  <option value="België (Vlaanderen)">België (Vlaanderen)</option>
+                  <option value="België (Wallonië / Brussel)">België (Wallonië / Brussel)</option>
+                  <option value="Nederland">Nederland</option>
+                  <option value="Duitsland / DACH">Duitsland / DACH</option>
+                  <option value="Overig Europa / Internationaal">Overig Europa / Internationaal</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="field-label" for="distMessage">Toelichting & Klantenbestand</label>
+              <textarea id="distMessage" name="Toelichting" rows="3" placeholder="Beschrijf kort uw marktfocus, actieve sectoren of geschat afzetvolume..."></textarea>
+            </div>
+
+            <div class="checkbox-wrap">
+              <input type="checkbox" id="distTerms" name="akkoord_voorwaarden" required>
+              <label for="distTerms">Ik ga akkoord met de <a href="#termsModal" class="open-terms-modal" style="color:var(--signal); text-decoration:underline;">algemene verkoopsvoorwaarden</a> van De Meester Industries.</label>
+            </div>
+
+            <button type="submit" class="btn-distributor-submit" id="btnDistSubmit">
+              <span>Aanvraag Verdelerlicentie Versturen</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </form>
+
+          <div id="distSuccessMsg" style="display:none; margin-top:20px; background:#142B1A; border:1px solid #1E8E3E; border-radius:6px; padding:16px; color:#A8F0B8; font-size:0.9rem;">
+            <strong>✓ Aanvraag succesvol verstuurd!</strong> Wij nemen binnen 1 werkdag contact met u op voor de verdere stappen van het licentiepartnerschap.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Compact Footer -->
   <footer>
     <div class="wrap">
@@ -683,7 +903,10 @@
           <a href="#kenmerken">Kenmerken</a>
           <a href="#toepassingen">Toepassingen</a>
           <a href="#specificaties">Specificaties</a>
+          <a href="#animaties">Montage & Smering</a>
+          <a href="#verdeler">Verdeler worden</a>
           <a href="#bestellen">Offerte</a>
+          <a href="#termsModal" class="open-terms-modal">Algemene Voorwaarden</a>
         </div>
 
         <div class="footer-contact-compact">
@@ -694,13 +917,63 @@
 
       <div class="footer-bottom">
         <span>&copy; 2026 Oliesmeernippel — De Meester Industries. Alle rechten voorbehouden.</span>
-        <span>RVS304 & RVS316 Schroefdraadaansluitingen</span>
+        <span><a href="#termsModal" class="open-terms-modal" style="color:var(--steel-600); text-decoration:underline;">Algemene Verkoopsvoorwaarden</a> · RVS304 & RVS316 Schroefdraadaansluitingen</span>
       </div>
     </div>
   </footer>
 
+  <!-- Modal: Algemene Verkoopsvoorwaarden -->
+  <div class="terms-modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <div class="terms-modal-card">
+      <div class="terms-modal-header">
+        <h3 id="termsTitle">Algemene Verkoopsvoorwaarden — De Meester Industries</h3>
+        <div class="terms-modal-actions">
+          <button type="button" class="btn-modal-print" onclick="window.print()">Afdrukken ⎙</button>
+          <button type="button" class="btn-modal-close" id="btnCloseTerms" aria-label="Sluiten">✕</button>
+        </div>
+      </div>
+
+      <div class="terms-modal-body">
+        <h4>Artikel 1 — Toepasselijkheid</h4>
+        <p>1.1 Deze algemene verkoopsvoorwaarden zijn van toepassing op alle aanbiedingen, offertes, bestellingen en overeenkomsten van De Meester Industries (hierna: "Verkoper") betreffende de levering van de gepatenteerde Oliesmeernippel, bijbehorende afsluitdoppen en toebehoren.</p>
+        <p>1.2 Afwijkingen van deze voorwaarden zijn slechts geldig indien deze uitdrukkelijk en schriftelijk door Verkoper zijn bevestigd. Inkoopvoorwaarden van de Klant worden uitdrukkelijk van de hand gewezen.</p>
+
+        <h4>Artikel 2 — Offertes, Prijzen en Totstandkoming</h4>
+        <p>2.1 Alle offertes en prijsopgaven zijn vrijblijvend en geldig gedurende dertig (30) kalenderdagen na offertedatum, tenzij uitdrukkelijk anders vermeld.</p>
+        <p>2.2 Prijzen luiden in Euro (€), exclusief BTW, heffingen, transport- en verpakkingskosten.</p>
+        <p>2.3 Een overeenkomst komt eerst tot stand na schriftelijke orderbevestiging door Verkoper of door de feitelijke verzending van de goederen.</p>
+
+        <h4>Artikel 3 — Betaling en Facturatie</h4>
+        <p>3.1 Betaling geschiedt binnen dertig (30) kalenderdagen na factuurdatum, netto zonder enige aftrek of schuldvergelijking, tenzij schriftelijk anders overeengekomen.</p>
+        <p>3.2 Bij overschrijding van de betalingstermijn is de Klant van rechtswege in verzuim. Verkoper is gerechtigd de wettelijke handelsrente in rekening te brengen, vermeerderd met een forfaitaire schadevergoeding van 10% ter dekking van buitengerechtelijke invorderingskosten.</p>
+
+        <h4>Artikel 4 — Levering en Eigendomsvoorbehoud</h4>
+        <p>4.1 Tenzij anders overeengekomen, geschiedt levering Ex Works (Incoterms 2020). Het transportrisico gaat over op de Klant vanaf het moment van verzending.</p>
+        <p>4.2 Alle geleverde goederen blijven het exclusieve eigendom van Verkoper tot het moment dat alle opeisbare vorderingen uit hoofde van de overeenkomst volledig zijn voldaan.</p>
+
+        <h4>Artikel 5 — Klachten, Inspectie en Conformiteit</h4>
+        <p>5.1 De Klant dient de goederen direct bij aflevering grondig te inspecteren op juiste schroefdraadmaat (M5/M6/M8/M10), materiaal (RVS304/RVS316) en uiterlijke staat.</p>
+        <p>5.2 Klachten betreffende zichtbare gebreken dienen binnen acht (8) werkdagen na aflevering schriftelijk en gedetailleerd aan Verkoper te worden gemeld.</p>
+
+        <h4>Artikel 6 — Garantie en Beperking van Aansprakelijkheid</h4>
+        <p>6.1 Verkoper garandeert de degelijkheid van de gebruikte materialen (RVS 304, RVS 316 en metaaldetecteerbaar polyamide) conform de gespecificeerde industrienormen.</p>
+        <p>6.2 De garantie dekt geen schade die het gevolg is van oneigenlijke installatie (bijv. geforceerd indraaien in beschadigde draad of overschrijding van het aandraaimoment) of oneigenlijk gebruik, waaronder met name begrepen het toedienen van traditionele vetten met vaste verdikkers in plaats van de voorgeschreven droge-olie aerosol.</p>
+        <p>6.3 De aansprakelijkheid van Verkoper is te allen tijde beperkt tot het netto factuurbedrag van de desbetreffende levering. Verkoper sluit iedere aansprakelijkheid voor indirecte schade, gevolgschade, machine-stilstand of omzetderving uit.</p>
+
+        <h4>Artikel 7 — Intellectueel Eigendom en Namaakverbod</h4>
+        <p>7.1 Alle intellectuele eigendomsrechten, octrooien, modelrechten, CAD-tekeningen en merkrechten met betrekking tot de Oliesmeernippel blijven te allen tijde het exclusieve eigendom van De Meester Industries.</p>
+        <p>7.2 Het is de Klant en/of derden uitdrukkelijk verboden om de producten van Verkoper na te maken, te modificeren of via reverse-engineering na te bouwen.</p>
+
+        <h4>Artikel 8 — Toepasselijk Recht en Geschillenbeslechting</h4>
+        <p>8.1 Op alle overeenkomsten is uitsluitend het Belgisch recht van toepassing. De toepasselijkheid van het Weens Koopverdrag (CISG) wordt uitdrukkelijk uitgesloten.</p>
+        <p>8.2 Alle geschillen behoren tot de uitsluitende bevoegdheid van de rechtbanken van het arrondissement waar de maatschappelijke zetel van Verkoper is gevestigd.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/viewer3d.js"></script>
+  <script src="js/instructions-3d.js"></script>
   <script src="js/form.js"></script>
   <script src="js/main.js"></script>
 </body>

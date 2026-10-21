@@ -73,4 +73,81 @@
     });
   });
 
+  // 5. Algemene Verkoopsvoorwaarden Modal Handlers
+  const termsModal = document.getElementById('termsModal');
+  const btnCloseTerms = document.getElementById('btnCloseTerms');
+
+  function openTerms(e) {
+    if (e) e.preventDefault();
+    if (termsModal) {
+      termsModal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeTerms() {
+    if (termsModal) {
+      termsModal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+
+  document.querySelectorAll('.open-terms-modal').forEach(link => {
+    link.addEventListener('click', openTerms);
+  });
+
+  if (btnCloseTerms) {
+    btnCloseTerms.addEventListener('click', closeTerms);
+  }
+
+  if (termsModal) {
+    termsModal.addEventListener('click', (e) => {
+      if (e.target === termsModal) closeTerms();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && termsModal && termsModal.classList.contains('open')) {
+      closeTerms();
+    }
+  });
+
+  // 6. Distributor License Form AJAX handler
+  const distForm = document.getElementById('distributorForm');
+  const btnDistSubmit = document.getElementById('btnDistSubmit');
+  const distSuccessMsg = document.getElementById('distSuccessMsg');
+
+  if (distForm) {
+    distForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      if (btnDistSubmit) {
+        btnDistSubmit.disabled = true;
+        btnDistSubmit.textContent = 'Verzenden...';
+      }
+
+      const formData = new FormData(distForm);
+
+      fetch('https://formsubmit.co/ajax/demeestersolutions@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json'
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        distForm.style.display = 'none';
+        if (distSuccessMsg) {
+          distSuccessMsg.style.display = 'block';
+          distSuccessMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      })
+      .catch(error => {
+        console.warn('AJAX submit failed, submitting form natively:', error);
+        distForm.submit();
+      });
+    });
+  }
+
 })();

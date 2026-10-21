@@ -458,7 +458,7 @@ nav a:hover::after, nav a.active::after {
 .canvas-wrapper {
   position: relative;
   width: 100%;
-  height: 380px;
+  height: 450px;
   background: #FFFFFF;
   cursor: grab;
   user-select: none;
@@ -1543,3 +1543,489 @@ footer {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- 3D Instructional Sequences (Montage & Smering) ---------- */
+.instructions-section {
+  padding: 84px 0;
+  background: var(--paper-light);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.instructions-player {
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin-top: 32px;
+}
+
+.instructions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--paper-dim);
+  border-bottom: 1px solid var(--line);
+}
+
+.instructions-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.anim-tab {
+  background: transparent;
+  border: 1px solid var(--steel-400);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.84rem;
+  color: var(--steel-700);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.anim-tab:hover {
+  background: var(--paper-light);
+  color: var(--steel-950);
+}
+
+.anim-tab.active {
+  background: var(--steel-900);
+  color: var(--paper-light);
+  border-color: var(--steel-900);
+}
+
+.instructions-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  background: #F9FAFB;
+  cursor: grab;
+}
+
+.instructions-canvas-wrap:active {
+  cursor: grabbing;
+}
+
+#instructionsCanvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.instructions-step-banner {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.instruction-current-step {
+  background: rgba(24, 27, 31, 0.88);
+  backdrop-filter: blur(8px);
+  color: #FFFFFF;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instruction-current-step::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+.instruction-badges-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.step-badge-pill {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+  color: var(--steel-700);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  transition: all 0.25s ease;
+}
+
+.step-badge-pill.active {
+  background: var(--signal-dark);
+  color: #FFFFFF;
+  border-color: var(--signal-dark);
+  font-weight: 700;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(184, 115, 51, 0.35);
+}
+
+.instructions-bar {
+  padding: 14px 20px;
+  background: var(--paper-dim);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.anim-play-btn {
+  background: var(--steel-900);
+  color: var(--paper-light);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 0.84rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease;
+}
+
+.anim-play-btn:hover {
+  background: var(--signal-dark);
+}
+
+.anim-restart-btn {
+  background: transparent;
+  color: var(--steel-800);
+  border: 1px solid var(--steel-400);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.anim-restart-btn:hover {
+  background: var(--paper-light);
+  border-color: var(--steel-800);
+}
+
+.anim-scrubber-wrap {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.anim-scrubber {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--steel-300);
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--signal-dark);
+}
+
+.anim-speed-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--steel-700);
+}
+
+.anim-speed-select {
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  color: var(--steel-900);
+  cursor: pointer;
+}
+
+/* ---------- Verdeler / Dealership Licentie Sectie ---------- */
+.distributor-section {
+  padding: 88px 0;
+  background: #181B1F;
+  color: var(--paper-light);
+  position: relative;
+  border-top: 1px solid #2A3038;
+}
+
+.distributor-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.distributor-perks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 32px;
+}
+
+.distributor-perk-card {
+  background: #20242A;
+  border: 1px solid #2E3540;
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.distributor-perk-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--signal);
+}
+
+.distributor-perk-card h4 {
+  color: var(--signal);
+  font-size: 0.96rem;
+  margin-bottom: 8px;
+}
+
+.distributor-perk-card p {
+  color: var(--steel-400);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.distributor-form-wrap {
+  background: #20242A;
+  border: 1px solid #2E3540;
+  border-radius: var(--radius-md);
+  padding: 36px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.distributor-form-wrap h3 {
+  font-size: 1.35rem;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.distributor-form-wrap p.sub {
+  color: var(--steel-400);
+  font-size: 0.88rem;
+  margin-bottom: 24px;
+}
+
+.distributor-form-wrap .field-label {
+  color: var(--steel-300);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.distributor-form-wrap input,
+.distributor-form-wrap select,
+.distributor-form-wrap textarea {
+  width: 100%;
+  background: #14171A;
+  border: 1px solid #333B47;
+  color: #FFFFFF;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  margin-bottom: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.distributor-form-wrap input:focus,
+.distributor-form-wrap select:focus,
+.distributor-form-wrap textarea:focus {
+  outline: none;
+  border-color: var(--signal);
+}
+
+.distributor-form-wrap .checkbox-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 0.82rem;
+  color: var(--steel-400);
+  cursor: pointer;
+}
+
+.distributor-form-wrap .checkbox-wrap input {
+  width: auto;
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.btn-distributor-submit {
+  width: 100%;
+  background: var(--signal);
+  color: #181B1F;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 0.98rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-distributor-submit:hover {
+  background: #F3B745;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(229, 160, 36, 0.4);
+}
+
+/* ---------- Algemene Verkoopsvoorwaarden Modal ---------- */
+.terms-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 18, 22, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.terms-modal.open {
+  display: flex;
+}
+
+.terms-modal-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-md);
+  max-width: 860px;
+  width: 100%;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.terms-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 28px;
+  background: var(--paper-dim);
+  border-bottom: 1px solid var(--line);
+}
+
+.terms-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--steel-950);
+}
+
+.terms-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-modal-print,
+.btn-modal-close {
+  background: transparent;
+  border: 1px solid var(--steel-400);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--steel-800);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-modal-close {
+  font-size: 1.1rem;
+  padding: 4px 10px;
+  line-height: 1;
+}
+
+.btn-modal-print:hover,
+.btn-modal-close:hover {
+  background: var(--paper-light);
+  border-color: var(--steel-950);
+  color: var(--steel-950);
+}
+
+.terms-modal-body {
+  padding: 28px;
+  overflow-y: auto;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--steel-800);
+}
+
+.terms-modal-body h4 {
+  font-size: 1.02rem;
+  color: var(--steel-950);
+  margin-top: 22px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.terms-modal-body h4:first-child {
+  margin-top: 0;
+}
+
+.terms-modal-body p {
+  margin-bottom: 12px;
+}
+
+.terms-modal-body ul {
+  padding-left: 20px;
+  margin-bottom: 14px;
+}
+
+.terms-modal-body li {
+  margin-bottom: 6px;
+}
+
+@media (max-width: 900px) {
+  .distributor-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .distributor-perks {
+    grid-template-columns: 1fr;
+  }
+  .instructions-canvas-wrap {
+    height: 380px;
+  }
+}
+

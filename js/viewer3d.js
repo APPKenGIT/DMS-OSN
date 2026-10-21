@@ -76,7 +76,7 @@
       controls.enableDamping = true;
       controls.dampingFactor = 0.06;
       controls.minDistance = 3.0;     // Closest allowed manual zoom-in
-      controls.maxDistance = 50.0;    // Furthest allowed manual zoom-out
+      controls.maxDistance = 85.0;    // Furthest allowed manual zoom-out
       controls.maxPolarAngle = Math.PI * 0.88;
       controls.target.copy(initialFrame.target);
 
@@ -382,38 +382,39 @@
   /**
    * Unified Framing Calculator
    * Determines the exact bounding height, vertical center, and optimal camera distance
-   * so the model is NEVER cropped and ALWAYS centered with 20% margin.
+   * so the model is NEVER cropped and ALWAYS centered with generous margins.
    */
   function getFraming(mode, explodePercent, viewName) {
     let targetY = 0;
-    let distance = 12.0;
+    let distance = 16.0;
 
     if (viewName === 'straw') {
-      // Straw demo: spans from spray tip (-11.0mm) to straw top (+21.0mm) = 32mm
-      targetY = 5.0 * MODEL_SCALE; // Center = 1.75
-      distance = 21.5;
+      // Straw demo: spans from spray cone tip (-11.0mm) to straw top (+21.0mm) = 32mm total
+      // Center Y = +5.0mm (1.75 Three.js units). Generous distance so full straw & spray fit cleanly.
+      targetY = 5.0 * MODEL_SCALE;
+      distance = 34.0;
     } else if (mode === 'cap') {
       // Cap only: centered at origin (0, 0, 0), height 7mm, width 12mm
       targetY = 0;
-      distance = 9.8;
+      distance = 13.5;
     } else if (mode === 'nippel') {
       // Nipple only: Y from -6.0mm to +8.0mm, height 14mm, center = 1.0mm
-      targetY = 1.0 * MODEL_SCALE; // 0.35
-      distance = 11.5;
+      targetY = 1.0 * MODEL_SCALE;
+      distance = 16.0;
     } else {
       // Assembly mode:
-      // Mounted (0%): Y from -6.0mm to +9.0mm (height 15mm, center 1.5mm) -> distance ~12.2
-      // Exploded (100%): Y from -6.0mm to +23.0mm (height 29mm, center 8.5mm) -> distance ~21.5
+      // Mounted (0%): Y from -6.0mm to +9.0mm (height 15mm, center 1.5mm) -> distance 16.0
+      // Exploded (100%): Y from -6.0mm to +23.0mm (height 29mm, center 8.5mm) -> distance 32.0
       const t = Math.max(0, Math.min(100, explodePercent)) / 100;
       targetY = (1.5 + 7.0 * t) * MODEL_SCALE;
-      distance = 12.2 + 9.3 * t;
+      distance = 16.0 + 16.0 * t;
     }
 
-    // Adapt distance slightly if container is narrow/portrait
+    // Adapt distance if container is narrow or portrait
     if (container && camera) {
-      const aspect = container.clientWidth / container.clientHeight;
-      if (aspect < 1.0) {
-        distance /= Math.max(0.72, aspect);
+      const aspect = container.clientWidth / Math.max(1, container.clientHeight);
+      if (aspect < 1.15) {
+        distance /= Math.max(0.60, aspect);
       }
     }
 
@@ -430,13 +431,13 @@
         break;
 
       case 'straw':
-        position.set(distance * 0.54, targetY + distance * 0.30, distance * 0.68);
+        position.set(distance * 0.52, targetY + distance * 0.32, distance * 0.70);
         break;
 
       case 'iso':
       default:
-        // Isometric 3D angle: 25-deg elevation, crisp perspective
-        position.set(distance * 0.58, targetY + distance * 0.40, distance * 0.70);
+        // Isometric 3D angle: 24-deg elevation, crisp perspective
+        position.set(distance * 0.58, targetY + distance * 0.38, distance * 0.72);
         break;
     }
 
