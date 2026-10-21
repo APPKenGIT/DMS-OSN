@@ -21,12 +21,14 @@
   
   let currentMaterialType = 'rvs304';
   let currentComponentMode = 'assembly'; // 'assembly' | 'nippel' | 'cap'
+  let currentViewName = 'iso';           // 'iso' | 'side' | 'top' | 'straw'
   let currentExplodePercent = 0;          // 0 to 100
   let isStrawVisible = false;
   let isAutoRotating = true;
   let lastUserInteraction = Date.now();
   let animationFrameId = null;
   let explodeAnimFrame = null;
+  let cameraTweenFrame = null;
 
   // DOM elements
   const container = document.getElementById('canvasWrapper');
@@ -41,15 +43,18 @@
   if (!container || !canvas) return;
 
   function init() {
-    // 1. Scene setup — pure white technical background
+    // 1. Scene setup — pure white technical background with deep fog range
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xFFFFFF);
-    scene.fog = new THREE.Fog(0xFFFFFF, 18, 42);
+    scene.fog = new THREE.Fog(0xFFFFFF, 50, 160);
 
-    // 2. Camera setup
+    // 2. Camera setup — balanced FOV with generous initial distance
     const aspect = container.clientWidth / container.clientHeight;
-    camera = new THREE.PerspectiveCamera(38, aspect, 0.1, 100);
-    camera.position.set(5.2, 3.4, 6.2);
+    camera = new THREE.PerspectiveCamera(36, aspect, 0.1, 200);
+
+    // Initial default framing for mounted assembly
+    const initialFrame = getFraming('assembly', 0, 'iso');
+    camera.position.copy(initialFrame.position);
 
     // 3. Renderer setup
     renderer = new THREE.WebGLRenderer({
@@ -65,15 +70,15 @@
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    // 4. OrbitControls
+    // 4. OrbitControls — allows wide zoom range but snaps back cleanly on presets
     if (typeof THREE.OrbitControls !== 'undefined') {
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.06;
-      controls.minDistance = 2.8;
-      controls.maxDistance = 16.0;
+      controls.minDistance = 3.0;     // Closest allowed manual zoom-in
+      controls.maxDistance = 50.0;    // Furthest allowed manual zoom-out
       controls.maxPolarAngle = Math.PI * 0.88;
-      controls.target.set(0, 1.5 * MODEL_SCALE, 0);
+      controls.target.copy(initialFrame.target);
 
       controls.addEventListener('start', () => {
         isAutoRotating = false;
@@ -124,28 +129,32 @@
   function setupLighting() {
     // Hemispheric fill light
     const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xC8D0DC, 1.05);
-    hemiLight.position.set(0, 20, 0);
+    hemiLight.position.set(0, 30, 0);
     scene.add(hemiLight);
 
-    // Key directional light with sharp soft shadow
+    // Key directional light with wide shadow frustum to cover exploded model
     const keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.35);
-    keyLight.position.set(7, 11, 7);
+    keyLight.position.set(12, 22, 14);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
     keyLight.shadow.mapSize.height = 1024;
-    keyLight.shadow.camera.near = 0.5;
-    keyLight.shadow.camera.far = 30;
+    keyLight.shadow.camera.near = 1.0;
+    keyLight.shadow.camera.far = 70;
+    keyLight.shadow.camera.left = -16;
+    keyLight.shadow.camera.right = 16;
+    keyLight.shadow.camera.top = 16;
+    keyLight.shadow.camera.bottom = -16;
     keyLight.shadow.bias = -0.0004;
     scene.add(keyLight);
 
     // Rim highlight light (warm metallic edge)
     const rimLight = new THREE.DirectionalLight(0xE5A024, 0.45);
-    rimLight.position.set(-7, 6, -6);
+    rimLight.position.set(-12, 12, -12);
     scene.add(rimLight);
 
     // Front soft fill light
     const fillLight = new THREE.DirectionalLight(0x94A3B8, 0.55);
-    fillLight.position.set(0, -3, 8);
+    fillLight.position.set(0, -4, 14);
     scene.add(fillLight);
   }
 
@@ -191,11 +200,11 @@
   }
 
   function setupGroundShadow() {
-    const shadowGeo = new THREE.PlaneGeometry(12, 12);
+    const shadowGeo = new THREE.PlaneGeometry(24, 24);
     const shadowMat = new THREE.ShadowMaterial({ opacity: 0.14 });
     shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
     shadowMesh.rotation.x = -Math.PI / 2;
-    shadowMesh.position.y = -6.0 * MODEL_SCALE - 0.05; // Placed right under bottom of nipple
+    shadowMesh.position.y = -6.0 * MODEL_SCALE - 0.05; // Base of nipple
     shadowMesh.receiveShadow = true;
     scene.add(shadowMesh);
   }
@@ -209,11 +218,11 @@
     lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
     const lineMat = new THREE.LineDashedMaterial({
       color: 0x1A6BC4,
-      dashSize: 0.15,
-      gapSize: 0.10,
+      dashSize: 0.18,
+      gapSize: 0.12,
       linewidth: 2,
       transparent: true,
-      opacity: 0.75
+      opacity: 0.8
     });
     guideLine = new THREE.Line(lineGeo, lineMat);
     guideLine.computeLineDistances();
@@ -318,7 +327,7 @@
           }
           capGroup.add(obj);
           capLoaded = true;
-          updateComponentMode(currentComponentMode);
+          updateComponentMode(currentComponentMode, false);
         },
         undefined,
         (err) => {
@@ -370,6 +379,70 @@
     capGroup.add(capDome);
   }
 
+  /**
+   * Unified Framing Calculator
+   * Determines the exact bounding height, vertical center, and optimal camera distance
+   * so the model is NEVER cropped and ALWAYS centered with 20% margin.
+   */
+  function getFraming(mode, explodePercent, viewName) {
+    let targetY = 0;
+    let distance = 12.0;
+
+    if (viewName === 'straw') {
+      // Straw demo: spans from spray tip (-11.0mm) to straw top (+21.0mm) = 32mm
+      targetY = 5.0 * MODEL_SCALE; // Center = 1.75
+      distance = 21.5;
+    } else if (mode === 'cap') {
+      // Cap only: centered at origin (0, 0, 0), height 7mm, width 12mm
+      targetY = 0;
+      distance = 9.8;
+    } else if (mode === 'nippel') {
+      // Nipple only: Y from -6.0mm to +8.0mm, height 14mm, center = 1.0mm
+      targetY = 1.0 * MODEL_SCALE; // 0.35
+      distance = 11.5;
+    } else {
+      // Assembly mode:
+      // Mounted (0%): Y from -6.0mm to +9.0mm (height 15mm, center 1.5mm) -> distance ~12.2
+      // Exploded (100%): Y from -6.0mm to +23.0mm (height 29mm, center 8.5mm) -> distance ~21.5
+      const t = Math.max(0, Math.min(100, explodePercent)) / 100;
+      targetY = (1.5 + 7.0 * t) * MODEL_SCALE;
+      distance = 12.2 + 9.3 * t;
+    }
+
+    // Adapt distance slightly if container is narrow/portrait
+    if (container && camera) {
+      const aspect = container.clientWidth / container.clientHeight;
+      if (aspect < 1.0) {
+        distance /= Math.max(0.72, aspect);
+      }
+    }
+
+    const target = new THREE.Vector3(0, targetY, 0);
+    let position = new THREE.Vector3();
+
+    switch (viewName) {
+      case 'side':
+        position.set(0, targetY, distance);
+        break;
+
+      case 'top':
+        position.set(0, targetY + distance, 0.01);
+        break;
+
+      case 'straw':
+        position.set(distance * 0.54, targetY + distance * 0.30, distance * 0.68);
+        break;
+
+      case 'iso':
+      default:
+        // Isometric 3D angle: 25-deg elevation, crisp perspective
+        position.set(distance * 0.58, targetY + distance * 0.40, distance * 0.70);
+        break;
+    }
+
+    return { position, target, distance, targetY };
+  }
+
   // Exploded View Slider & Animation
   function setExplodePercent(percent, animate = false) {
     currentExplodePercent = Math.max(0, Math.min(100, percent));
@@ -386,18 +459,34 @@
       capGroup.position.set(0, explodeMm * MODEL_SCALE, 0);
       updateGuideLine(explodeMm);
 
-      if (controls && !animate) {
-        controls.target.y = (1.5 + (explodeMm * 0.45)) * MODEL_SCALE;
+      const frame = getFraming('assembly', currentExplodePercent, currentViewName);
+
+      if (controls) {
+        controls.target.y = frame.targetY;
+
+        // When actively sliding, smoothly adjust camera distance along current viewing ray
+        // so the exploding cap never clips the top border of the canvas!
+        if (!animate && camera) {
+          const ray = camera.position.clone().sub(controls.target);
+          if (ray.lengthSq() > 0.01) {
+            ray.normalize().multiplyScalar(frame.distance);
+            camera.position.copy(controls.target).add(ray);
+          }
+        }
       }
     }
   }
 
-  function animateExplodeTo(targetPercent, duration = 500) {
+  function animateExplodeTo(targetPercent, duration = 600) {
     if (explodeAnimFrame) cancelAnimationFrame(explodeAnimFrame);
 
     const startPercent = currentExplodePercent;
     const diff = targetPercent - startPercent;
     const startTime = performance.now();
+
+    // Calculate start & target camera framings
+    const startFrame = getFraming('assembly', startPercent, currentViewName);
+    const targetFrame = getFraming('assembly', targetPercent, currentViewName);
 
     function step(now) {
       const elapsed = now - startTime;
@@ -406,6 +495,13 @@
       const val = startPercent + diff * ease;
 
       setExplodePercent(val, true);
+
+      // Smoothly track camera during explode animation
+      if (controls && camera) {
+        camera.position.lerpVectors(startFrame.position, targetFrame.position, ease);
+        controls.target.lerpVectors(startFrame.target, targetFrame.target, ease);
+        controls.update();
+      }
 
       if (progress < 1) {
         explodeAnimFrame = requestAnimationFrame(step);
@@ -425,14 +521,14 @@
   }
 
   // Component Mode Switcher: Assembly / Nipple / Cap
-  function updateComponentMode(mode) {
+  function updateComponentMode(mode, triggerCamera = true) {
     currentComponentMode = mode;
 
     // Reset straw demo if switching component modes
     if (isStrawVisible) {
       isStrawVisible = false;
       strawGroup.visible = false;
-      // Reset active state from straw button to iso
+      currentViewName = 'iso';
       const strawBtn = document.querySelector('[data-view="straw"]');
       if (strawBtn) strawBtn.classList.remove('active');
       const isoBtn = document.querySelector('[data-view="iso"]');
@@ -460,10 +556,11 @@
       if (viewerLabel) {
         viewerLabel.textContent = 'FIG. 01 — SAMENSTELLING (ASSEMBLY & EXPLODED VIEW)';
       }
-      tweenCamera(
-        new THREE.Vector3(5.2, 3.4, 6.2),
-        new THREE.Vector3(0, (1.5 + (explodeMm * 0.45)) * MODEL_SCALE, 0)
-      );
+
+      if (triggerCamera) {
+        const frame = getFraming('assembly', currentExplodePercent, currentViewName);
+        tweenCamera(frame.position, frame.target);
+      }
 
     } else if (mode === 'nippel') {
       // 2. Nipple Only: rotate freely around nipple
@@ -478,10 +575,11 @@
       if (viewerLabel) {
         viewerLabel.textContent = 'FIG. 02 — OLIESMEERNIPPEL (RVS · SCHROEFDRAAD & INBUS)';
       }
-      tweenCamera(
-        new THREE.Vector3(4.6, 2.6, 5.6),
-        new THREE.Vector3(0, 1.0 * MODEL_SCALE, 0)
-      );
+
+      if (triggerCamera) {
+        const frame = getFraming('nippel', 0, currentViewName);
+        tweenCamera(frame.position, frame.target);
+      }
 
     } else if (mode === 'cap') {
       // 3. Cap Only: rotate freely around cap at origin (0, 0, 0)
@@ -500,10 +598,11 @@
       if (viewerLabel) {
         viewerLabel.textContent = 'FIG. 03 — AFSLUITDOP (POLYAMIDE METAALDETECTEERBAAR)';
       }
-      tweenCamera(
-        new THREE.Vector3(3.8, 2.4, 4.6),
-        new THREE.Vector3(0, 0, 0)
-      );
+
+      if (triggerCamera) {
+        const frame = getFraming('cap', 0, currentViewName);
+        tweenCamera(frame.position, frame.target);
+      }
     }
   }
 
@@ -523,8 +622,9 @@
     });
   }
 
-  // Camera presets
-  function tweenCamera(targetPos, targetLookAt, duration = 750) {
+  // Camera presets & smooth transitions
+  function tweenCamera(targetPos, targetLookAt, duration = 650) {
+    if (cameraTweenFrame) cancelAnimationFrame(cameraTweenFrame);
     isAutoRotating = false;
     lastUserInteraction = Date.now();
 
@@ -533,21 +633,26 @@
     const startTime = performance.now();
 
     function update(now) {
-      const progress = Math.min((now - startTime) / duration, 1);
-      const ease = 0.5 - 0.5 * Math.cos(progress * Math.PI);
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
 
       camera.position.lerpVectors(startPos, targetPos, ease);
       controls.target.lerpVectors(startTarget, targetLookAt, ease);
       controls.update();
 
       if (progress < 1) {
-        requestAnimationFrame(update);
+        cameraTweenFrame = requestAnimationFrame(update);
+      } else {
+        cameraTweenFrame = null;
       }
     }
-    requestAnimationFrame(update);
+    cameraTweenFrame = requestAnimationFrame(update);
   }
 
   function setView(viewName) {
+    currentViewName = viewName;
+
     document.querySelectorAll('.viewer-btn').forEach(b => b.classList.remove('active'));
     const btn = document.querySelector(`[data-view="${viewName}"]`);
     if (btn) btn.classList.add('active');
@@ -572,7 +677,9 @@
       if (viewerLabel) {
         viewerLabel.textContent = 'FIG. 04 — DEMO: RIETJE-DOSERING (DOP VERWIJDERD)';
       }
-      tweenCamera(new THREE.Vector3(4.8, 3.2, 5.4), new THREE.Vector3(0, 1.2 * MODEL_SCALE, 0));
+
+      const frame = getFraming(currentComponentMode, currentExplodePercent, 'straw');
+      tweenCamera(frame.position, frame.target);
       return;
     }
 
@@ -591,33 +698,25 @@
       }
     }
 
-    const currentTargetY = controls.target.y;
-
-    switch (viewName) {
-      case 'side':
-        if (viewerLabel) viewerLabel.textContent = 'ZIJAANZICHT (SCHROEFDRAAD & PROFIEL)';
-        tweenCamera(new THREE.Vector3(0, currentTargetY, 7.8), new THREE.Vector3(0, currentTargetY, 0));
-        break;
-
-      case 'top':
-        if (viewerLabel) viewerLabel.textContent = 'BOVENAANZICHT (INBUS & RIETJE-BORING)';
-        tweenCamera(new THREE.Vector3(0, currentTargetY + 7.5, 0.05), new THREE.Vector3(0, currentTargetY, 0));
-        break;
-
-      case 'iso':
-      default:
-        if (viewerLabel) {
-          if (currentComponentMode === 'assembly') {
-            viewerLabel.textContent = 'FIG. 01 — SAMENSTELLING (ASSEMBLY & EXPLODED VIEW)';
-          } else if (currentComponentMode === 'nippel') {
-            viewerLabel.textContent = 'FIG. 02 — OLIESMEERNIPPEL (RVS · SCHROEFDRAAD & INBUS)';
-          } else {
-            viewerLabel.textContent = 'FIG. 03 — AFSLUITDOP (POLYAMIDE METAALDETECTEERBAAR)';
-          }
+    // Update label for view
+    if (viewName === 'side') {
+      if (viewerLabel) viewerLabel.textContent = 'ZIJAANZICHT (SCHROEFDRAAD & PROFIEL)';
+    } else if (viewName === 'top') {
+      if (viewerLabel) viewerLabel.textContent = 'BOVENAANZICHT (INBUS & RIETJE-BORING)';
+    } else {
+      if (viewerLabel) {
+        if (currentComponentMode === 'assembly') {
+          viewerLabel.textContent = 'FIG. 01 — SAMENSTELLING (ASSEMBLY & EXPLODED VIEW)';
+        } else if (currentComponentMode === 'nippel') {
+          viewerLabel.textContent = 'FIG. 02 — OLIESMEERNIPPEL (RVS · SCHROEFDRAAD & INBUS)';
+        } else {
+          viewerLabel.textContent = 'FIG. 03 — AFSLUITDOP (POLYAMIDE METAALDETECTEERBAAR)';
         }
-        tweenCamera(new THREE.Vector3(5.2, 3.4, 6.2), new THREE.Vector3(0, currentTargetY, 0));
-        break;
+      }
     }
+
+    const frame = getFraming(currentComponentMode, currentExplodePercent, viewName);
+    tweenCamera(frame.position, frame.target);
   }
 
   // Setup UI event listeners
@@ -661,13 +760,20 @@
       });
     });
 
-    // Reset View button
+    // Reset View button: restores beautiful default framing, collapses explosion, iso view
     const btnResetView = document.getElementById('btnResetView');
     if (btnResetView) {
       btnResetView.addEventListener('click', () => {
         setExplodePercent(0);
-        updateComponentMode('assembly');
-        setView('iso');
+        currentViewName = 'iso';
+        updateComponentMode('assembly', false);
+
+        document.querySelectorAll('.viewer-btn').forEach(b => b.classList.remove('active'));
+        const isoBtn = document.querySelector('[data-view="iso"]');
+        if (isoBtn) isoBtn.classList.add('active');
+
+        const frame = getFraming('assembly', 0, 'iso');
+        tweenCamera(frame.position, frame.target);
       });
     }
 
@@ -688,6 +794,7 @@
     if (!container || !camera || !renderer) return;
     const width = container.clientWidth;
     const height = container.clientHeight;
+    if (width === 0 || height === 0) return;
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
@@ -723,6 +830,7 @@
     setExplodePercent,
     toggleExplode,
     setView,
-    setMaterial
+    setMaterial,
+    getFraming
   };
 })();
