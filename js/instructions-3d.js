@@ -46,17 +46,11 @@
   const PORT_Y = 13.0;    // Center of the lubrication port
 
   // Global Framing — generous distance so full scene has 35% breathing room
-  // Dedicated camera viewpoints & centered targets for Montage vs Smering:
-  const TARGET_MONTAGE = new THREE.Vector3(0, 11.0, 5.0);
-  const CAM_POS_MONTAGE = new THREE.Vector3(58.0, 38.0, 68.0);
-
-  // Smering: camera looks from front-left (-X), centered on the midpoint between carriage and can (X=4, Z=12)
-  // so the entire black aerosol can and the linear guide are DEAD-CENTER with 30% margin on all sides!
-  const TARGET_SMERING = new THREE.Vector3(4.0, 12.0, 12.0);
-  const CAM_POS_SMERING = new THREE.Vector3(-58.0, 36.0, 68.0);
-
-  let DEFAULT_TARGET = TARGET_MONTAGE;
-  let DEFAULT_CAM_POS = CAM_POS_MONTAGE;
+  // Perfectly centered, wide-margin studio camera for both Montage & Smering:
+  // Distance ~100, FOV 28° ensures BOTH ends of the rail, carriage, tools & entire aerosol can
+  // are DEAD-CENTER with 25-30% clear margin on all sides (no overlap with top banner!).
+  const DEFAULT_TARGET = new THREE.Vector3(0, 10.0, 4.0);
+  const DEFAULT_CAM_POS = new THREE.Vector3(56.0, 40.0, 74.0);
 
   function init() {
     animContainer = document.getElementById('instructionsCanvasWrap');
@@ -70,7 +64,7 @@
 
     // 2. Camera setup — balanced perspective, generous distance (no excessive zoom!)
     const aspect = animContainer.clientWidth / Math.max(1, animContainer.clientHeight);
-    camera = new THREE.PerspectiveCamera(32, aspect, 0.1, 400);
+    camera = new THREE.PerspectiveCamera(28, aspect, 0.1, 400);
     camera.position.copy(DEFAULT_CAM_POS);
 
     // 3. Renderer setup
@@ -615,92 +609,94 @@
   }
 
   // Photorealistic Industrial Black Aerosol Can & 3.2mm Black Straw:
-  // Proportioned realistically (radius 2.8, height 14.5), stealth black satin finish.
-  // The black flexible straw (diameter 3.2mm) enters DEAD-STRAIGHT along the horizontal Z axis
-  // for the last 7mm, so it NEVER cuts or touches the rim of the stainless steel nipple!
+  // Proportions: standard 200ml spray can (radius 3.5, height 15.0), stealth satin black finish.
+  // Positioned on the left (-X = -15.0) in the background so the camera (at +X = 56.0) has a
+  // 100% crystal-clear, unobstructed foreground view of the nipple, bore entrance, and straw!
+  // The black straw (3.2mm outer diameter, scaled radius 0.58) enters DEAD-STRAIGHT on the
+  // horizontal Z-axis for the last 8mm, so it NEVER touches or cuts the outer rim of the nipple!
   function setupAerosolCan() {
     aerosolGroup = new THREE.Group();
     worldGroup.add(aerosolGroup);
 
-    const canRadius = 2.7;
-    const canHeight = 12.0;
-    const canX = 14.0;
-    const canY = 5.5;
+    const canRadius = 3.5;
+    const canHeight = 15.0;
+    const canX = -15.0;
+    const canY = 4.0;
 
-    // 1. Chime Bottom Rim (crimped metal rolled seam)
-    const chimeGeo = new THREE.CylinderGeometry(canRadius * 0.96, canRadius * 1.02, 0.45, 32);
+    // 1. Chime Bottom Rim (crimped aluminium rolled seam)
+    const chimeGeo = new THREE.CylinderGeometry(canRadius * 0.96, canRadius * 1.02, 0.55, 32);
     const chime = new THREE.Mesh(chimeGeo, matRailSteel);
-    chime.position.set(canX, canY + 0.22, 0);
+    chime.position.set(canX, canY + 0.28, 0);
     chime.castShadow = true;
     aerosolGroup.add(chime);
 
-    // 2. Can Body: Stealth Matte Black Canister
+    // 2. Can Body: Stealth Matte Black Industrial Canister
     const canBodyGeo = new THREE.CylinderGeometry(canRadius, canRadius, canHeight, 32);
     const canMesh = new THREE.Mesh(canBodyGeo, matAerosolCan);
-    canMesh.position.set(canX, canY + 0.45 + canHeight / 2, 0);
+    canMesh.position.set(canX, canY + 0.55 + canHeight / 2, 0);
     canMesh.castShadow = true;
     aerosolGroup.add(canMesh);
 
-    // Contrasting Technical Label Band (Interflon Style Stealth Graphics)
-    const labelGeo = new THREE.CylinderGeometry(canRadius * 1.008, canRadius * 1.008, canHeight * 0.55, 32);
+    // Technical Label Band (Stealth Graphics)
+    const labelGeo = new THREE.CylinderGeometry(canRadius * 1.008, canRadius * 1.008, canHeight * 0.60, 32);
     const matLabel = new THREE.MeshStandardMaterial({
-      color: 0x0A0D10, // Deep technical matte black
-      roughness: 0.55
+      color: 0x0C0E11, // Deep matte technical black
+      roughness: 0.5
     });
     const labelMesh = new THREE.Mesh(labelGeo, matLabel);
-    labelMesh.position.set(canX, canY + 0.45 + canHeight * 0.45, 0);
+    labelMesh.position.set(canX, canY + 0.55 + canHeight * 0.48, 0);
     aerosolGroup.add(labelMesh);
 
     // Signal Accent Stripe (Interflon Gold/Orange)
-    const stripeGeo = new THREE.CylinderGeometry(canRadius * 1.012, canRadius * 1.012, 0.40, 32);
+    const stripeGeo = new THREE.CylinderGeometry(canRadius * 1.012, canRadius * 1.012, 0.45, 32);
     const matAccent = new THREE.MeshStandardMaterial({ color: 0xE5A024, roughness: 0.35 });
     const stripeMesh = new THREE.Mesh(stripeGeo, matAccent);
-    stripeMesh.position.set(canX, canY + 0.45 + canHeight * 0.74, 0);
+    stripeMesh.position.set(canX, canY + 0.55 + canHeight * 0.78, 0);
     aerosolGroup.add(stripeMesh);
 
     // 3. Spun Aluminium Contoured Top Shoulder Dome
     const domeGeo = new THREE.SphereGeometry(canRadius, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.32);
     const dome = new THREE.Mesh(domeGeo, matRailSteel);
-    dome.position.set(canX, canY + 0.45 + canHeight, 0);
+    dome.position.set(canX, canY + 0.55 + canHeight, 0);
     aerosolGroup.add(dome);
 
     // 4. Valve Mounting Cup Ring
-    const valveGeo = new THREE.CylinderGeometry(1.0, 1.3, 0.65, 24);
+    const valveGeo = new THREE.CylinderGeometry(1.2, 1.6, 0.75, 24);
     const valve = new THREE.Mesh(valveGeo, matRailSteel);
-    valve.position.set(canX, canY + 0.45 + canHeight + 0.55, 0);
+    valve.position.set(canX, canY + 0.55 + canHeight + 0.65, 0);
     aerosolGroup.add(valve);
 
-    // 5. Ergonomic Spray Actuator Button (Matte Black POM with Red Nozzle Insert)
-    const nozzleGeo = new THREE.CylinderGeometry(1.0, 1.0, 1.25, 20);
+    // 5. Ergonomic Spray Actuator Button (Matte Black POM with Red Nozzle Orifice)
+    const nozzleGeo = new THREE.CylinderGeometry(1.2, 1.2, 1.45, 20);
     const matActuator = new THREE.MeshStandardMaterial({ color: 0x1A1C1E, roughness: 0.4 });
     const nozzle = new THREE.Mesh(nozzleGeo, matActuator);
-    nozzle.position.set(canX, canY + 0.45 + canHeight + 1.45, 0);
+    nozzle.position.set(canX, canY + 0.55 + canHeight + 1.65, 0);
     aerosolGroup.add(nozzle);
 
-    // Red nozzle orifice ring
-    const exitHoleGeo = new THREE.CylinderGeometry(0.48, 0.48, 0.5, 16);
+    // Red nozzle orifice ring facing towards +X
+    const exitHoleGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.5, 16);
     const matOrifice = new THREE.MeshStandardMaterial({ color: 0xDE3628, roughness: 0.3 });
     const exitHole = new THREE.Mesh(exitHoleGeo, matOrifice);
     exitHole.rotation.z = Math.PI / 2;
-    exitHole.position.set(canX - 0.85, canY + 0.45 + canHeight + 1.4, 0);
+    exitHole.position.set(canX + 1.0, canY + 0.55 + canHeight + 1.6, 0);
     aerosolGroup.add(exitHole);
 
-    // 6. Black Technical Flexible Straw (Diameter 3.2mm = radius 0.77 scene units)
-    // Starts from actuator nozzle and takes a realistic, natural curve.
-    // CRITICAL: The last 7mm (Z from -19.0 to -26.0) is 100% COLLINEAR on the horizontal Z-axis (X=0, Y=PORT_Y)!
+    // 6. Black Technical Flexible Straw (Diameter 3.2mm = radius 0.58 scene units)
+    // Starts from actuator nozzle at (canX + 1.1, nozzleY, 0) and curves naturally.
+    // CRITICAL: The last 8mm (Z from -18.0 to -24.0) is 100% COLLINEAR on the horizontal Z-axis (X=0, Y=PORT_Y)!
     // It enters the nipple bore dead-straight, so it NEVER touches or cuts the outer rim of the nipple!
-    const startY = canY + 0.45 + canHeight + 1.4; // ~19.35
+    const startY = canY + 0.55 + canHeight + 1.6; // ~21.7
     const strawPoints = [
-      new THREE.Vector3(canX - 0.95, startY, 0),        // Exit from actuator nozzle
-      new THREE.Vector3(canX - 4.5, startY - 0.8, -4.0), // Initial gentle bend forward
-      new THREE.Vector3(6.5, PORT_Y + 3.2, -10.0),       // Natural smooth downward arch
-      new THREE.Vector3(1.6, PORT_Y + 0.4, -16.0),       // Aligning with horizontal centerline
-      new THREE.Vector3(0.0, PORT_Y, -20.0),             // Perfectly on horizontal bore axis
-      new THREE.Vector3(0.0, PORT_Y, -26.0)              // Perfectly on horizontal bore axis inside nipple!
+      new THREE.Vector3(canX + 1.15, startY, 0.0),         // Exit from actuator nozzle
+      new THREE.Vector3(canX + 5.0, startY - 0.8, -3.0),   // Gentle initial forward curve
+      new THREE.Vector3(-6.0, PORT_Y + 2.4, -8.0),         // Natural smooth descending arch
+      new THREE.Vector3(-1.8, PORT_Y + 0.3, -14.0),        // Smooth transition to horizontal bore axis
+      new THREE.Vector3(0.0, PORT_Y, -18.0),               // Perfectly on horizontal bore axis
+      new THREE.Vector3(0.0, PORT_Y, -24.0)                // Straight inside nipple bore!
     ];
     const strawCurve = new THREE.CatmullRomCurve3(strawPoints, false, 'chordal', 0.5);
-    const strawRadius = 0.77; // Exactly 3.2mm scaled (CAD_SCALE 0.48)
-    const strawGeo = new THREE.TubeGeometry(strawCurve, 36, strawRadius, 16, false);
+    const strawRadius = 0.58; // Exactly 3.2mm scaled to scene
+    const strawGeo = new THREE.TubeGeometry(strawCurve, 40, strawRadius, 16, false);
     const strawMesh = new THREE.Mesh(strawGeo, matStraw);
     strawMesh.castShadow = true;
     aerosolGroup.add(strawMesh);
@@ -824,43 +820,41 @@
       ]);
 
       if (t < 0.20) {
-        // Stap 1: Cap is removed FAR AWAY (pulls forward, then swings far up & to the right!)
+        // Stap 1: Cap is removed to the RIGHT side (+X = 14.0, Y = 16.0), leaving left side clear for can!
         const p = t / 0.20;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
         capPivot.visible = true;
-        // Cap starts at 14.28, pulls forward off nipple to 21.0, then swings to X=20, Y=26, Z=24
+        // Cap pulls forward off nipple to clear tip, then parks on right (+X=14, Y=16, Z=20)
         capPivot.position.set(
-          20.0 * ease,
-          PORT_Y + (13.0 * ease),
-          14.28 + (ease * 10.0)
+          14.0 * ease,
+          PORT_Y + (3.0 * ease),
+          14.28 + (ease * 6.0)
         );
 
-        // Aerosol can waits safely parked to the side
-        aerosolGroup.position.set(0, PORT_Y, 40.0);
+        // Aerosol can waits safely parked
+        aerosolGroup.position.set(0, 0, 42.0);
         sprayParticles.visible = false;
 
       } else if (t < 0.45) {
-        // Stap 2: Aerosol can moves forward, red straw enters 7.5mm deep into horizontal bore
+        // Stap 2: Aerosol can moves forward, black 3.2mm straw enters 7.5mm deep into horizontal bore
         const p = (t - 0.20) / 0.25;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
-        // Cap stays parked far to the side
         capPivot.visible = true;
-        capPivot.position.set(20.0, PORT_Y + 13.0, 24.28);
+        capPivot.position.set(14.0, PORT_Y + 3.0, 20.28);
 
-        // Can advances along Z from 40.0 to target where straw tip penetrates 7.5mm:
-        // Straw tip enters nipple bore cleanly:
-        const targetZ = 35.74;
-        aerosolGroup.position.set(0, PORT_Y, 40.0 - (ease * (40.0 - targetZ)));
+        // Straw tip enters nipple bore dead-straight:
+        const targetZ = 37.34;
+        aerosolGroup.position.set(0, 0, 42.0 - (ease * (42.0 - targetZ)));
         sprayParticles.visible = false;
 
       } else if (t < 0.70) {
         // Stap 3: Spray button pressed, pulsing atomized dry lubricant micro-mist sprays into carriage
         const p = (t - 0.45) / 0.25;
 
-        capPivot.position.set(20.0, PORT_Y + 13.0, 24.28);
-        aerosolGroup.position.set(0, PORT_Y, 35.74);
+        capPivot.position.set(14.0, PORT_Y + 3.0, 20.28);
+        aerosolGroup.position.set(0, 0, 37.34);
 
         // Pulsing spray mist inside carriage channel
         sprayParticles.visible = true;
@@ -874,13 +868,13 @@
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
         sprayParticles.visible = false;
-        aerosolGroup.position.set(0, PORT_Y, 35.74 + (ease * 14.0));
+        aerosolGroup.position.set(0, 0, 37.34 + (ease * 12.0));
 
         // Cap starts returning smoothly
         capPivot.position.set(
-          20.0 * (1 - ease),
-          PORT_Y + (13.0 * (1 - ease)),
-          14.28 + (10.0 * (1 - ease))
+          14.0 * (1 - ease),
+          PORT_Y + (3.0 * (1 - ease)),
+          14.28 + (6.0 * (1 - ease))
         );
 
       } else {
@@ -888,11 +882,11 @@
         const p = (t - 0.85) / 0.15;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
-        aerosolGroup.position.set(0, PORT_Y, 49.74);
+        aerosolGroup.position.set(0, 0, 49.34);
         sprayParticles.visible = false;
 
         capPivot.visible = true;
-        capPivot.position.set(0, PORT_Y, 24.28 - (ease * (24.28 - 14.28)));
+        capPivot.position.set(0, PORT_Y, 20.28 - (ease * (20.28 - 14.28)));
       }
     }
   }
@@ -920,11 +914,8 @@
 
   function resetCameraView() {
     if (!camera || !controls) return;
-    const isSmering = (activeTab === 'smering');
-    const targetCam = isSmering ? CAM_POS_SMERING : CAM_POS_MONTAGE;
-    const targetLookAt = isSmering ? TARGET_SMERING : TARGET_MONTAGE;
-    camera.position.copy(targetCam);
-    controls.target.copy(targetLookAt);
+    camera.position.copy(DEFAULT_CAM_POS);
+    controls.target.copy(DEFAULT_TARGET);
     controls.update();
   }
 
