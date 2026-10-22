@@ -11,5 +11,7 @@ $RECYCLE.BIN/
 *.swp
 *.bak
 
-# Archives
+# Archives & Media drafts
 *.zip
+*.mp4
+!assets/videos/*.mp4
