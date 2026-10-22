@@ -1621,7 +1621,7 @@ footer {
 .instructions-canvas-wrap {
   position: relative;
   width: 100%;
-  height: 480px;
+  height: 520px;
   background: #F9FAFB;
   cursor: grab;
 }
