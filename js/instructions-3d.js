@@ -2,9 +2,8 @@
  * Oliesmeernippel — Interactive 3D Instruction Sequences (Three.js)
  * De Meester Industries
  * 
- * Uses the EXACT SAME Real CAD Models (osn_nippel.obj & osn_cap_mounted.obj)
- * Mounted horizontally on the end-cap / side lubrication port of an industrial
- * profile linear guide carriage (THK / Hiwin style) as requested by user.
+ * Hyper-realistic Industrial Linear Profile Rail Guide (Hiwin / THK style)
+ * with the Real CAD Oliesmeernippel & Cap mounted on the end-cap lubrication port.
  * 
  * Sequence 1: Montage (Inbussleutel metrisch 4 & Afsluitdop)
  * Sequence 2: Smeerinstructie (Dop afnemen, aerosol-rietje diep insteken, doseren, dop terug)
@@ -31,28 +30,30 @@
   let allenKeyGroup, aerosolGroup, sprayParticles;
 
   // Materials
-  let matRailSteel, matCarriageSteel, matEndCapBlack, matScrewStainless;
+  let matRailSteel, matCarriageSteel, matEndCapBlack, matScrewStainless, matBrassBushing;
   let matNipple, matCapBlue, matAllenKey, matAerosolCan, matSpray, matStraw;
 
-  // Constants
-  const CAD_SCALE = 0.50; // Scale to match linear rail visual proportions
-  const PORT_Z = 11.0;    // Z-coordinate of the front lubrication port surface
-  const PORT_Y = 5.2;     // Y-coordinate of the lubrication port center
+  // Visual Geometry & Coordinate Constants
+  // Rail top is at Y = 9.0mm. Carriage top is at Y = 16.5mm.
+  // Port is positioned at Y = 12.4mm (3.4mm above the rail top, in the clear!)
+  const CAD_SCALE = 0.48; // Scale for 1:1 match with linear guide block
+  const PORT_Z = 11.5;    // Front face of the black end-cap wiper plate
+  const PORT_Y = 12.4;    // Center of the lubrication port (in upper half of end-cap, above rail)
 
   function init() {
     animContainer = document.getElementById('instructionsCanvasWrap');
     animCanvas = document.getElementById('instructionsCanvas');
     if (!animContainer || !animCanvas) return;
 
-    // 1. Scene setup — clean technical studio background
+    // 1. Scene setup — technical studio background
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xF8FAFC);
-    scene.fog = new THREE.Fog(0xF8FAFC, 65, 190);
+    scene.fog = new THREE.Fog(0xF8FAFC, 70, 200);
 
-    // 2. Camera setup — matches 3/4 isometric angle of industrial linear guide photo
+    // 2. Camera setup — matches 3/4 isometric perspective of linear guide photo
     const aspect = animContainer.clientWidth / Math.max(1, animContainer.clientHeight);
-    camera = new THREE.PerspectiveCamera(36, aspect, 0.1, 250);
-    camera.position.set(24, 18, 28);
+    camera = new THREE.PerspectiveCamera(36, aspect, 0.1, 260);
+    camera.position.set(24, 21, 28);
 
     // 3. Renderer setup
     renderer = new THREE.WebGLRenderer({
@@ -63,7 +64,7 @@
     renderer.setSize(animContainer.clientWidth, animContainer.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.18;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -73,9 +74,9 @@
       controls.enableDamping = true;
       controls.dampingFactor = 0.06;
       controls.minDistance = 10.0;
-      controls.maxDistance = 80.0;
+      controls.maxDistance = 85.0;
       controls.maxPolarAngle = Math.PI * 0.88;
-      controls.target.set(0, PORT_Y, 6.0);
+      controls.target.set(0, PORT_Y - 1.2, 5.0);
     }
 
     // 5. Lighting
@@ -84,11 +85,11 @@
     // 6. Materials
     setupMaterials();
 
-    // 7. Base groups & industrial linear guide assembly
+    // 7. Base groups & hyper-realistic linear guide assembly
     worldGroup = new THREE.Group();
     scene.add(worldGroup);
 
-    buildLinearRailAndCarriage();
+    buildRealisticProfileRailAndCarriage();
     setupToolingAndAerosol();
 
     // 8. Load Real CAD Models (exact same as 3D hero viewer)
@@ -98,72 +99,79 @@
     window.addEventListener('resize', onResize);
     setupControlsUI();
 
-    // 10. Start loop
+    // 10. Start animation loop
     lastTime = performance.now();
     animate();
   }
 
   function setupLighting() {
     // Hemispheric ambient light for metallic chrome contrast
-    const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xC4CBD4, 1.15);
+    const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xC4CBD4, 1.2);
     hemiLight.position.set(0, 45, 0);
     scene.add(hemiLight);
 
     // Directional Key Light with soft shadows
     const keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.35);
-    keyLight.position.set(22, 38, 26);
+    keyLight.position.set(22, 40, 26);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
     keyLight.shadow.mapSize.height = 1024;
     keyLight.shadow.camera.near = 1.0;
     keyLight.shadow.camera.far = 110;
-    keyLight.shadow.camera.left = -30;
-    keyLight.shadow.camera.right = 30;
-    keyLight.shadow.camera.top = 30;
-    keyLight.shadow.camera.bottom = -30;
+    keyLight.shadow.camera.left = -32;
+    keyLight.shadow.camera.right = 32;
+    keyLight.shadow.camera.top = 32;
+    keyLight.shadow.camera.bottom = -32;
     keyLight.shadow.bias = -0.0003;
     scene.add(keyLight);
 
-    // Rim highlight light (industrial warm edge)
+    // Rim highlight light (industrial warm metallic edge)
     const rimLight = new THREE.DirectionalLight(0xE5A024, 0.45);
-    rimLight.position.set(-24, 18, -24);
+    rimLight.position.set(-24, 20, -24);
     scene.add(rimLight);
 
     // Front soft fill
     const fillLight = new THREE.DirectionalLight(0x94A3B8, 0.55);
-    fillLight.position.set(0, -6, 28);
+    fillLight.position.set(0, -4, 28);
     scene.add(fillLight);
   }
 
   function setupMaterials() {
-    // Ground linear profile rail (mirror-ground bearing steel)
+    // Mirror-ground bearing steel for linear rail
     matRailSteel = new THREE.MeshStandardMaterial({
-      color: 0xD0D8E0,
-      metalness: 0.94,
-      roughness: 0.16,
-      envMapIntensity: 1.3
+      color: 0xCCD4DC,
+      metalness: 0.95,
+      roughness: 0.14,
+      envMapIntensity: 1.4
     });
 
-    // Precision ground carriage block (tool steel)
+    // Satin ground tool steel for carriage body
     matCarriageSteel = new THREE.MeshStandardMaterial({
-      color: 0xDCE2E8,
-      metalness: 0.88,
-      roughness: 0.22,
-      envMapIntensity: 1.1
+      color: 0xD8DFE7,
+      metalness: 0.90,
+      roughness: 0.20,
+      envMapIntensity: 1.2
     });
 
-    // Composite end caps (matte black POM / reinforced polyamide wipers)
+    // Technical matte black injection molded POM for wipers / end plates
     matEndCapBlack = new THREE.MeshStandardMaterial({
-      color: 0x1A1E24,
-      metalness: 0.18,
-      roughness: 0.60
+      color: 0x16191D,
+      metalness: 0.15,
+      roughness: 0.55
     });
 
     // Stainless cap screws (M3 socket heads)
     matScrewStainless = new THREE.MeshStandardMaterial({
-      color: 0xC8D0D8,
-      metalness: 0.90,
-      roughness: 0.20
+      color: 0xD0D6DE,
+      metalness: 0.92,
+      roughness: 0.18
+    });
+
+    // Brass / bronze threaded insert for grease port
+    matBrassBushing = new THREE.MeshStandardMaterial({
+      color: 0xD4A034,
+      metalness: 0.85,
+      roughness: 0.25
     });
 
     // Oliesmeernippel RVS304 (identical to hero 3D viewer)
@@ -213,145 +221,233 @@
     });
   }
 
-  // Build the Profile Linear Rail & Carriage Guide (matches uploaded image)
-  function buildLinearRailAndCarriage() {
+  // Build the Hyper-Realistic Profile Linear Rail & Carriage Guide
+  function buildRealisticProfileRailAndCarriage() {
     railGroup = new THREE.Group();
     carriageGroup = new THREE.Group();
     worldGroup.add(railGroup);
     worldGroup.add(carriageGroup);
 
-    // A. Profile Linear Rail (Profielrail met kogelbanen)
-    const railLength = 68;
-    const railWidth = 9.0;
-    const railHeight = 7.0;
+    // ========================================================
+    // 1. Profile Linear Rail (Extruded Cross-Section with Grooves)
+    // ========================================================
+    const railLength = 76;
+    const railShape = new THREE.Shape();
 
-    // Main rail body
-    const railBodyGeo = new THREE.BoxGeometry(railWidth, railHeight, railLength);
-    const railBody = new THREE.Mesh(railBodyGeo, matRailSteel);
-    railBody.position.set(0, railHeight / 2, 0);
-    railBody.castShadow = true;
-    railBody.receiveShadow = true;
-    railGroup.add(railBody);
+    // Real Gothic-arch linear profile rail cross section:
+    // Base width 12mm, Height 9mm
+    railShape.moveTo(-5.8, 0);
+    railShape.lineTo(5.8, 0);
+    railShape.lineTo(6.0, 0.4);
+    railShape.lineTo(6.0, 3.4);
+    // Lower raceway arch
+    railShape.lineTo(5.2, 4.6);
+    railShape.lineTo(6.0, 5.6);
+    railShape.lineTo(6.0, 6.4);
+    // Upper raceway arch
+    railShape.lineTo(5.2, 7.4);
+    railShape.lineTo(6.0, 8.4);
+    // Top chamfer
+    railShape.lineTo(5.3, 9.0);
+    railShape.lineTo(-5.3, 9.0);
+    railShape.lineTo(-6.0, 8.4);
+    // Left upper raceway arch
+    railShape.lineTo(-5.2, 7.4);
+    railShape.lineTo(-6.0, 6.4);
+    railShape.lineTo(-6.0, 5.6);
+    // Left lower raceway arch
+    railShape.lineTo(-5.2, 4.6);
+    railShape.lineTo(-6.0, 3.4);
+    railShape.lineTo(-6.0, 0.4);
+    railShape.closePath();
 
-    // Longitudinal circular raceway grooves on left and right sides
-    const grooveRadius = 1.1;
-    const grooveGeo = new THREE.CylinderGeometry(grooveRadius, grooveRadius, railLength, 16);
-    const matGroove = new THREE.MeshStandardMaterial({ color: 0x9AA5B2, metalness: 0.95, roughness: 0.12 });
-    
-    // Left groove
-    const grooveLeft = new THREE.Mesh(grooveGeo, matGroove);
-    grooveLeft.rotation.x = Math.PI / 2;
-    grooveLeft.position.set(-railWidth / 2 + 0.3, railHeight * 0.55, 0);
-    railGroup.add(grooveLeft);
+    const railGeo = new THREE.ExtrudeGeometry(railShape, {
+      depth: railLength,
+      bevelEnabled: true,
+      bevelSegments: 2,
+      steps: 1,
+      bevelSize: 0.15,
+      bevelThickness: 0.15
+    });
+    railGeo.center();
 
-    // Right groove
-    const grooveRight = new THREE.Mesh(grooveGeo, matGroove);
-    grooveRight.rotation.x = Math.PI / 2;
-    grooveRight.position.set(railWidth / 2 - 0.3, railHeight * 0.55, 0);
-    railGroup.add(grooveRight);
+    const railMesh = new THREE.Mesh(railGeo, matRailSteel);
+    // Rail extends along Z-axis, centered at origin
+    railMesh.position.set(0, 4.5, 0);
+    railMesh.castShadow = true;
+    railMesh.receiveShadow = true;
+    railGroup.add(railMesh);
 
-    // Rail top mounting counterbored bolt holes
-    for (let z = -24; z <= 24; z += 16) {
-      // Counterbore
-      const holeGeo = new THREE.CylinderGeometry(2.0, 2.0, 1.8, 20);
-      const matHole = new THREE.MeshBasicMaterial({ color: 0x1E242B });
+    // Counterbored top bolt holes with socket head cap screws inside
+    for (let z = -26; z <= 26; z += 17) {
+      // Counterbore cavity
+      const holeGeo = new THREE.CylinderGeometry(2.1, 2.1, 2.4, 24);
+      const matHole = new THREE.MeshBasicMaterial({ color: 0x1A1E24 });
       const hole = new THREE.Mesh(holeGeo, matHole);
-      hole.position.set(0, railHeight + 0.05, z);
+      hole.position.set(0, 9.05, z);
       railGroup.add(hole);
 
-      // Inner bolt hole
-      const innerGeo = new THREE.CylinderGeometry(1.2, 1.2, 4.0, 16);
-      const inner = new THREE.Mesh(innerGeo, matHole);
-      inner.position.set(0, railHeight - 2.0, z);
-      railGroup.add(inner);
+      // Screw head inside hole
+      const boltGeo = new THREE.CylinderGeometry(1.9, 1.9, 0.6, 20);
+      const bolt = new THREE.Mesh(boltGeo, matScrewStainless);
+      bolt.position.set(0, 7.8, z);
+      railGroup.add(bolt);
+
+      // Inbus socket inside bolt
+      const boltSocketGeo = new THREE.CylinderGeometry(0.9, 0.9, 0.4, 6);
+      const boltSocket = new THREE.Mesh(boltSocketGeo, matHole);
+      boltSocket.position.set(0, 8.0, z);
+      railGroup.add(boltSocket);
     }
 
-    // B. Linear Carriage Block (Loopwagen)
-    // 1. Silver Ground Steel Main Body
-    const blockWidth = 17.0;
-    const blockHeight = 9.8;
-    const blockLength = 18.0;
+    // ========================================================
+    // 2. Precision Carriage Block (Loopwagen)
+    // ========================================================
+    const carriageLength = 20.0;
+    const carriageWidth = 20.0;
+    const carriageHeight = 13.0; // From Y=3.5 to Y=16.5
+    const carriageYCenter = 10.0;
 
-    const blockGeo = new THREE.BoxGeometry(blockWidth, blockHeight, blockLength);
-    const blockMesh = new THREE.Mesh(blockGeo, matCarriageSteel);
-    blockMesh.position.set(0, railHeight + blockHeight / 2 - 1.2, 0);
-    blockMesh.castShadow = true;
-    blockMesh.receiveShadow = true;
-    carriageGroup.add(blockMesh);
+    // Extruded U-channel cross section for the steel carriage body:
+    const carriageShape = new THREE.Shape();
+    // Outer boundary
+    carriageShape.moveTo(-10.0, 3.6);
+    carriageShape.lineTo(-10.0, 15.6);
+    carriageShape.lineTo(-8.8, 16.5); // Top-left chamfer
+    carriageShape.lineTo(8.8, 16.5);
+    carriageShape.lineTo(10.0, 15.6);  // Top-right chamfer
+    carriageShape.lineTo(10.0, 3.6);
+    // Inner cutout wrapping over the rail with clearance
+    carriageShape.lineTo(6.4, 3.6);
+    carriageShape.lineTo(6.4, 9.8);   // Above rail top (rail top = 9.0)
+    carriageShape.lineTo(-6.4, 9.8);
+    carriageShape.lineTo(-6.4, 3.6);
+    carriageShape.closePath();
+
+    const carriageGeo = new THREE.ExtrudeGeometry(carriageShape, {
+      depth: carriageLength,
+      bevelEnabled: true,
+      bevelSegments: 2,
+      steps: 1,
+      bevelSize: 0.15,
+      bevelThickness: 0.15
+    });
+    carriageGeo.center();
+
+    const carriageMesh = new THREE.Mesh(carriageGeo, matCarriageSteel);
+    carriageMesh.position.set(0, carriageYCenter, 0);
+    carriageMesh.castShadow = true;
+    carriageMesh.receiveShadow = true;
+    carriageGroup.add(carriageMesh);
 
     // 4 Top tapped mounting holes (machine montagegaten)
-    for (let x of [-5.5, 5.5]) {
-      for (let z of [-5.5, 5.5]) {
-        const topHoleGeo = new THREE.CylinderGeometry(1.0, 1.0, 1.2, 16);
-        const matTopHole = new THREE.MeshBasicMaterial({ color: 0x22262E });
-        const topHole = new THREE.Mesh(topHoleGeo, matTopHole);
-        topHole.position.set(x, railHeight + blockHeight - 1.15, z);
+    for (let x of [-6.4, 6.4]) {
+      for (let z of [-5.8, 5.8]) {
+        const topHoleGeo = new THREE.CylinderGeometry(1.2, 1.2, 1.4, 20);
+        const matDarkHole = new THREE.MeshBasicMaterial({ color: 0x1E242B });
+        const topHole = new THREE.Mesh(topHoleGeo, matDarkHole);
+        topHole.position.set(x, 16.55, z);
         carriageGroup.add(topHole);
       }
     }
 
-    // Longitudinal chamfer stripes on top (as visible in the photo)
-    const stripeGeo = new THREE.BoxGeometry(1.8, 0.2, blockLength);
-    const matStripe = new THREE.MeshStandardMaterial({ color: 0xA8B4C0, roughness: 0.5 });
+    // Top precision datum grooves / ground stripes
+    const stripeGeo = new THREE.BoxGeometry(2.0, 0.25, carriageLength + 0.2);
+    const matStripe = new THREE.MeshStandardMaterial({ color: 0xB0BCC8, roughness: 0.45 });
     const stripe1 = new THREE.Mesh(stripeGeo, matStripe);
-    stripe1.position.set(-2.0, railHeight + blockHeight - 1.1, 0);
+    stripe1.position.set(-2.5, 16.5, 0);
     const stripe2 = new THREE.Mesh(stripeGeo, matStripe);
-    stripe2.position.set(2.0, railHeight + blockHeight - 1.1, 0);
+    stripe2.position.set(2.5, 16.5, 0);
     carriageGroup.add(stripe1);
     carriageGroup.add(stripe2);
 
-    // 2. Black Front & Rear End Caps (Afstrijkers / Eindkappen met smeerpoort)
-    const endCapThickness = 2.0;
-    const endCapWidth = 17.4;
-    const endCapHeight = 10.2;
+    // ========================================================
+    // 3. Black Front & Rear End Caps (Afstrijkers / Eindkappen)
+    // ========================================================
+    const endCapThickness = 2.4;
+    const endCapZ = carriageLength / 2 + endCapThickness / 2; // Z = 10.0 + 1.2 = 11.2
 
-    // Build front end cap (Z = +10.0)
-    const frontCapGeo = new THREE.BoxGeometry(endCapWidth, endCapHeight, endCapThickness);
-    const frontCap = new THREE.Mesh(frontCapGeo, matEndCapBlack);
-    frontCap.position.set(0, railHeight + blockHeight / 2 - 1.2, blockLength / 2 + endCapThickness / 2);
+    // Build front end cap (Z = +11.2)
+    const frontCapShape = new THREE.Shape();
+    frontCapShape.moveTo(-10.2, 3.4);
+    frontCapShape.lineTo(-10.2, 15.8);
+    frontCapShape.lineTo(-9.0, 16.7);
+    frontCapShape.lineTo(9.0, 16.7);
+    frontCapShape.lineTo(10.2, 15.8);
+    frontCapShape.lineTo(10.2, 3.4);
+    // Inner wiper lip conforming tightly to rail
+    frontCapShape.lineTo(6.1, 3.4);
+    frontCapShape.lineTo(6.1, 9.2);
+    frontCapShape.lineTo(-6.1, 9.2);
+    frontCapShape.lineTo(-6.1, 3.4);
+    frontCapShape.closePath();
+
+    const endCapGeo = new THREE.ExtrudeGeometry(frontCapShape, {
+      depth: endCapThickness,
+      bevelEnabled: true,
+      bevelSegments: 2,
+      steps: 1,
+      bevelSize: 0.12,
+      bevelThickness: 0.12
+    });
+    endCapGeo.center();
+
+    // Front end cap
+    const frontCap = new THREE.Mesh(endCapGeo, matEndCapBlack);
+    frontCap.position.set(0, carriageYCenter, endCapZ);
     frontCap.castShadow = true;
     carriageGroup.add(frontCap);
 
-    // Build rear end cap (Z = -10.0)
-    const rearCap = new THREE.Mesh(frontCapGeo, matEndCapBlack);
-    rearCap.position.set(0, railHeight + blockHeight / 2 - 1.2, -blockLength / 2 - endCapThickness / 2);
+    // Rear end cap
+    const rearCap = new THREE.Mesh(endCapGeo, matEndCapBlack);
+    rearCap.position.set(0, carriageYCenter, -endCapZ);
     rearCap.castShadow = true;
     carriageGroup.add(rearCap);
 
-    // End cap retaining screws (2 screws on front plate as in photo)
-    for (let x of [-6.2, 6.2]) {
-      const screwGeo = new THREE.CylinderGeometry(1.1, 1.1, 0.8, 16);
+    // Front end cap retaining screws (left and right)
+    for (let x of [-7.2, 7.2]) {
+      const screwGeo = new THREE.CylinderGeometry(1.2, 1.2, 0.8, 16);
       const screw = new THREE.Mesh(screwGeo, matScrewStainless);
       screw.rotation.x = Math.PI / 2;
-      screw.position.set(x, railHeight + 4.5, blockLength / 2 + endCapThickness + 0.3);
+      screw.position.set(x, 14.2, PORT_Z + 0.3);
       carriageGroup.add(screw);
 
-      // Inbus socket in screw head
-      const screwSocketGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.3, 6);
-      const matDarkSocket = new THREE.MeshBasicMaterial({ color: 0x0F1115 });
+      const screwSocketGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.35, 6);
+      const matDarkSocket = new THREE.MeshBasicMaterial({ color: 0x0A0D11 });
       const screwSocket = new THREE.Mesh(screwSocketGeo, matDarkSocket);
       screwSocket.rotation.x = Math.PI / 2;
-      screwSocket.position.set(x, railHeight + 4.5, blockLength / 2 + endCapThickness + 0.6);
+      screwSocket.position.set(x, 14.2, PORT_Z + 0.6);
       carriageGroup.add(screwSocket);
     }
 
-    // 3. Central Lubrication Port (Getapte smeerpoort M6 aan de voorzijde)
-    // Positioned horizontally right between the wipers in the black end cap
-    const portCollarGeo = new THREE.CylinderGeometry(2.3, 2.3, 0.8, 24);
-    const portCollar = new THREE.Mesh(portCollarGeo, matScrewStainless);
-    portCollar.rotation.x = Math.PI / 2;
-    portCollar.position.set(0, PORT_Y, PORT_Z - 0.2);
-    carriageGroup.add(portCollar);
+    // ========================================================
+    // 4. Central Lubrication Port (Getapte smeerpoort M6)
+    // Centered at PORT_Y = 12.4, PORT_Z = 11.5 (above rail top, in the clear!)
+    // ========================================================
+    // Raised circular mounting boss on black end plate
+    const bossGeo = new THREE.CylinderGeometry(3.2, 3.4, 0.8, 24);
+    const boss = new THREE.Mesh(bossGeo, matEndCapBlack);
+    boss.rotation.x = Math.PI / 2;
+    boss.position.set(0, PORT_Y, PORT_Z - 0.2);
+    carriageGroup.add(boss);
 
-    const portHoleGeo = new THREE.CylinderGeometry(1.6, 1.6, 1.2, 24);
-    const matPortDark = new THREE.MeshBasicMaterial({ color: 0x0A0C0E });
-    const portHole = new THREE.Mesh(portHoleGeo, matPortDark);
-    portHole.rotation.x = Math.PI / 2;
-    portHole.position.set(0, PORT_Y, PORT_Z + 0.1);
-    carriageGroup.add(portHole);
+    // Brass/steel threaded bushing collar
+    const collarGeo = new THREE.CylinderGeometry(2.4, 2.4, 0.6, 24);
+    const collar = new THREE.Mesh(collarGeo, matBrassBushing);
+    collar.rotation.x = Math.PI / 2;
+    collar.position.set(0, PORT_Y, PORT_Z);
+    carriageGroup.add(collar);
+
+    // Threaded port cavity (M6)
+    const portCavityGeo = new THREE.CylinderGeometry(1.6, 1.6, 2.0, 24);
+    const matDarkCavity = new THREE.MeshBasicMaterial({ color: 0x08090C });
+    const portCavity = new THREE.Mesh(portCavityGeo, matDarkCavity);
+    portCavity.rotation.x = Math.PI / 2;
+    portCavity.position.set(0, PORT_Y, PORT_Z - 0.5);
+    carriageGroup.add(portCavity);
 
     // Ground Contact Shadow Floor
-    const floorGeo = new THREE.PlaneGeometry(90, 90);
+    const floorGeo = new THREE.PlaneGeometry(100, 100);
     const floorMat = new THREE.ShadowMaterial({ opacity: 0.14 });
     const floorMesh = new THREE.Mesh(floorGeo, floorMat);
     floorMesh.rotation.x = -Math.PI / 2;
@@ -371,7 +467,7 @@
     if (typeof THREE.OBJLoader !== 'undefined') {
       const loader = new THREE.OBJLoader();
 
-      // 1. Real CAD Oliesmeernippel Model
+      // 1. Real CAD Oliesmeernippel Model (osn_nippel.obj)
       loader.load(
         'assets/models/osn_nippel.obj',
         (obj) => {
@@ -384,7 +480,7 @@
             }
           });
 
-          // In CAD coordinates: Y=-6 is thread tip, Y=2.0 is collar, Y=8.0 is inbus head.
+          // In CAD: Y=-6 is thread tip, Y=2.0 is collar, Y=8.0 is inbus head.
           // Shift mesh so collar (seating face) is at Y=0:
           obj.position.set(0, -2.0, 0);
 
@@ -402,7 +498,7 @@
         (err) => console.warn('Instructions CAD Nipple could not be loaded:', err)
       );
 
-      // 2. Real CAD Afsluitdop Model (Correct orientation)
+      // 2. Real CAD Afsluitdop Model (osn_cap_mounted.obj)
       loader.load(
         'assets/models/osn_cap_mounted.obj',
         (obj) => {
@@ -514,16 +610,16 @@
       ]);
 
       if (t < 0.20) {
-        // Stap 1: Nipple approaches horizontally along Z
+        // Stap 1: Nipple approaches horizontally along Z towards the end cap port
         const p = t / 0.20;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
-        // Nipple advances from Z = 20.0 to Z = 13.5 (thread tip enters port)
-        nipplePivot.position.set(0, PORT_Y, 20.0 - (ease * 6.5));
+        // Nipple advances from Z = 22.0 to Z = 14.5 (thread tip enters port)
+        nipplePivot.position.set(0, PORT_Y, 22.0 - (ease * 7.5));
         nipplePivot.rotation.z = 0;
 
-        // Inbussleutel hovers at Z = 27.0
-        allenKeyGroup.position.set(0, PORT_Y, 27.0);
+        // Inbussleutel hovers behind at Z = 29.0
+        allenKeyGroup.position.set(0, PORT_Y, 29.0);
         allenKeyGroup.rotation.z = 0;
 
         capPivot.visible = false;
@@ -533,11 +629,11 @@
         const p = (t - 0.20) / 0.18;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
-        nipplePivot.position.set(0, PORT_Y, 13.5);
+        nipplePivot.position.set(0, PORT_Y, 14.5);
         nipplePivot.rotation.z = 0;
 
         // Inbus moves along -Z into socket
-        allenKeyGroup.position.set(0, PORT_Y, 27.0 - (ease * 10.5));
+        allenKeyGroup.position.set(0, PORT_Y, 29.0 - (ease * 11.5));
         allenKeyGroup.rotation.z = 0;
 
         capPivot.visible = false;
@@ -547,11 +643,11 @@
         const p = (t - 0.38) / 0.30;
         const rotations = p * Math.PI * 8; // 4 turns
 
-        // Nipple advances final 2.5mm until collar seats flush against end cap at PORT_Z
-        nipplePivot.position.set(0, PORT_Y, 13.5 - (p * 2.5));
+        // Nipple advances final 3.0mm until collar seats flush against end cap at PORT_Z
+        nipplePivot.position.set(0, PORT_Y, 14.5 - (p * 3.0));
         nipplePivot.rotation.z = rotations;
 
-        allenKeyGroup.position.set(0, PORT_Y, 16.5 - (p * 2.5));
+        allenKeyGroup.position.set(0, PORT_Y, 17.5 - (p * 3.0));
         allenKeyGroup.rotation.z = rotations;
 
         capPivot.visible = false;
@@ -564,7 +660,7 @@
         nipplePivot.position.set(0, PORT_Y, PORT_Z);
         nipplePivot.rotation.z = Math.PI * 8;
 
-        allenKeyGroup.position.set(0, PORT_Y, 14.0 + (ease * 18.0));
+        allenKeyGroup.position.set(0, PORT_Y, 14.5 + (ease * 18.0));
         allenKeyGroup.rotation.z = 0;
 
         capPivot.visible = false;
@@ -578,8 +674,8 @@
         allenKeyGroup.visible = false;
 
         capPivot.visible = true;
-        // Cap advances from Z = 22.0 to PORT_Z (flush over collar and hex head)
-        capPivot.position.set(0, PORT_Y, 22.0 - (ease * 11.0));
+        // Cap advances from Z = 24.0 to PORT_Z (flush over collar and hex head)
+        capPivot.position.set(0, PORT_Y, 24.0 - (ease * 12.5));
       }
 
     } else {
@@ -607,7 +703,7 @@
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
         capPivot.visible = true;
-        capPivot.position.set(0, PORT_Y, PORT_Z + (ease * 11.0));
+        capPivot.position.set(0, PORT_Y, PORT_Z + (ease * 12.5));
 
         // Aerosol waits high in front
         aerosolGroup.position.set(0, PORT_Y - 19.4 + 16.0, 32.0);
@@ -620,12 +716,9 @@
 
         // Cap moves aside out of the way
         capPivot.visible = true;
-        capPivot.position.set(8.0 * ease, PORT_Y + 4.0 * ease, PORT_Z + 11.0);
+        capPivot.position.set(8.5 * ease, PORT_Y + 4.5 * ease, PORT_Z + 12.5);
 
-        // Straw tip enters nipple head at PORT_Z + 3.0 and penetrates 7.5mm deep (to PORT_Z - 0.75)
-        // Straw tip in aerosolGroup is at Z = -14.0, Y = 19.4.
-        // So when aerosolGroup is at Y = PORT_Y - 19.4 and Z = PORT_Z + 14.0 - 0.75 = PORT_Z + 13.25,
-        // the straw is 7.5mm deep inside the nipple!
+        // Straw tip enters nipple head and penetrates 7.5mm deep
         const targetZ = PORT_Z + 13.25;
         aerosolGroup.position.set(0, PORT_Y - 19.4, 32.0 - (ease * (32.0 - targetZ)));
         sprayParticles.visible = false;
@@ -634,7 +727,7 @@
         // Stap 3: Spray button pressed, atomized dry lubricant micro-mist sprays into carriage
         const p = (t - 0.45) / 0.25;
 
-        capPivot.position.set(8.0, PORT_Y + 4.0, PORT_Z + 11.0);
+        capPivot.position.set(8.5, PORT_Y + 4.5, PORT_Z + 12.5);
         aerosolGroup.position.set(0, PORT_Y - 19.4, PORT_Z + 13.25);
 
         // Pulsing spray mist inside carriage channel
@@ -650,7 +743,7 @@
 
         sprayParticles.visible = false;
         aerosolGroup.position.set(0, PORT_Y - 19.4, PORT_Z + 13.25 + (ease * 18.0));
-        capPivot.position.set(8.0 * (1 - ease), PORT_Y + 4.0 * (1 - ease), PORT_Z + 11.0);
+        capPivot.position.set(8.5 * (1 - ease), PORT_Y + 4.5 * (1 - ease), PORT_Z + 12.5);
 
       } else {
         // Stap 5: Cap slides back along -Z and hermetically locks onto the nipple
@@ -661,7 +754,7 @@
         sprayParticles.visible = false;
 
         capPivot.visible = true;
-        capPivot.position.set(0, PORT_Y, PORT_Z + 11.0 - (ease * 11.0));
+        capPivot.position.set(0, PORT_Y, PORT_Z + 12.5 - (ease * 12.5));
       }
     }
   }
@@ -699,8 +792,8 @@
         if (tabSmering) tabSmering.classList.remove('active');
         if (badgesMontage) badgesMontage.style.display = 'flex';
         if (badgesSmering) badgesSmering.style.display = 'none';
-        camera.position.set(24, 18, 28);
-        controls.target.set(0, PORT_Y, 6.0);
+        camera.position.set(24, 21, 28);
+        controls.target.set(0, PORT_Y - 1.2, 5.0);
       });
     }
 
@@ -712,8 +805,8 @@
         if (tabMontage) tabMontage.classList.remove('active');
         if (badgesMontage) badgesMontage.style.display = 'none';
         if (badgesSmering) badgesSmering.style.display = 'flex';
-        camera.position.set(22, 16, 26);
-        controls.target.set(0, PORT_Y, 6.0);
+        camera.position.set(22, 19, 26);
+        controls.target.set(0, PORT_Y - 1.2, 5.0);
       });
     }
 
