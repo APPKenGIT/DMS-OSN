@@ -46,8 +46,8 @@
   const PORT_Y = 13.0;    // Center of the lubrication port
 
   // Global Framing — generous distance so full scene has 35% breathing room
-  const DEFAULT_TARGET = new THREE.Vector3(0, 11.0, 3.0);
-  const DEFAULT_CAM_POS = new THREE.Vector3(46.0, 32.0, 52.0);
+  const DEFAULT_TARGET = new THREE.Vector3(0, 10.0, 6.0);
+  const DEFAULT_CAM_POS = new THREE.Vector3(62.0, 42.0, 72.0);
 
   function init() {
     animContainer = document.getElementById('instructionsCanvasWrap');
@@ -61,7 +61,7 @@
 
     // 2. Camera setup — balanced perspective, generous distance (no excessive zoom!)
     const aspect = animContainer.clientWidth / Math.max(1, animContainer.clientHeight);
-    camera = new THREE.PerspectiveCamera(36, aspect, 0.1, 350);
+    camera = new THREE.PerspectiveCamera(30, aspect, 0.1, 400);
     camera.position.copy(DEFAULT_CAM_POS);
 
     // 3. Renderer setup
@@ -530,54 +530,79 @@
     }
   }
 
-  // Realistic L-shaped 4mm Allen Key with Smooth 90° Elbow Bend & Chamfered Drive Tip
+  // Photorealistic Ball-End (Kogelgewricht) 4mm Allen Key:
+  // The long shaft with spherical ball-hex head enters the nipple horizontally.
+  // The key is tilted upward at an ergonomic 16° angle (enabled by the ball joint!).
+  // The short L-handle points UPWARD at the outer front end (far in front of the carriage and rail),
+  // rotating freely in clear air with ZERO collision with the linear rail!
+  let allenKeyTiltGroup, allenKeySpinnerGroup;
+
   function setupRealisticAllenKey() {
     allenKeyGroup = new THREE.Group();
     worldGroup.add(allenKeyGroup);
 
+    // Pivot group: tilts upward around the ball-head center by 16 degrees
+    allenKeyTiltGroup = new THREE.Group();
+    allenKeyTiltGroup.rotation.x = 0.28; // 16° upward tilt (kogelgewricht)
+    allenKeyGroup.add(allenKeyTiltGroup);
+
+    // Spinner group: rotates around the tilted shaft axis during tightening
+    allenKeySpinnerGroup = new THREE.Group();
+    allenKeyTiltGroup.add(allenKeySpinnerGroup);
+
     const hexRadius = 1.15; // Scaled 4mm metric inbus across-flats
 
-    // 1. Short drive leg pointing along -Z (into the horizontal hex socket)
-    const legLength = 7.5;
-    const legGeo = new THREE.CylinderGeometry(hexRadius, hexRadius, legLength, 6);
-    const leg = new THREE.Mesh(legGeo, matAllenKey);
-    leg.rotation.x = Math.PI / 2;
-    leg.position.set(0, 0, -legLength / 2);
-    leg.castShadow = true;
-    allenKeyGroup.add(leg);
+    // 1. Spherical Ball-Hex Head (Kogelkop) at the drive tip (Z = 0)
+    const ballGeo = new THREE.SphereGeometry(hexRadius * 0.98, 16, 12);
+    ballGeo.scale(1.0, 1.0, 1.15); // Slightly elongated ball-hex
+    const ballMesh = new THREE.Mesh(ballGeo, matAllenKey);
+    ballMesh.position.set(0, 0, 0);
+    ballMesh.castShadow = true;
+    allenKeySpinnerGroup.add(ballMesh);
 
-    // Chamfered lead-in drive tip
-    const tipGeo = new THREE.CylinderGeometry(hexRadius * 0.82, hexRadius, 0.7, 6);
-    const tip = new THREE.Mesh(tipGeo, matAllenKey);
-    tip.rotation.x = Math.PI / 2;
-    tip.position.set(0, 0, -legLength - 0.35);
-    allenKeyGroup.add(tip);
+    // 2. Necked waist behind the ball head (characteristic of ball-end keys)
+    const neckGeo = new THREE.CylinderGeometry(hexRadius * 0.78, hexRadius * 0.95, 1.8, 12);
+    const neck = new THREE.Mesh(neckGeo, matAllenKey);
+    neck.rotation.x = Math.PI / 2;
+    neck.position.set(0, 0, 1.0);
+    neck.castShadow = true;
+    allenKeySpinnerGroup.add(neck);
 
-    // 2. Smooth 90-degree curved elbow bend
+    // 3. Long Hexagonal Drive Shaft extending forward along +Z (length 36mm)
+    const shaftLength = 36.0;
+    const shaftGeo = new THREE.CylinderGeometry(hexRadius, hexRadius, shaftLength, 6);
+    const shaft = new THREE.Mesh(shaftGeo, matAllenKey);
+    shaft.rotation.x = Math.PI / 2;
+    shaft.position.set(0, 0, 1.9 + shaftLength / 2);
+    shaft.castShadow = true;
+    allenKeySpinnerGroup.add(shaft);
+
+    // 4. Smooth 90-degree elbow bend turning UPWARD into +Y
+    const bendZ = 1.9 + shaftLength; // Z = 37.9
     const elbowCurve = new THREE.QuadraticBezierCurve3(
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 0, 2.6),
-      new THREE.Vector3(0, 2.6, 2.6)
+      new THREE.Vector3(0, 0, bendZ),
+      new THREE.Vector3(0, 0, bendZ + 2.5),
+      new THREE.Vector3(0, 2.5, bendZ + 2.5)
     );
     const elbowGeo = new THREE.TubeGeometry(elbowCurve, 12, hexRadius * 0.98, 6, false);
     const elbow = new THREE.Mesh(elbowGeo, matAllenKey);
     elbow.castShadow = true;
-    allenKeyGroup.add(elbow);
+    allenKeySpinnerGroup.add(elbow);
 
-    // 3. Long leverage handle extending upward along +Y
-    const handleLength = 22.0;
+    // 5. Short L-handle extending UPWARD along +Y into open air (length 14mm)
+    const handleLength = 14.0;
     const handleGeo = new THREE.CylinderGeometry(hexRadius, hexRadius, handleLength, 6);
     const handle = new THREE.Mesh(handleGeo, matAllenKey);
-    handle.position.set(0, 2.6 + handleLength / 2, 2.6);
+    handle.position.set(0, 2.5 + handleLength / 2, bendZ + 2.5);
     handle.castShadow = true;
-    allenKeyGroup.add(handle);
+    allenKeySpinnerGroup.add(handle);
 
-    // Stamped size badge "4 mm" on handle
-    const badgeGeo = new THREE.BoxGeometry(0.3, 3.5, 1.4);
+    // Stamped size badge "4 mm" on short handle
+    const badgeGeo = new THREE.BoxGeometry(0.3, 3.0, 1.2);
     const matBadge = new THREE.MeshStandardMaterial({ color: 0x485260, metalness: 0.8, roughness: 0.4 });
     const badge = new THREE.Mesh(badgeGeo, matBadge);
-    badge.position.set(hexRadius * 0.95, 2.6 + handleLength * 0.6, 2.6);
-    allenKeyGroup.add(badge);
+    badge.position.set(hexRadius * 0.95, 2.5 + handleLength * 0.5, bendZ + 2.5);
+    allenKeySpinnerGroup.add(badge);
   }
 
   // Realistic Aerosol Can positioned SAFELY to the side (X=18.0) — ZERO collision with rail or carriage!
@@ -637,7 +662,7 @@
   function updateAnimation(t) {
     if (activeTab === 'montage') {
       // ----------------------------------------------------
-      // Sequence 1: MONTAGE (Inbussleutel 4 & Afsluitdop)
+      // Sequence 1: MONTAGE (Inbussleutel 4 met kogelkop & Afsluitdop)
       // ----------------------------------------------------
       aerosolGroup.visible = false;
       sprayParticles.visible = false;
@@ -645,53 +670,52 @@
 
       updateStepBadge(t, [
         { upTo: 0.20, id: 'stepM1', label: 'Stap 1: Positioneren' },
-        { upTo: 0.38, id: 'stepM2', label: 'Stap 2: Inbus 4mm Invoeren' },
-        { upTo: 0.68, id: 'stepM3', label: 'Stap 3: Trillingsvast Inschroeven' },
+        { upTo: 0.38, id: 'stepM2', label: 'Stap 2: Inbus 4mm Kogelkop Invoeren' },
+        { upTo: 0.68, id: 'stepM3', label: 'Stap 3: Rechtsom Inschroeven' },
         { upTo: 0.82, id: 'stepM4', label: 'Stap 4: Inbussleutel Terugtrekken' },
         { upTo: 1.00, id: 'stepM5', label: 'Stap 5: Afsluitdop Vergrendelen' }
       ]);
 
       if (t < 0.20) {
-        // Stap 1: Nipple approaches horizontally along Z towards the visible threaded port hole
+        // Stap 1: Nipple approaches horizontally along Z towards visible threaded port
         const p = t / 0.20;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
-        // Nipple advances from Z = 28.0 to Z = 16.5 (thread tip enters visible port)
+        // Nipple advances from Z = 28.0 to Z = 16.5 (thread enters port)
         nipplePivot.position.set(0, PORT_Y, 28.0 - (ease * 11.5));
         nipplePivot.rotation.z = 0;
 
-        // Inbussleutel hovers safely behind at Z = 34.0
-        allenKeyGroup.position.set(0, PORT_Y, 34.0);
-        allenKeyGroup.rotation.z = 0;
+        // Allen key ball-end hovers safely behind at Z = 28.0
+        allenKeyGroup.position.set(0, PORT_Y, 28.0);
+        if (allenKeySpinnerGroup) allenKeySpinnerGroup.rotation.z = 0;
 
         capPivot.visible = false;
 
       } else if (t < 0.38) {
-        // Stap 2: Inbus 4mm enters horizontally into hex socket
+        // Stap 2: Ball-end (kogelgewricht) enters horizontally into hex socket
         const p = (t - 0.20) / 0.18;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
         nipplePivot.position.set(0, PORT_Y, 16.5);
         nipplePivot.rotation.z = 0;
 
-        // Inbus tip enters hex socket (advances from 34.0 to Z = 20.2)
-        allenKeyGroup.position.set(0, PORT_Y, 34.0 - (ease * 13.8));
-        allenKeyGroup.rotation.z = 0;
+        // Inbus ball tip enters hex socket (advances from 28.0 to Z = 18.2)
+        allenKeyGroup.position.set(0, PORT_Y, 28.0 - (ease * 9.8));
+        if (allenKeySpinnerGroup) allenKeySpinnerGroup.rotation.z = 0;
 
         capPivot.visible = false;
 
       } else if (t < 0.68) {
-        // Stap 3: Inbus 4mm turns 4 full revolutions, driving nipple into threaded port
+        // Stap 3: Screwed in CLOCKWISE (rechtsom indraaien!), turning 4 full turns
         const p = (t - 0.38) / 0.30;
         const rotations = p * Math.PI * 8; // 4 full turns
 
-        // Nipple advances final 3.0mm until collar seats flush against end cap at PORT_Z
-        // Hex head remains 100% visible and accessible outside the block!
+        // Clockwise in Three.js (looking down -Z into hole) = NEGATIVE rotation!
         nipplePivot.position.set(0, PORT_Y, 16.5 - (p * 3.0));
-        nipplePivot.rotation.z = rotations;
+        nipplePivot.rotation.z = -rotations;
 
-        allenKeyGroup.position.set(0, PORT_Y, 20.2 - (p * 3.0));
-        allenKeyGroup.rotation.z = rotations;
+        allenKeyGroup.position.set(0, PORT_Y, 18.2 - (p * 3.0));
+        if (allenKeySpinnerGroup) allenKeySpinnerGroup.rotation.z = -rotations;
 
         capPivot.visible = false;
 
@@ -701,25 +725,27 @@
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
         nipplePivot.position.set(0, PORT_Y, PORT_Z);
-        nipplePivot.rotation.z = Math.PI * 8;
+        nipplePivot.rotation.z = -Math.PI * 8; // Maintains final tight position
 
         // Allen key retracts completely out of the way
-        allenKeyGroup.position.set(0, PORT_Y, 17.2 + (ease * 24.0));
-        allenKeyGroup.rotation.z = 0;
+        allenKeyGroup.position.set(0, PORT_Y, 15.2 + (ease * 22.0));
+        if (allenKeySpinnerGroup) allenKeySpinnerGroup.rotation.z = -Math.PI * 8;
 
         capPivot.visible = false;
 
       } else {
-        // Stap 5: Cap advances horizontally along -Z and snaps locked over the nipple head
+        // Stap 5: Cap advances along -Z and snaps locked over the nipple head
+        // Seating Z = 14.28 so closed outer face is at 17.64 (covering nipple tip at 17.34 cleanly!)
         const p = (t - 0.82) / 0.18;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
         nipplePivot.position.set(0, PORT_Y, PORT_Z);
+        nipplePivot.rotation.z = -Math.PI * 8;
         allenKeyGroup.visible = false;
 
         capPivot.visible = true;
-        // Cap advances from Z = 28.0 to PORT_Z (locking over hex head and collar)
-        capPivot.position.set(0, PORT_Y, 28.0 - (ease * 14.5));
+        // Cap advances from Z = 28.0 to Z = 14.28
+        capPivot.position.set(0, PORT_Y, 28.0 - (ease * (28.0 - 14.28)));
       }
 
     } else {
@@ -731,7 +757,7 @@
 
       // Nipple is seated flush in the end cap port
       nipplePivot.position.set(0, PORT_Y, PORT_Z);
-      nipplePivot.rotation.z = 0;
+      nipplePivot.rotation.z = -Math.PI * 8;
 
       updateStepBadge(t, [
         { upTo: 0.20, id: 'stepS1', label: 'Stap 1: Afsluitdop Afnemen' },
@@ -747,11 +773,11 @@
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
         capPivot.visible = true;
-        // Cap pulls forward off nipple, then swings far to X=20, Y=26, Z=24
+        // Cap starts at 14.28, pulls forward off nipple to 21.0, then swings to X=20, Y=26, Z=24
         capPivot.position.set(
           20.0 * ease,
           PORT_Y + (13.0 * ease),
-          PORT_Z + (ease * 11.0)
+          14.28 + (ease * 10.0)
         );
 
         // Aerosol can waits safely parked to the side
@@ -765,13 +791,10 @@
 
         // Cap stays parked far to the side
         capPivot.visible = true;
-        capPivot.position.set(20.0, PORT_Y + 13.0, PORT_Z + 11.0);
+        capPivot.position.set(20.0, PORT_Y + 13.0, 24.28);
 
         // Can advances along Z from 40.0 to target where straw tip penetrates 7.5mm:
-        // Straw tip is at (0, 0, -22.0) relative to aerosolGroup.
-        // Nipple front face is at PORT_Z + (8.0 * CAD_SCALE) = 13.5 + 3.84 = 17.34.
-        // Penetrating 7.5mm deep (scaled ~3.6mm) means straw tip at Z = 13.74.
-        // Therefore, aerosolGroup Z must be 13.74 + 22.0 = 35.74!
+        // Straw tip enters nipple bore cleanly:
         const targetZ = 35.74;
         aerosolGroup.position.set(0, PORT_Y, 40.0 - (ease * (40.0 - targetZ)));
         sprayParticles.visible = false;
@@ -780,7 +803,7 @@
         // Stap 3: Spray button pressed, pulsing atomized dry lubricant micro-mist sprays into carriage
         const p = (t - 0.45) / 0.25;
 
-        capPivot.position.set(20.0, PORT_Y + 13.0, PORT_Z + 11.0);
+        capPivot.position.set(20.0, PORT_Y + 13.0, 24.28);
         aerosolGroup.position.set(0, PORT_Y, 35.74);
 
         // Pulsing spray mist inside carriage channel
@@ -801,11 +824,11 @@
         capPivot.position.set(
           20.0 * (1 - ease),
           PORT_Y + (13.0 * (1 - ease)),
-          PORT_Z + 11.0
+          14.28 + (10.0 * (1 - ease))
         );
 
       } else {
-        // Stap 5: Cap slides back along -Z and hermetically locks onto the nipple
+        // Stap 5: Cap slides back along -Z and hermetically locks onto the nipple at Z = 14.28
         const p = (t - 0.85) / 0.15;
         const ease = 0.5 - 0.5 * Math.cos(p * Math.PI);
 
@@ -813,7 +836,7 @@
         sprayParticles.visible = false;
 
         capPivot.visible = true;
-        capPivot.position.set(0, PORT_Y, PORT_Z + 11.0 - (ease * 11.0));
+        capPivot.position.set(0, PORT_Y, 24.28 - (ease * (24.28 - 14.28)));
       }
     }
   }
