@@ -46,8 +46,13 @@
   const PORT_Y = 13.0;    // Center of the lubrication port
 
   // Global Framing — generous distance so full scene has 35% breathing room
-  const DEFAULT_TARGET = new THREE.Vector3(0, 10.0, 6.0);
-  const DEFAULT_CAM_POS = new THREE.Vector3(62.0, 42.0, 72.0);
+  // Dedicated camera viewpoints for Montage vs Smering (turned around so straw is 100% visible!):
+  const DEFAULT_TARGET = new THREE.Vector3(0, 10.0, 5.0);
+  const CAM_POS_MONTAGE = new THREE.Vector3(56.0, 36.0, 64.0);
+  // Smering view: turned around to front-left (-X) so the aerosol can is in the background
+  // and the red straw and nipple bore are in clear, 100% unobstructed foreground profile!
+  const CAM_POS_SMERING = new THREE.Vector3(-52.0, 34.0, 58.0);
+  let DEFAULT_CAM_POS = CAM_POS_MONTAGE;
 
   function init() {
     animContainer = document.getElementById('instructionsCanvasWrap');
@@ -531,19 +536,19 @@
   }
 
   // Photorealistic Ball-End (Kogelgewricht) 4mm Allen Key:
-  // The long shaft with spherical ball-hex head enters the nipple horizontally.
-  // The key is tilted upward at an ergonomic 16° angle (enabled by the ball joint!).
-  // The short L-handle points UPWARD at the outer front end (far in front of the carriage and rail),
-  // rotating freely in clear air with ZERO collision with the linear rail!
+  // The spherical ball-hex head enters the nipple horizontally.
+  // The key is tilted UPWARD at an ergonomic 24° angle (-0.42 rad) so it rises high into open air!
+  // The long shaft extends 26mm, and the short L-handle points UPWARD.
+  // When rotating 360°, the lowest sweep is 3.5mm ABOVE the rail — ZERO collision with the linear guide!
   let allenKeyTiltGroup, allenKeySpinnerGroup;
 
   function setupRealisticAllenKey() {
     allenKeyGroup = new THREE.Group();
     worldGroup.add(allenKeyGroup);
 
-    // Pivot group: tilts upward around the ball-head center by 16 degrees
+    // Pivot group: tilts UPWARD around ball-head center by 24 degrees (negative X rotation = UP in Three.js!)
     allenKeyTiltGroup = new THREE.Group();
-    allenKeyTiltGroup.rotation.x = 0.28; // 16° upward tilt (kogelgewricht)
+    allenKeyTiltGroup.rotation.x = -0.42; // Tilted UPWARDS into clear air!
     allenKeyGroup.add(allenKeyTiltGroup);
 
     // Spinner group: rotates around the tilted shaft axis during tightening
@@ -554,97 +559,139 @@
 
     // 1. Spherical Ball-Hex Head (Kogelkop) at the drive tip (Z = 0)
     const ballGeo = new THREE.SphereGeometry(hexRadius * 0.98, 16, 12);
-    ballGeo.scale(1.0, 1.0, 1.15); // Slightly elongated ball-hex
+    ballGeo.scale(1.0, 1.0, 1.15); // Ellipsoidal ball-hex
     const ballMesh = new THREE.Mesh(ballGeo, matAllenKey);
     ballMesh.position.set(0, 0, 0);
     ballMesh.castShadow = true;
     allenKeySpinnerGroup.add(ballMesh);
 
-    // 2. Necked waist behind the ball head (characteristic of ball-end keys)
-    const neckGeo = new THREE.CylinderGeometry(hexRadius * 0.78, hexRadius * 0.95, 1.8, 12);
+    // 2. Narrowed neck behind the ball head (standard Wiha/PB Swiss ball-end profile)
+    const neckGeo = new THREE.CylinderGeometry(hexRadius * 0.78, hexRadius * 0.95, 1.6, 12);
     const neck = new THREE.Mesh(neckGeo, matAllenKey);
     neck.rotation.x = Math.PI / 2;
-    neck.position.set(0, 0, 1.0);
+    neck.position.set(0, 0, 0.9);
     neck.castShadow = true;
     allenKeySpinnerGroup.add(neck);
 
-    // 3. Long Hexagonal Drive Shaft extending forward along +Z (length 36mm)
-    const shaftLength = 36.0;
+    // 3. Long Hexagonal Drive Shaft extending forward along +Z (length 25mm, fits 100% in view)
+    const shaftLength = 25.0;
     const shaftGeo = new THREE.CylinderGeometry(hexRadius, hexRadius, shaftLength, 6);
     const shaft = new THREE.Mesh(shaftGeo, matAllenKey);
     shaft.rotation.x = Math.PI / 2;
-    shaft.position.set(0, 0, 1.9 + shaftLength / 2);
+    shaft.position.set(0, 0, 1.7 + shaftLength / 2);
     shaft.castShadow = true;
     allenKeySpinnerGroup.add(shaft);
 
     // 4. Smooth 90-degree elbow bend turning UPWARD into +Y
-    const bendZ = 1.9 + shaftLength; // Z = 37.9
+    const bendZ = 1.7 + shaftLength; // Z = 26.7
     const elbowCurve = new THREE.QuadraticBezierCurve3(
       new THREE.Vector3(0, 0, bendZ),
-      new THREE.Vector3(0, 0, bendZ + 2.5),
-      new THREE.Vector3(0, 2.5, bendZ + 2.5)
+      new THREE.Vector3(0, 0, bendZ + 2.2),
+      new THREE.Vector3(0, 2.2, bendZ + 2.2)
     );
     const elbowGeo = new THREE.TubeGeometry(elbowCurve, 12, hexRadius * 0.98, 6, false);
     const elbow = new THREE.Mesh(elbowGeo, matAllenKey);
     elbow.castShadow = true;
     allenKeySpinnerGroup.add(elbow);
 
-    // 5. Short L-handle extending UPWARD along +Y into open air (length 14mm)
-    const handleLength = 14.0;
+    // 5. Short L-handle extending UPWARD along +Y into open air (length 11.5mm)
+    const handleLength = 11.5;
     const handleGeo = new THREE.CylinderGeometry(hexRadius, hexRadius, handleLength, 6);
     const handle = new THREE.Mesh(handleGeo, matAllenKey);
-    handle.position.set(0, 2.5 + handleLength / 2, bendZ + 2.5);
+    handle.position.set(0, 2.2 + handleLength / 2, bendZ + 2.2);
     handle.castShadow = true;
     allenKeySpinnerGroup.add(handle);
 
     // Stamped size badge "4 mm" on short handle
-    const badgeGeo = new THREE.BoxGeometry(0.3, 3.0, 1.2);
+    const badgeGeo = new THREE.BoxGeometry(0.3, 2.8, 1.1);
     const matBadge = new THREE.MeshStandardMaterial({ color: 0x485260, metalness: 0.8, roughness: 0.4 });
     const badge = new THREE.Mesh(badgeGeo, matBadge);
-    badge.position.set(hexRadius * 0.95, 2.5 + handleLength * 0.5, bendZ + 2.5);
+    badge.position.set(hexRadius * 0.95, 2.2 + handleLength * 0.5, bendZ + 2.2);
     allenKeySpinnerGroup.add(badge);
   }
 
-  // Realistic Aerosol Can positioned SAFELY to the side (X=18.0) — ZERO collision with rail or carriage!
+  // Photorealistic Compact Industrial Aerosol Can:
+  // Perfectly proportioned (height 12.8mm) so it is 100% visible in view with NO clipping!
+  // Placed at X = 13.5 (on the right/far side of the carriage), allowing the red flexible straw
+  // to extend gracefully across into the nipple bore in clear foreground profile!
   function setupAerosolCan() {
     aerosolGroup = new THREE.Group();
     worldGroup.add(aerosolGroup);
 
-    // Can body (held to the side at X = 18.0, Y = 16.0)
-    // Carriage outer edge is at X = 10.0, so this leaves an 8.0mm completely clear air gap!
-    const canGeo = new THREE.CylinderGeometry(3.6, 3.6, 16.0, 32);
-    const canMesh = new THREE.Mesh(canGeo, matAerosolCan);
-    canMesh.position.set(18.0, 16.0, 0);
+    const canRadius = 1.65;
+    const canHeight = 9.2;
+    const canX = 13.5;
+    const canY = 7.5;
+
+    // 1. Chime Bottom Rim (crimped tinplate rolled seam)
+    const chimeGeo = new THREE.CylinderGeometry(canRadius * 0.96, canRadius * 1.02, 0.45, 32);
+    const chime = new THREE.Mesh(chimeGeo, matRailSteel);
+    chime.position.set(canX, canY + 0.22, 0);
+    chime.castShadow = true;
+    aerosolGroup.add(chime);
+
+    // 2. Can Body with Industrial Label
+    const canBodyGeo = new THREE.CylinderGeometry(canRadius, canRadius, canHeight, 32);
+    const canMesh = new THREE.Mesh(canBodyGeo, matAerosolCan);
+    canMesh.position.set(canX, canY + 0.45 + canHeight / 2, 0);
     canMesh.castShadow = true;
     aerosolGroup.add(canMesh);
 
-    // Can top dome
-    const domeGeo = new THREE.SphereGeometry(3.6, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.35);
+    // Contrasting Industrial Brand Label Band
+    const labelGeo = new THREE.CylinderGeometry(canRadius * 1.01, canRadius * 1.01, canHeight * 0.65, 32);
+    const matLabel = new THREE.MeshStandardMaterial({
+      color: 0x1E293B, // Deep industrial graphite/navy
+      metalness: 0.25,
+      roughness: 0.4
+    });
+    const labelMesh = new THREE.Mesh(labelGeo, matLabel);
+    labelMesh.position.set(canX, canY + 0.45 + canHeight * 0.48, 0);
+    aerosolGroup.add(labelMesh);
+
+    // Signal Accent Stripe (Interflon Orange style)
+    const stripeGeo = new THREE.CylinderGeometry(canRadius * 1.015, canRadius * 1.015, 0.45, 32);
+    const matAccent = new THREE.MeshStandardMaterial({ color: 0xE5A024, roughness: 0.35 });
+    const stripeMesh = new THREE.Mesh(stripeGeo, matAccent);
+    stripeMesh.position.set(canX, canY + 0.45 + canHeight * 0.78, 0);
+    aerosolGroup.add(stripeMesh);
+
+    // 3. Spun Aluminium Contoured Top Shoulder Dome
+    const domeGeo = new THREE.SphereGeometry(canRadius, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.32);
     const dome = new THREE.Mesh(domeGeo, matRailSteel);
-    dome.position.set(18.0, 24.0, 0);
+    dome.position.set(canX, canY + 0.45 + canHeight, 0);
     aerosolGroup.add(dome);
 
-    // Valve cup & mounting ring
-    const valveGeo = new THREE.CylinderGeometry(1.2, 1.6, 1.4, 24);
+    // 4. Valve Mounting Cup Ring
+    const valveGeo = new THREE.CylinderGeometry(0.85, 1.15, 0.65, 24);
     const valve = new THREE.Mesh(valveGeo, matRailSteel);
-    valve.position.set(18.0, 25.2, 0);
+    valve.position.set(canX, canY + 0.45 + canHeight + 0.55, 0);
     aerosolGroup.add(valve);
 
-    // Spray actuator nozzle button (black POM)
-    const nozzleGeo = new THREE.CylinderGeometry(1.3, 1.3, 1.8, 16);
-    const nozzle = new THREE.Mesh(nozzleGeo, matEndCapBlack);
-    nozzle.position.set(18.0, 26.5, 0);
+    // 5. Ergonomic Spray Actuator Button (Bright Safety Red / Technical POM)
+    const nozzleGeo = new THREE.CylinderGeometry(0.85, 0.85, 1.15, 18);
+    const matActuator = new THREE.MeshStandardMaterial({ color: 0xDE3628, roughness: 0.35 });
+    const nozzle = new THREE.Mesh(nozzleGeo, matActuator);
+    nozzle.position.set(canX, canY + 0.45 + canHeight + 1.4, 0);
     aerosolGroup.add(nozzle);
 
-    // Flexible red straw that originates from nozzle at (18.0, 26.2, 0)
-    // and curves gracefully down & inwards to align horizontally with the nipple bore at (0, 0, -22.0)
+    // Actuator nozzle hole (where straw exits)
+    const exitHoleGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.5, 12);
+    const exitHole = new THREE.Mesh(exitHoleGeo, matDarkPort);
+    exitHole.rotation.z = Math.PI / 2;
+    exitHole.position.set(canX - 0.75, canY + 0.45 + canHeight + 1.35, 0);
+    aerosolGroup.add(exitHole);
+
+    // 6. High-Visibility Technical Red Flexible Straw
+    // Starts from actuator at (canX - 0.85, canY + 0.45 + canHeight + 1.35, 0)
+    // Curves down and forward into the nipple bore at (0, 0, -22.0)
+    const startY = canY + 0.45 + canHeight + 1.35; // ~18.8
     const strawCurve = new THREE.CubicBezierCurve3(
-      new THREE.Vector3(18.0, 26.2, 0),
-      new THREE.Vector3(12.0, 26.2, -6.0),
-      new THREE.Vector3(3.0, 0, -12.0),
-      new THREE.Vector3(0, 0, -22.0) // Straw tip pointing straight horizontally into -Z
+      new THREE.Vector3(canX - 0.85, startY, 0),
+      new THREE.Vector3(canX - 4.5, startY - 0.5, -4.0),
+      new THREE.Vector3(2.5, 0, -10.0),
+      new THREE.Vector3(0, 0, -22.0) // Straw tip aligned straight horizontally into nipple bore!
     );
-    const strawGeo = new THREE.TubeGeometry(strawCurve, 24, 0.40, 12, false);
+    const strawGeo = new THREE.TubeGeometry(strawCurve, 28, 0.36, 12, false);
     const strawMesh = new THREE.Mesh(strawGeo, matStraw);
     strawMesh.castShadow = true;
     aerosolGroup.add(strawMesh);
@@ -652,7 +699,7 @@
     // Pulsing spray mist cone inside the lubrication cavity
     const sprayConeGeo = new THREE.ConeGeometry(2.4, 5.5, 16, 1, true);
     sprayParticles = new THREE.Mesh(sprayConeGeo, matSpray);
-    sprayParticles.rotation.x = -Math.PI / 2; // Spray emerges forward along -Z into carriage
+    sprayParticles.rotation.x = -Math.PI / 2;
     sprayParticles.position.set(0, PORT_Y, PORT_Z - 2.5);
     worldGroup.add(sprayParticles);
     sprayParticles.visible = false;
@@ -860,9 +907,12 @@
     }
   }
 
+  
+
   function resetCameraView() {
     if (!camera || !controls) return;
-    camera.position.copy(DEFAULT_CAM_POS);
+    const targetPos = (activeTab === 'smering') ? CAM_POS_SMERING : CAM_POS_MONTAGE;
+    camera.position.copy(targetPos);
     controls.target.copy(DEFAULT_TARGET);
     controls.update();
   }
@@ -893,6 +943,7 @@
         if (tabMontage) tabMontage.classList.remove('active');
         if (badgesMontage) badgesMontage.style.display = 'none';
         if (badgesSmering) badgesSmering.style.display = 'flex';
+        // Automatically turn view around so straw is 100% visible without obstruction!
         resetCameraView();
       });
     }
