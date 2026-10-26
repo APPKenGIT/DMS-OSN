@@ -37,7 +37,7 @@
       <div class="top-bar-links">
         <a href="mailto:demeestersolutions@gmail.com">demeestersolutions@gmail.com</a>
         <span>·</span>
-        <a href="#bestellen">Vraag staffelofferte aan</a>
+        <a href="offerte.html">Vraag staffelofferte aan</a>
       </div>
     </div>
   </div>
@@ -61,12 +61,12 @@
         <a href="#kenmerken">Kenmerken</a>
         <a href="#toepassingen">Toepassingen</a>
         <a href="#specificaties">Specificaties</a>
-        <a href="#animaties">3D Montage</a>
-        <a href="#verdeler">Verdelers</a>
+        <a href="montage.html">3D Montage</a>
+        <a href="verdelers.html">Verdelers</a>
       </nav>
 
       <div class="header-right">
-        <a class="header-cta" href="#bestellen">
+        <a class="header-cta" href="offerte.html">
           <span>Offerte aanvragen</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -100,7 +100,7 @@
         </p>
 
         <div class="hero-actions">
-          <a class="btn-primary" href="#bestellen">
+          <a class="btn-primary" href="offerte.html">
             <span>Offerte aanvragen</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -544,341 +544,70 @@
     </div>
   </section>
 
-  <!-- 3D Instructional Videos / Sequences Section -->
-  <section class="instructions-section" id="animaties">
+  <!-- Navigation Hub to Dedicated Pages -->
+  <section class="hub-section">
     <div class="wrap">
-      <div class="section-head">
-        <span class="index">04 — 3D MONTAGE- & SMEERINSTRUCTIES</span>
-        <h2>Bekijk stap-voor-stap hoe de Oliesmeernippel gemonteerd en gesmeerd wordt.</h2>
-        <p>Interactieve technische demonstraties op een industriële lineaire geleidingswagen met profielrail. Draai en zoom vrij rondom tijdens de animatie om de inbussleutel maat 4 en de aerosol in actie te zien.</p>
+      <div class="section-head" style="text-align:center; max-width:760px; margin:0 auto 40px auto;">
+        <span class="index">04 — VERVOLGSTAPPEN & TOEPASSING</span>
+        <h2>Ontdek montage, officiële verdelers of vraag direct een offerte aan.</h2>
+        <p>Kies hieronder het gewenste onderdeel. Bekijk de interactieve 3D montage-animatie, meld uw onderneming aan als erkend verdeler of configureer direct een staffelofferte op maat.</p>
       </div>
 
-      <div class="instructions-player">
-        <!-- Player Header with Tabs -->
-        <div class="instructions-header">
-          <div class="instructions-tabs">
-            <button type="button" class="anim-tab active" id="tabAnimMontage">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-              </svg>
-              1. Montagehandleiding (Inbus 4 & Afsluitdop)
-            </button>
-            <button type="button" class="anim-tab" id="tabAnimSmering">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-              </svg>
-              2. Smeerinstructie (Aerosol & Rietje-Dosering)
-            </button>
-          </div>
-
-          <div style="font-size:0.75rem; color:var(--steel-600); font-family:var(--font-mono);">
-            INTERACTIEVE 3D ANIMATIE · INBUS METRISCH 4 MM
-          </div>
-        </div>
-
-        <!-- Canvas Container -->
-        <div class="instructions-canvas-wrap" id="instructionsCanvasWrap">
-          <canvas id="instructionsCanvas"></canvas>
-
-          <!-- Floating Live Step Banner -->
-          <div class="instructions-step-banner">
-            <div class="instruction-current-step" id="instructionStepLabel">
-              Stap 1: Positioneren
-            </div>
-
-            <!-- Step Badges (Montage) -->
-            <div class="instruction-badges-row" id="badgesMontage">
-              <span class="step-badge-pill active" id="stepM1">1. Positioneren</span>
-              <span class="step-badge-pill" id="stepM2">2. Inbus 4mm</span>
-              <span class="step-badge-pill" id="stepM3">3. Inschroeven</span>
-              <span class="step-badge-pill" id="stepM4">4. Sleutel eruit</span>
-              <span class="step-badge-pill" id="stepM5">5. Dop monteren</span>
-            </div>
-
-            <!-- Step Badges (Smering) -->
-            <div class="instruction-badges-row" id="badgesSmering" style="display:none;">
-              <span class="step-badge-pill active" id="stepS1">1. Dop afnemen</span>
-              <span class="step-badge-pill" id="stepS2">2. Rietje insteken (7.5mm)</span>
-              <span class="step-badge-pill" id="stepS3">3. Droge olie spuiten</span>
-              <span class="step-badge-pill" id="stepS4">4. Rietje terug</span>
-              <span class="step-badge-pill" id="stepS5">5. Dop sluiten</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Controls Bar -->
-        <div class="instructions-bar">
-          <button type="button" class="anim-play-btn" id="btnAnimPlayPause">Pauzeren ⏸</button>
-          <button type="button" class="anim-restart-btn" id="btnAnimRestart" title="Herstart animatie">Opnieuw ↺</button>
-          <button type="button" class="anim-restart-btn" id="btnAnimResetCam" title="Camerahoek & afstand herstellen">View herstellen ⌖</button>
-          
-          <div class="anim-scrubber-wrap">
-            <input type="range" class="anim-scrubber" id="instructionScrubber" min="0" max="100" value="0" title="Sleep door animatie">
-          </div>
-
-          <div class="anim-speed-wrap">
-            <span>Snelheid:</span>
-            <select class="anim-speed-select" id="animSpeedSelect">
-              <option value="1.0" selected>1.0x Normaal</option>
-              <option value="0.5">0.5x Vertraagd</option>
-              <option value="1.5">1.5x Versneld</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Quote Request Section (GitHub Pages & FormSubmit Ready) -->
-  <section class="cta-strip" id="bestellen">
-    <div class="wrap cta-grid">
-      <div class="cta-info">
-        <div class="tag tag-signal" style="background:rgba(229,160,36,0.2); color:#F3B745;">
-          <span>Vrijblijvende offerte op maat</span>
-        </div>
-
-        <h2 style="margin-top:16px;">Vraag direct een offerte aan voor uw gewenste aantal & maat.</h2>
-        
-        <p>
-          Vrijblijvende prijsvoorstellen op maat. De afsluitdop wordt altijd standaard bijgeleverd bij de nippel. Losse doppen zijn apart na te bestellen per 50 stuks.
-        </p>
-
-        <div class="cta-highlights">
-          <div class="cta-highlight-item">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            <span>Staffelkortingen bij 50, 100, 500 en 1000+ stuks</span>
-          </div>
-          <div class="cta-highlight-item">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            <span>Flexibele afnames vanaf 10 stuks tot grote series</span>
-          </div>
-          <div class="cta-highlight-item">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            <span>Facturatie op rekening mogelijk voor bedrijven</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Form Container -->
-      <div class="cta-form-container">
-        <!-- Main Form (GitHub Pages + FormSubmit AJAX) -->
-        <form class="cta-form" id="quoteForm" action="https://formsubmit.co/demeestersolutions@gmail.com" method="POST">
-          <!-- FormSubmit Configuration -->
-          <input type="hidden" name="_subject" value="Nieuwe offerteaanvraag — Oliesmeernippel (De Meester Industries)">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-
-          <!-- Dynamic Multi-Articles Container -->
-          <div id="articlesList" class="articles-list">
-            <!-- Articles rendered dynamically by js/form.js -->
-          </div>
-
-          <button type="button" id="btnAddArticle" class="btn-add-article">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <span>Extra artikel toevoegen</span>
-          </button>
-
-          <!-- Contact details -->
-          <div class="form-row">
-            <div>
-              <label for="company">Bedrijfsnaam (optioneel)</label>
-              <input id="company" name="Bedrijfsnaam" type="text" placeholder="Uw bedrijfsnaam">
-            </div>
-
-            <div>
-              <label for="email">E-mailadres <span style="color:var(--signal);">*</span></label>
-              <input id="email" name="E-mailadres aanvrager" type="email" placeholder="naam@bedrijf.be" required>
-            </div>
-          </div>
-
-          <label for="notes">Aanvullende opmerkingen of referentie (optioneel)</label>
-          <textarea id="notes" name="Aanvullende opmerkingen" rows="2" placeholder="Eventueel projectreferentie, inkoopordernummer of specifieke wensen…"></textarea>
-
-          <!-- Live Configuration Summary Box -->
-          <div class="live-config-summary">
-            <div class="live-config-title">Configuratie-overzicht:</div>
-            <div class="live-config-text" id="liveConfigText">
-              Laden…
-            </div>
-          </div>
-
-          <div style="margin-bottom:18px;">
-            <label style="display:flex; align-items:flex-start; gap:8px; font-size:0.8rem; color:var(--steel-400); cursor:pointer;">
-              <input type="checkbox" name="akkoord_voorwaarden" required style="width:auto; margin-top:3px; cursor:pointer;">
-              <span>Ik ga akkoord met de <a href="#termsModal" class="open-terms-modal" style="color:var(--signal); text-decoration:underline;">algemene verkoopsvoorwaarden</a> van De Meester Industries.</span>
-            </label>
-          </div>
-
-          <button type="submit" id="quoteSubmitBtn">
-            <span>Offerte aanvragen</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
-
-          <p class="form-note">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 14 14"></polyline>
-            </svg>
-            Vrijblijvend prijsvoorstel op maat · Snelle opvolging
-          </p>
-        </form>
-
-        <!-- In-page Success Confirmation Overlay -->
-        <div class="form-status-overlay" id="formStatusOverlay">
-          <div class="status-icon-circle">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="20 6 9 17 4 12"></polyline>
+      <div class="hub-grid">
+        <!-- Card 1: 3D Montage -->
+        <a href="montage.html" class="hub-card">
+          <div class="hub-card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
             </svg>
           </div>
-          <h3>Aanvraag succesvol ontvangen!</h3>
-          <p>
-            Bedankt voor uw aanvraag. We hebben uw specificaties ontvangen en sturen u zo snel mogelijk een gespecificeerd voorstel naar <strong id="confirmedEmail" style="color:var(--paper-light);">uw e-mailadres</strong>.
-          </p>
-          <button class="btn-reset-form" id="btnNewQuote">Nog een aanvraag doen</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Distributor / Dealership License Application Section -->
-  <section class="distributor-section" id="verdeler">
-    <div class="wrap">
-      <div class="distributor-grid">
-        <div class="distributor-info">
-          <div class="tag tag-signal" style="background:rgba(229,160,36,0.2); color:#F3B745;">
-            <span>Zakelijk Partnerschap</span>
+          <div class="hub-card-tag">Stap-voor-stap</div>
+          <h3 class="hub-card-title">3D Montage & Smering</h3>
+          <p class="hub-card-desc">Interactieve technische 3D simulatie met inbussleutel montage, afsluitdop en aerosol spuitrietje smering op een echte lineaire wagen.</p>
+          <div class="hub-card-cta">
+            <span>Bekijk 3D instructies</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
-          <h2 style="margin-top:16px; font-size:2.1rem; color:#FFFFFF;">Word Erkend Verdeler of OEM-Licentiepartner</h2>
-          <p style="color:var(--steel-300); font-size:1.05rem; line-height:1.6; margin-top:12px;">
-            Vergroot uw technisch productaanbod met de gepatenteerde Oliesmeernippel voor droge-oliesmering. Wij bieden technische groothandels, MRO-distributeurs en machinebouwers een exclusief partnerprogramma met beschermde marktsegmenten en aantrekkelijke marges.
-          </p>
+        </a>
 
-          <div class="distributor-perks">
-            <div class="distributor-perk-card">
-              <h4>1. Aantrekkelijke B2B Marges</h4>
-              <p>Groothandelsprijzen met ruime marge en projectgebonden staffelkortingen voor seriematige afnames.</p>
-            </div>
-            <div class="distributor-perk-card">
-              <h4>2. Exclusiviteit per Regio</h4>
-              <p>Mogelijkheid tot gebiedsbescherming of industriesegment-exclusiviteit (o.a. food, pharma, semicon, OEM).</p>
-            </div>
-            <div class="distributor-perk-card">
-              <h4>3. Compleet Marketingpakket</h4>
-              <p>Fysieke demoboxen voor uw buitendienst, 3D CAD-modellen (STEP/DWG), TDS-fiches en promotiemateriaal.</p>
-            </div>
-            <div class="distributor-perk-card">
-              <h4>4. Directe OEM-Integratie</h4>
-              <p>Technische documentatie voor opname in productcatalogi van lineaire geleidingsfabrikanten en machinebouw.</p>
-            </div>
+        <!-- Card 2: Verdelers -->
+        <a href="verdelers.html" class="hub-card">
+          <div class="hub-card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
           </div>
-        </div>
-
-        <div class="distributor-form-wrap">
-          <h3>Aanvraagformulier Verdelerlicentie</h3>
-          <p class="sub">Vul onderstaand formulier in. Wij nemen binnen 1 werkdag contact op voor een kennismaking.</p>
-
-          <form action="https://formsubmit.co/demeestersolutions@gmail.com" method="POST" id="distributorForm">
-            <input type="hidden" name="_subject" value="Nieuwe Aanvraag Verdelerlicentie — Oliesmeernippel">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_captcha" value="false">
-
-            <div class="form-row">
-              <div>
-                <label class="field-label" for="distCompany">Bedrijfsnaam *</label>
-                <input type="text" id="distCompany" name="Bedrijfsnaam" required placeholder="bv. ABC Technische Groothandel">
-              </div>
-              <div>
-                <label class="field-label" for="distVat">BTW-nummer / KVK *</label>
-                <input type="text" id="distVat" name="BTW_nummer" required placeholder="bv. BE 0123.456.789 / NL...">
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div>
-                <label class="field-label" for="distName">Contactpersoon *</label>
-                <input type="text" id="distName" name="Contactpersoon" required placeholder="Voor- en achternaam">
-              </div>
-              <div>
-                <label class="field-label" for="distRole">Functie</label>
-                <input type="text" id="distRole" name="Functie" placeholder="bv. Zaakvoerder, Product Manager">
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div>
-                <label class="field-label" for="distEmail">Zakelijk e-mailadres *</label>
-                <input type="email" id="distEmail" name="Email" required placeholder="naam@bedrijf.be">
-              </div>
-              <div>
-                <label class="field-label" for="distPhone">Telefoonnummer *</label>
-                <input type="tel" id="distPhone" name="Telefoon" required placeholder="+32 / +31 ...">
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div>
-                <label class="field-label" for="distType">Type Organisatie *</label>
-                <select id="distType" name="Type_Organisatie" required>
-                  <option value="" disabled selected>Selecteer uw type onderneming</option>
-                  <option value="Technische Groothandel / MRO">Technische Groothandel / MRO</option>
-                  <option value="OEM Machinebouwer">OEM Machinebouwer</option>
-                  <option value="Lineaire Systeemintegrator">Lineaire Systeemintegrator</option>
-                  <option value="Smeermiddelenspecialist">Smeermiddelenspecialist / Verdeler</option>
-                  <option value="Anders">Anders</option>
-                </select>
-              </div>
-              <div>
-                <label class="field-label" for="distRegion">Actieve Regio / Werkgebied *</label>
-                <select id="distRegion" name="Regio" required>
-                  <option value="" disabled selected>Selecteer regio</option>
-                  <option value="België (Vlaanderen)">België (Vlaanderen)</option>
-                  <option value="België (Wallonië / Brussel)">België (Wallonië / Brussel)</option>
-                  <option value="Nederland">Nederland</option>
-                  <option value="Duitsland / DACH">Duitsland / DACH</option>
-                  <option value="Overig Europa / Internationaal">Overig Europa / Internationaal</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label class="field-label" for="distMessage">Toelichting & Klantenbestand</label>
-              <textarea id="distMessage" name="Toelichting" rows="3" placeholder="Beschrijf kort uw marktfocus, actieve sectoren of geschat afzetvolume..."></textarea>
-            </div>
-
-            <div class="checkbox-wrap">
-              <input type="checkbox" id="distTerms" name="akkoord_voorwaarden" required>
-              <label for="distTerms">Ik ga akkoord met de <a href="#termsModal" class="open-terms-modal" style="color:var(--signal); text-decoration:underline;">algemene verkoopsvoorwaarden</a> van De Meester Industries.</label>
-            </div>
-
-            <button type="submit" class="btn-distributor-submit" id="btnDistSubmit">
-              <span>Aanvraag Verdelerlicentie Versturen</span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
-            </button>
-          </form>
-
-          <div id="distSuccessMsg" style="display:none; margin-top:20px; background:#142B1A; border:1px solid #1E8E3E; border-radius:6px; padding:16px; color:#A8F0B8; font-size:0.9rem;">
-            <strong>✓ Aanvraag succesvol verstuurd!</strong> Wij nemen binnen 1 werkdag contact met u op voor de verdere stappen van het licentiepartnerschap.
+          <div class="hub-card-tag">B2B Partnerschap</div>
+          <h3 class="hub-card-title">Verdelers & Licenties</h3>
+          <p class="hub-card-desc">Word geautoriseerd wederverkoper of OEM-integrator. Beschermde marktmarges, demomodellen en technische ondersteuning.</p>
+          <div class="hub-card-cta">
+            <span>Meld aan als verdeler</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
-        </div>
+        </a>
+
+        <!-- Card 3: Offerte -->
+        <a href="offerte.html" class="hub-card featured">
+          <div class="hub-card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="hub-card-tag" style="background:var(--signal); color:var(--steel-900);">Direct aanvragen</div>
+          <h3 class="hub-card-title">Offerte & B2B Bestellen</h3>
+          <p class="hub-card-desc">Stel uw gewenste staffel samen per schroefdraad (M5-M10) en RVS legering (304/316) met BTW-nummer klantopzoeking.</p>
+          <div class="hub-card-cta">
+            <span>Configureer offerte</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </a>
       </div>
     </div>
   </section>
@@ -903,9 +632,9 @@
           <a href="#kenmerken">Kenmerken</a>
           <a href="#toepassingen">Toepassingen</a>
           <a href="#specificaties">Specificaties</a>
-          <a href="#animaties">3D Montage</a>
-          <a href="#verdeler">Verdelers</a>
-          <a href="#bestellen">Offerte</a>
+          <a href="montage.html">3D Montage</a>
+          <a href="verdelers.html">Verdelers</a>
+          <a href="offerte.html">Offerte</a>
           <a href="#termsModal" class="open-terms-modal">Algemene Voorwaarden</a>
         </div>
 
@@ -973,8 +702,6 @@
 
   <!-- Scripts -->
   <script src="js/viewer3d.js"></script>
-  <script src="js/instructions-3d.js"></script>
-  <script src="js/form.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

@@ -311,12 +311,33 @@
 
     dataObj['Offerte Overzicht'] = summaryText.trim();
 
-    // Contact info
+    // B2B Customer Lookup & Contact info
     const company = document.getElementById('company')?.value || '';
     if (company) dataObj['Bedrijfsnaam'] = company;
 
+    const vat = document.getElementById('vat')?.value || '';
+    if (vat) dataObj['BTW_nummer'] = vat;
+
+    const contactName = document.getElementById('contactName')?.value || '';
+    if (contactName) dataObj['Contactpersoon'] = contactName;
+
+    const contactRole = document.getElementById('contactRole')?.value || '';
+    if (contactRole) dataObj['Functie'] = contactRole;
+
+    const phone = document.getElementById('phone')?.value || '';
+    if (phone) dataObj['Telefoonnummer'] = phone;
+
     const email = document.getElementById('email')?.value || '';
     dataObj['E-mailadres aanvrager'] = email;
+
+    const address = document.getElementById('address')?.value || '';
+    if (address) dataObj['Adres'] = address;
+
+    const city = document.getElementById('city')?.value || '';
+    if (city) dataObj['Postcode_Gemeente'] = city;
+
+    const country = document.getElementById('country')?.value || '';
+    if (country) dataObj['Land'] = country;
 
     const notes = document.getElementById('notes')?.value || '';
     if (notes) dataObj['Aanvullende opmerkingen'] = notes;

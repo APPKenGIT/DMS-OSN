@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Montage- & Smeerinstructies — Oliesmeernippel | De Meester Industries</title>
+  <meta name="description" content="Bekijk interactieve 3D demonstraties van de montage en het smeren van de Oliesmeernippel op een lineaire geleidingswagen met profielrail. Inbus 4mm en droge-olie aerosol.">
+  <link rel="canonical" href="https://appkengit.github.io/DMS-OSN/montage.html">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+  <link rel="alternate icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png">
+
+  <!-- Fonts & Stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Three.js + OrbitControls + OBJLoader for 3D Interactive Instruction Player -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+</head>
+<body>
+
+  <!-- Sticky Header Navigation -->
+  <header>
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="Oliesmeernippel startpagina">
+        <svg class="mark" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#181B1F" stroke-width="2"/>
+          <circle cx="12" cy="12" r="3.2" fill="#E5A024"/>
+        </svg>
+        <span class="brand-text">
+          Oliesmeernippel
+          <small>De Meester Industries</small>
+        </span>
+      </a>
+
+      <nav id="siteNav" aria-label="Hoofdnavigatie">
+        <a href="index.html#werking">Werking</a>
+        <a href="index.html#kenmerken">Kenmerken</a>
+        <a href="index.html#toepassingen">Toepassingen</a>
+        <a href="index.html#specificaties">Specificaties</a>
+        <a href="montage.html" class="active">3D Montage</a>
+        <a href="verdelers.html">Verdelers</a>
+      </nav>
+
+      <div class="header-right">
+        <a class="header-cta" href="offerte.html">
+          <span>Offerte aanvragen</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu openen" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke="#181B1F" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Subpage Hero Header -->
+  <section class="subpage-hero">
+    <div class="wrap subpage-hero-inner">
+      <div class="breadcrumb-trail">
+        <a href="index.html">Home</a>
+        <span>/</span>
+        <span style="color:var(--steel-900);">3D Montage- & Smeerinstructies</span>
+      </div>
+
+      <div class="tag tag-signal">
+        <span>Interactieve 3D Instructies · Inbus 4mm & Aerosol</span>
+      </div>
+
+      <h1>3D Montage- & Smeerinstructies</h1>
+      
+      <p class="lead">
+        Bekijk stap-voor-stap hoe de Oliesmeernippel gemonteerd en gesmeerd wordt op een industriële lineaire geleidingswagen met profielrail. Draai en zoom vrij rondom tijdens de animatie om de inbussleutel maat 4 en de aerosol in actie te zien.
+      </p>
+    </div>
+  </section>
+
+  <!-- 3D Instructional Videos / Sequences Section -->
+  <section class="instructions-section" id="animaties" style="border-top:none; padding-top:40px;">
+    <div class="wrap">
+      <div class="instructions-player">
+        <!-- Player Header with Tabs -->
+        <div class="instructions-header">
+          <div class="instructions-tabs">
+            <button type="button" class="anim-tab active" id="tabAnimMontage">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+              </svg>
+              1. Montagehandleiding (Inbus 4 & Afsluitdop)
+            </button>
+            <button type="button" class="anim-tab" id="tabAnimSmering">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+              </svg>
+              2. Smeerinstructie (Aerosol & Rietje-Dosering)
+            </button>
+          </div>
+
+          <div style="font-size:0.75rem; color:var(--steel-600); font-family:var(--font-mono);">
+            INTERACTIEVE 3D ANIMATIE · INBUS METRISCH 4 MM
+          </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="instructions-canvas-wrap" id="instructionsCanvasWrap">
+          <canvas id="instructionsCanvas"></canvas>
+
+          <!-- Floating Live Step Banner -->
+          <div class="instructions-step-banner">
+            <div class="instruction-current-step" id="instructionStepLabel">
+              Stap 1: Positioneren
+            </div>
+
+            <!-- Step Badges (Montage) -->
+            <div class="instruction-badges-row" id="badgesMontage">
+              <span class="step-badge-pill active" id="stepM1">1. Positioneren</span>
+              <span class="step-badge-pill" id="stepM2">2. Inbus 4mm</span>
+              <span class="step-badge-pill" id="stepM3">3. Inschroeven</span>
+              <span class="step-badge-pill" id="stepM4">4. Sleutel eruit</span>
+              <span class="step-badge-pill" id="stepM5">5. Dop monteren</span>
+            </div>
+
+            <!-- Step Badges (Smering) -->
+            <div class="instruction-badges-row" id="badgesSmering" style="display:none;">
+              <span class="step-badge-pill active" id="stepS1">1. Dop afnemen</span>
+              <span class="step-badge-pill" id="stepS2">2. Rietje insteken (7.5mm)</span>
+              <span class="step-badge-pill" id="stepS3">3. Droge olie spuiten</span>
+              <span class="step-badge-pill" id="stepS4">4. Rietje terug</span>
+              <span class="step-badge-pill" id="stepS5">5. Dop sluiten</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="instructions-bar">
+          <button type="button" class="anim-play-btn" id="btnAnimPlayPause">Pauzeren ⏸</button>
+          <button type="button" class="anim-restart-btn" id="btnAnimRestart" title="Herstart animatie">Opnieuw ↺</button>
+          <button type="button" class="anim-restart-btn" id="btnAnimResetCam" title="Camerahoek & afstand herstellen">View herstellen ⌖</button>
+          
+          <div class="anim-scrubber-wrap">
+            <input type="range" class="anim-scrubber" id="instructionScrubber" min="0" max="100" value="0" title="Sleep door animatie">
+          </div>
+
+          <div class="anim-speed-wrap">
+            <span>Snelheid:</span>
+            <select class="anim-speed-select" id="animSpeedSelect">
+              <option value="1.0" selected>1.0x Normaal</option>
+              <option value="0.5">0.5x Vertraagd</option>
+              <option value="1.5">1.5x Versneld</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Installation Tips & Best Practices -->
+      <div style="margin-top:64px;">
+        <div class="section-head" style="margin-bottom:28px;">
+          <span class="index">BEST PRACTICES</span>
+          <h2>Praktische montagetips voor de technicus</h2>
+          <p>Voorkom beschadiging aan de schroefdraad en garandeer een lekvrije, betrouwbare werking.</p>
+        </div>
+
+        <div class="montage-tips-grid">
+          <div class="montage-tip-card">
+            <h4>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--signal-dark)" stroke-width="2.2">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+              </svg>
+              1. Draaimoment & Inbussleutel 4 mm
+            </h4>
+            <p>
+              Gebruik een kwalitatieve 4 mm inbussleutel (bij voorkeur met kogelkop voor moeilijker bereikbare plaatsen). Draai de nippel <strong>handvast + 1/4 slag</strong> aan. Dit volstaat voor een hermetische afdichting zonder de kunststof afstrijker te overbelasten.
+            </p>
+          </div>
+
+          <div class="montage-tip-card">
+            <h4>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--signal-dark)" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              2. Zuiveren van het smeerkanaal
+            </h4>
+            <p>
+              Reinig bij retrofit de schroefdraad van de bestaande wagen grondig van oud vet en verontreinigingen voordat u de Oliesmeernippel indraait. Dit voorkomt dat vastzittend vet de droge-oliefilm blokkeert.
+            </p>
+          </div>
+
+          <div class="montage-tip-card">
+            <h4>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--signal-dark)" stroke-width="2.2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+              </svg>
+              3. Doseren met droge-olie aerosol
+            </h4>
+            <p>
+              Steek het 3,2 mm doseerrietje van de spuitbus <strong>7,5 mm diep</strong> in het centrale gat van de nippel. Een korte puls van 1 à 2 seconden brengt een actieve micro-film aan over de volledige kogelomloop zonder lekkage.
+            </p>
+          </div>
+
+          <div class="montage-tip-card">
+            <h4>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--signal-dark)" stroke-width="2.2">
+                <rect x="5" y="4" width="14" height="16" rx="3"></rect>
+                <line x1="9" y1="9" x2="15" y2="9"></line>
+              </svg>
+              4. Afsluitdop altijd terugplaatsen
+            </h4>
+            <p>
+              Druk na elke smeerbeurt de metaaldetecteerbare blauwe dop stevig terug op de nippel tot deze vastklikt. Dit beschermt het smeerkanaal tegen stof, spanen, koelvloeistof en reinigingsmiddelen.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Strip linking to Offerte -->
+  <section style="background:var(--steel-950); padding:64px 0; border-top:1px solid var(--steel-850); color:var(--paper-light);">
+    <div class="wrap" style="display:flex; justify-content:space-between; align-items:center; gap:32px; flex-wrap:wrap;">
+      <div>
+        <div class="tag tag-signal" style="background:rgba(229,160,36,0.2); color:#F3B745; margin-bottom:12px;">
+          <span>Direct bestellen</span>
+        </div>
+        <h2 style="color:#FFFFFF; font-size:1.85rem; margin:0;">Klaar om uw lineaire geleidingen uit te rusten?</h2>
+        <p style="color:var(--steel-300); margin-top:8px; font-size:1rem;">Vraag direct een gespecificeerde B2B-offerte aan met staffelkortingen vanaf 10 stuks.</p>
+      </div>
+
+      <div>
+        <a class="btn-primary" href="offerte.html" style="background:var(--signal); color:var(--steel-950); border-color:var(--signal);">
+          <span>Offerte aanvragen</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M5 12h14M12 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compact Footer -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-inner-compact">
+        <div class="footer-brand-compact">
+          <svg class="mark" viewBox="0 0 24 24" fill="none" style="width:24px; height:24px;">
+            <circle cx="12" cy="12" r="10" stroke="#181B1F" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3.2" fill="#E5A024"/>
+          </svg>
+          <span style="font-family:var(--font-display); font-weight:800; font-size:1.02rem;">
+            Oliesmeernippel
+            <small style="font-family:var(--font-body); font-weight:600; font-size:0.68rem; color:var(--steel-600); text-transform:uppercase; margin-left:6px;">De Meester Industries</small>
+          </span>
+        </div>
+
+        <div class="footer-nav-compact">
+          <a href="index.html#werking">Werking</a>
+          <a href="index.html#kenmerken">Kenmerken</a>
+          <a href="index.html#toepassingen">Toepassingen</a>
+          <a href="index.html#specificaties">Specificaties</a>
+          <a href="montage.html" style="color:var(--signal-dark); font-weight:700;">3D Montage</a>
+          <a href="verdelers.html">Verdelers</a>
+          <a href="offerte.html">Offerte</a>
+          <a href="#termsModal" class="open-terms-modal">Algemene Voorwaarden</a>
+        </div>
+
+        <div class="footer-contact-compact">
+          <span>Contact:</span>
+          <a href="mailto:demeestersolutions@gmail.com">demeestersolutions@gmail.com</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 Oliesmeernippel — De Meester Industries. Alle rechten voorbehouden.</span>
+        <span><a href="#termsModal" class="open-terms-modal" style="color:var(--steel-600); text-decoration:underline;">Algemene Verkoopsvoorwaarden</a> · RVS304 & RVS316 Schroefdraadaansluitingen</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal: Algemene Verkoopsvoorwaarden -->
+  <div class="terms-modal" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <div class="terms-modal-card">
+      <div class="terms-modal-header">
+        <h3 id="termsTitle">Algemene Verkoopsvoorwaarden — De Meester Industries</h3>
+        <div class="terms-modal-actions">
+          <button type="button" class="btn-modal-print" onclick="window.print()">Afdrukken ⎙</button>
+          <button type="button" class="btn-modal-close" id="btnCloseTerms" aria-label="Sluiten">✕</button>
+        </div>
+      </div>
+
+      <div class="terms-modal-body">
+        <h4>Artikel 1 — Toepasselijkheid</h4>
+        <p>1.1 Deze algemene verkoopsvoorwaarden zijn van toepassing op alle aanbiedingen, offertes, bestellingen en overeenkomsten van De Meester Industries (hierna: "Verkoper") betreffende de levering van de gepatenteerde Oliesmeernippel, bijbehorende afsluitdoppen en toebehoren.</p>
+        <p>1.2 Afwijkingen van deze voorwaarden zijn slechts geldig indien deze uitdrukkelijk en schriftelijk door Verkoper zijn bevestigd. Inkoopvoorwaarden van de Klant worden uitdrukkelijk van de hand gewezen.</p>
+
+        <h4>Artikel 2 — Offertes, Prijzen en Totstandkoming</h4>
+        <p>2.1 Alle offertes en prijsopgaven zijn vrijblijvend en geldig gedurende dertig (30) kalenderdagen na offertedatum, tenzij uitdrukkelijk anders vermeld.</p>
+        <p>2.2 Prijzen luiden in Euro (€), exclusief BTW, heffingen, transport- en verpakkingskosten.</p>
+        <p>2.3 Een overeenkomst komt eerst tot stand na schriftelijke orderbevestiging door Verkoper of door de feitelijke verzending van de goederen.</p>
+
+        <h4>Artikel 3 — Betaling en Facturatie</h4>
+        <p>3.1 Betaling geschiedt binnen dertig (30) kalenderdagen na factuurdatum, netto zonder enige aftrek of schuldvergelijking, tenzij schriftelijk anders overeengekomen.</p>
+        <p>3.2 Bij overschrijding van de betalingstermijn is de Klant van rechtswege in verzuim. Verkoper is gerechtigd de wettelijke handelsrente in rekening te brengen, vermeerderd met een forfaitaire schadevergoeding van 10% ter dekking van buitengerechtelijke invorderingskosten.</p>
+
+        <h4>Artikel 4 — Levering en Eigendomsvoorbehoud</h4>
+        <p>4.1 Tenzij anders overeengekomen, geschiedt levering Ex Works (Incoterms 2020). Het transportrisico gaat over op de Klant vanaf het moment van verzending.</p>
+        <p>4.2 Alle geleverde goederen blijven het exclusieve eigendom van Verkoper tot het moment dat alle opeisbare vorderingen uit hoofde van de overeenkomst volledig zijn voldaan.</p>
+
+        <h4>Artikel 5 — Klachten, Inspectie en Conformiteit</h4>
+        <p>5.1 De Klant dient de goederen direct bij aflevering grondig te inspecteren op juiste schroefdraadmaat (M5/M6/M8/M10), materiaal (RVS304/RVS316) en uiterlijke staat.</p>
+        <p>5.2 Klachten betreffende zichtbare gebreken dienen binnen acht (8) werkdagen na aflevering schriftelijk en gedetailleerd aan Verkoper te worden gemeld.</p>
+
+        <h4>Artikel 6 — Garantie en Beperking van Aansprakelijkheid</h4>
+        <p>6.1 Verkoper garandeert de degelijkheid van de gebruikte materialen (RVS 304, RVS 316 en metaaldetecteerbaar polyamide) conform de gespecificeerde industrienormen.</p>
+        <p>6.2 De garantie dekt geen schade die het gevolg is van oneigenlijke installatie (bijv. geforceerd indraaien in beschadigde draad of overschrijding van het aandraaimoment) of oneigenlijk gebruik, waaronder met name begrepen het toedienen van traditionele vetten met vaste verdikkers in plaats van de voorgeschreven droge-olie aerosol.</p>
+        <p>6.3 De aansprakelijkheid van Verkoper is te allen tijde beperkt tot het netto factuurbedrag van de desbetreffende levering. Verkoper sluit iedere aansprakelijkheid voor indirecte schade, gevolgschade, machine-stilstand of omzetderving uit.</p>
+
+        <h4>Artikel 7 — Intellectueel Eigendom en Namaakverbod</h4>
+        <p>7.1 Alle intellectuele eigendomsrechten, octrooien, modelrechten, CAD-tekeningen en merkrechten met betrekking tot de Oliesmeernippel blijven te allen tijde het exclusieve eigendom van De Meester Industries.</p>
+        <p>7.2 Het is de Klant en/of derden uitdrukkelijk verboden om de producten van Verkoper na te maken, te modificeren of via reverse-engineering na te bouwen.</p>
+
+        <h4>Artikel 8 — Toepasselijk Recht en Geschillenbeslechting</h4>
+        <p>8.1 Op alle overeenkomsten is uitsluitend het Belgisch recht van toepassing. De toepasselijkheid van het Weens Koopverdrag (CISG) wordt uitdrukkelijk uitgesloten.</p>
+        <p>8.2 Alle geschillen behoren tot de uitsluitende bevoegdheid van de rechtbanken van het arrondissement waar de maatschappelijke zetel van Verkoper is gevestigd.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/instructions-3d.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
