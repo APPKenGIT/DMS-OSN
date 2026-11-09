@@ -2610,7 +2610,7 @@ footer {
 
 .calc-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
@@ -2627,7 +2627,7 @@ footer {
   background: linear-gradient(135deg, var(--steel-900) 0%, var(--steel-850) 100%);
   border-color: var(--steel-700);
   color: #FFFFFF;
-  grid-column: span 2;
+  grid-column: 1 / -1;
   border-left: 5px solid var(--signal);
 }
 
@@ -3254,11 +3254,12 @@ footer {
 }
 
 /* Responsive tweaks */
-@media (max-width: 768px) {
-  .calc-gauge-container {
-    flex-direction: column;
-    text-align: center;
+@media (max-width: 820px) {
+  .calc-kpi-grid {
+    grid-template-columns: 1fr;
   }
+}
+@media (max-width: 768px) {
   .tco-5y-columns {
     height: 180px;
   }

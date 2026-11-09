@@ -197,7 +197,6 @@
       kpiNettoWinst5j: document.getElementById('kpiNettoWinst5j'),
       kpiNettoWinstLabel: document.getElementById('kpiNettoWinstLabel'),
       kpiInvestering: document.getElementById('kpiInvestering'),
-      kpiRoiPercentage: document.getElementById('kpiRoiPercentage'),
 
       // Tabel cellen
       rowProductVet: document.getElementById('rowProductVet'),
@@ -238,8 +237,6 @@
       barOlieVal: document.getElementById('barOlieVal'),
 
       // Gauge
-      gaugeCircleVal: document.getElementById('gaugeCircleVal'),
-      gaugeCenterNum: document.getElementById('gaugeCenterNum'),
 
       // Gestapelde balken
       stackedVetTotal: document.getElementById('stackedVetTotal'),
@@ -256,21 +253,6 @@
 
     let latestRes = null;
 
-    // Update Radial Payback Gauge
-    function updateGauge(res) {
-      if (!displays.gaugeCircleVal || !displays.gaugeCenterNum) return;
-
-      if (res.terugverdientijdDagen < 1) {
-        const uren = Math.round(res.terugverdientijdUren * 10) / 10;
-        displays.gaugeCenterNum.textContent = `${uren}h`;
-        displays.gaugeCircleVal.style.strokeDashoffset = '15';
-      } else {
-        const dagen = Math.round(res.terugverdientijdDagen);
-        displays.gaugeCenterNum.textContent = `${dagen}d`;
-        const offset = Math.min(220, Math.max(30, dagen * 10));
-        displays.gaugeCircleVal.style.strokeDashoffset = `${offset}`;
-      }
-    }
 
     // Update Gestapelde Kostenbalken
     function updateStackedBars(res) {
@@ -359,7 +341,6 @@
       latestRes = res;
 
       // Render visuals
-      updateGauge(res);
       updateStackedBars(res);
       updateDynamicTcoChart(res);
 
@@ -396,9 +377,6 @@
         displays.kpiInvestering.textContent = formatEuro(res.eenmaligeInvestering, 2);
       }
 
-      if (displays.kpiRoiPercentage) {
-        displays.kpiRoiPercentage.textContent = `${formatNumber(res.roiPercentage, 0)}%`;
-      }
 
       // Tabel rijen
       if (displays.rowProductVet) displays.rowProductVet.textContent = formatEuro(res.productKostVetJaar, 2);
