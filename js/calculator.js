@@ -2,50 +2,51 @@
  * Oliesmeernippel — De Meester Industries
  * Opbrengstmodel & ROI-Calculator (js/calculator.js)
  * 
- * Gebaseerd op het geverifieerde industriële rekenmodel (OM - Oliesmeernippel v1.xlsx).
  * Berekent de besparing op productverbruik, smeertijd, productiestilstand en spare parts.
- * Inclusief geavanceerde visuals: machine geleiding visualisator, radial payback gauge,
- * gestapelde kostenverdeling, 5-jaars TCO staafdiagram en directie-export.
+ * Stukprijs Oliesmeernippel: € 25,50 excl. BTW per stuk.
+ * Inclusief aanpasbaar vermijdingspercentage defecten (0 - 100%).
  */
 
 (function () {
   'use strict';
 
-  // Benchmark standaardwaarden (rechtstreeks uit het gecontroleerde Excel-model)
+  // Benchmark standaardwaarden (excl. BTW)
   const BENCHMARKS = {
     // Smeerpunten / wagens
     smeerpunten: 1,
 
     // Huidige situatie (Smeervet patroon)
-    vetPrijs: 36.0,          // € per patroon
+    vetPrijs: 36.0,          // € per patroon (excl. BTW)
     vetInhoud: 400.0,        // gram
     vetFrequentie: 14,       // dagen tussen smeerbeurten
     vetVolume: 6.0,          // gram per smeerbeurt
     vetTijd: 3.0,            // minuten per smeerbeurt
 
     // Toepassing met Oliesmeernippel (Droge olie aerosol)
-    oliePrijs: 36.0,         // € per aerosol spuitbus
+    oliePrijs: 36.0,         // € per aerosol spuitbus (excl. BTW)
     olieInhoud: 500.0,       // milliliter
     olieFrequentie: 90,      // dagen tussen smeerbeurten
     olieVolume: 5.0,         // ml per smeerbeurt
     olieTijd: 2.0,           // minuten per smeerbeurt
-    nippelPrijs: 35.0,       // € eenmalige investering per nippel
+    nippelPrijs: 25.5,       // € eenmalige investering per nippel incl. dop (excl. BTW)
 
     // Arbeidstarieven
-    tariefSmeerder: 52.0,    // € / uur voor smeertechnicus
-    tariefMonteur: 65.0,     // € / uur voor mechanisch onderhoudstechnicus
+    tariefSmeerder: 52.0,    // € / uur voor smeertechnicus (excl. BTW)
+    tariefMonteur: 65.0,     // € / uur voor mechanisch technicus (excl. BTW)
 
     // Stilstand & Lagerschade
-    stilstandKostUur: 10000.0, // € stilstandskost productielijn per uur
+    stilstandKostUur: 10000.0, // € stilstandskost productielijn per uur (excl. BTW)
     hersteltijdUur: 3.0,       // hersteltijd per voorval in uren
-    risicoVoorvallen: 2,       // aantal lagerschades / voorvallen per jaar
-    sparePartsKost: 150.0,     // gemiddelde kostprijs vervangwagen / as per defect
+    risicoVoorvallen: 2,       // aantal lagerschades / voorvallen per jaar op vet
+    sparePartsKost: 150.0,     // gemiddelde kostprijs vervangwagen / as per defect (excl. BTW)
+
+    // Percentage vermeden defecten met droge olie (0 - 100%)
+    reductiePercentage: 100,
 
     // Horizon
     jarenHorizon: 5
   };
 
-  // Hulpfunctie voor nette Euro-formattering
   function formatEuro(amount, decimals = 0) {
     if (isNaN(amount) || !isFinite(amount)) return '€ 0';
     return new Intl.NumberFormat('nl-NL', {
@@ -71,7 +72,7 @@
   }
 
   /**
-   * Kerncalculatie volgens geverifieerd Excel-model
+   * Kerncalculatie volgens gecorrigeerd model (€ 25,50 / nippel + defectreductie)
    */
   function calculateROI(params) {
     const p = Object.assign({}, BENCHMARKS, params);
@@ -91,14 +92,18 @@
     const besparingArbeidJaar = arbeidKostVetJaar - arbeidKostOlieJaar;
 
     // 3. Downtime & Herstel (per machine / productielijn)
+    const reductiePct = Math.min(100, Math.max(0, parseFloat(p.reductiePercentage) || 0));
+    const vermedenVoorvallen = p.risicoVoorvallen * (reductiePct / 100.0);
+    const resterendeVoorvallen = p.risicoVoorvallen - vermedenVoorvallen;
+
     const stilstandEnHerstelKostVoorval = (p.stilstandKostUur * p.hersteltijdUur) + (p.hersteltijdUur * p.tariefMonteur);
     const downtimeKostVetJaar = stilstandEnHerstelKostVoorval * p.risicoVoorvallen;
-    const downtimeKostOlieJaar = 0.0;
+    const downtimeKostOlieJaar = stilstandEnHerstelKostVoorval * resterendeVoorvallen;
     const besparingDowntimeJaar = downtimeKostVetJaar - downtimeKostOlieJaar;
 
     // 4. Materiaal & Spare Parts (lineaire wagens / assen)
     const sparePartsKostVetJaar = p.sparePartsKost * p.risicoVoorvallen;
-    const sparePartsKostOlieJaar = 0.0;
+    const sparePartsKostOlieJaar = p.sparePartsKost * resterendeVoorvallen;
     const besparingSparePartsJaar = sparePartsKostVetJaar - sparePartsKostOlieJaar;
 
     // 5. Jaarlijkse totalen (OPEX)
@@ -106,8 +111,8 @@
     const totaleKostenOlieJaar = productKostOlieJaar + arbeidKostOlieJaar + downtimeKostOlieJaar + sparePartsKostOlieJaar;
     const jaarlijkseBesparing = totaleKostenVetJaar - totaleKostenOlieJaar;
 
-    // 6. Eenmalige investering (CAPEX)
-    const eenmaligeInvestering = p.nippelPrijs * n;
+    // 6. Eenmalige investering (CAPEX: € 25,50 per nippel incl. dop excl. BTW)
+    const eenmaligeInvestering = (parseFloat(p.nippelPrijs) || 25.5) * n;
 
     // 7. Terugverdientijd
     let terugverdientijdDagen = 0;
@@ -135,6 +140,8 @@
       arbeidKostVetJaar,
       arbeidKostOlieJaar,
       besparingArbeidJaar,
+      reductiePct,
+      vermedenVoorvallen,
       downtimeKostVetJaar,
       downtimeKostOlieJaar,
       besparingDowntimeJaar,
@@ -155,7 +162,7 @@
     };
   }
 
-  // Initialisatie van de volledige calculator op test.html
+  // Initialisatie van de volledige calculator
   function initFullCalculator() {
     const calcEl = document.getElementById('roiCalculatorApp');
     if (!calcEl) return;
@@ -166,6 +173,9 @@
       smeerpuntenSlider: document.getElementById('calcSmeerpuntenSlider'),
       stilstandKost: document.getElementById('calcStilstandKost'),
       voorvallen: document.getElementById('calcVoorvallen'),
+      reductiePct: document.getElementById('calcReductiePct'),
+      reductiePctSlider: document.getElementById('calcReductiePctSlider'),
+      reductiePctDisplay: document.getElementById('reductiePctDisplay'),
       vetFrequentie: document.getElementById('calcVetFrequentie'),
       olieFrequentie: document.getElementById('calcOlieFrequentie'),
       hersteltijd: document.getElementById('calcHersteltijd'),
@@ -211,9 +221,7 @@
       barOlieTco: document.getElementById('barOlieTco'),
       barOlieVal: document.getElementById('barOlieVal'),
 
-      // Nieuwe visuele elementen
-      carriagesContainer: document.getElementById('carriagesContainer'),
-      railStatusPill: document.getElementById('railStatusPill'),
+      // Gauge
       gaugeCircleVal: document.getElementById('gaugeCircleVal'),
       gaugeCenterNum: document.getElementById('gaugeCenterNum'),
 
@@ -224,6 +232,7 @@
       segVetSpare: document.getElementById('segVetSpare'),
       segVetArbeid: document.getElementById('segVetArbeid'),
       segVetProduct: document.getElementById('segVetProduct'),
+      segOlieClean: document.getElementById('segOlieClean'),
 
       // CTA offerte button
       btnToOfferte: document.getElementById('btnCalcToOfferte')
@@ -231,45 +240,14 @@
 
     let latestRes = null;
 
-    // Render visuele wagentjes op de rail
-    function renderCarriages(n) {
-      if (!displays.carriagesContainer) return;
-      displays.carriagesContainer.innerHTML = '';
-
-      if (displays.railStatusPill) {
-        displays.railStatusPill.textContent = `${n} ${n === 1 ? 'smeerpunt' : 'smeerpunten'} beschermd`;
-      }
-
-      const maxIcons = 14;
-      const count = Math.min(n, maxIcons);
-
-      for (let i = 1; i <= count; i++) {
-        const item = document.createElement('div');
-        item.className = 'calc-carriage-icon';
-        item.title = `Geleidewagen #${i} voorzien van Oliesmeernippel`;
-        item.textContent = i;
-        displays.carriagesContainer.appendChild(item);
-      }
-
-      if (n > maxIcons) {
-        const more = document.createElement('span');
-        more.className = 'calc-carriage-overflow';
-        more.textContent = `+ nog ${n - maxIcons} wagens`;
-        displays.carriagesContainer.appendChild(more);
-      }
-    }
-
     // Update Radial Payback Gauge
     function updateGauge(res) {
       if (!displays.gaugeCircleVal || !displays.gaugeCenterNum) return;
 
-      const totalCirc = 251.2; // 2 * pi * 40
-
       if (res.terugverdientijdDagen < 1) {
         const uren = Math.round(res.terugverdientijdUren * 10) / 10;
         displays.gaugeCenterNum.textContent = `${uren}h`;
-        // Zeer snelle ROI: ring bijna vol
-        displays.gaugeCircleVal.style.strokeDashoffset = '20';
+        displays.gaugeCircleVal.style.strokeDashoffset = '15';
       } else {
         const dagen = Math.round(res.terugverdientijdDagen);
         displays.gaugeCenterNum.textContent = `${dagen}d`;
@@ -293,6 +271,11 @@
       if (displays.segVetSpare) displays.segVetSpare.style.width = `${pctSpare}%`;
       if (displays.segVetArbeid) displays.segVetArbeid.style.width = `${pctArb}%`;
       if (displays.segVetProduct) displays.segVetProduct.style.width = `${pctProd}%`;
+
+      if (displays.segOlieClean) {
+        const olieTotPct = Math.min(100, Math.max(2, (res.totaleKostenOlieJaar / tot) * 100));
+        displays.segOlieClean.style.width = `${olieTotPct}%`;
+      }
     }
 
     // Update 5-Jaars Kolomgrafiek
@@ -328,10 +311,16 @@
     }
 
     function updateView() {
+      const redVal = inputs.reductiePct ? parseFloat(inputs.reductiePct.value) : BENCHMARKS.reductiePercentage;
+      if (inputs.reductiePctDisplay) {
+        inputs.reductiePctDisplay.textContent = `${Math.round(redVal)}%`;
+      }
+
       const currentParams = {
         smeerpunten: inputs.smeerpunten ? parseInt(inputs.smeerpunten.value, 10) : BENCHMARKS.smeerpunten,
         stilstandKost: inputs.stilstandKost ? parseFloat(inputs.stilstandKost.value) : BENCHMARKS.stilstandKostUur,
         risicoVoorvallen: inputs.voorvallen ? parseFloat(inputs.voorvallen.value) : BENCHMARKS.risicoVoorvallen,
+        reductiePercentage: redVal,
         vetFrequentie: inputs.vetFrequentie ? parseFloat(inputs.vetFrequentie.value) : BENCHMARKS.vetFrequentie,
         olieFrequentie: inputs.olieFrequentie ? parseFloat(inputs.olieFrequentie.value) : BENCHMARKS.olieFrequentie,
         hersteltijdUur: inputs.hersteltijd ? parseFloat(inputs.hersteltijd.value) : BENCHMARKS.hersteltijdUur,
@@ -345,7 +334,6 @@
       latestRes = res;
 
       // Render visuals
-      renderCarriages(res.smeerpunten);
       updateGauge(res);
       updateStackedBars(res);
       update5yChart(res);
@@ -408,7 +396,7 @@
       if (displays.barVetTco && displays.barOlieTco) {
         const maxTco = Math.max(res.tcoVetHorizon, res.tcoOlieHorizon, 1);
         const pctVet = Math.min(100, Math.max(10, (res.tcoVetHorizon / maxTco) * 100));
-        const pctOlie = Math.min(100, Math.max(4, (res.tcoOlieHorizon / maxTco) * 100));
+        const pctOlie = Math.min(100, Math.max(2, (res.tcoOlieHorizon / maxTco) * 100));
 
         displays.barVetTco.style.width = `${pctVet}%`;
         displays.barOlieTco.style.width = `${pctOlie}%`;
@@ -435,10 +423,22 @@
       });
     }
 
+    // Koppel slider en numeriek veld voor vermijdingspercentage
+    if (inputs.reductiePct && inputs.reductiePctSlider) {
+      inputs.reductiePctSlider.addEventListener('input', function () {
+        inputs.reductiePct.value = this.value;
+        updateView();
+      });
+      inputs.reductiePct.addEventListener('input', function () {
+        inputs.reductiePctSlider.value = this.value;
+        updateView();
+      });
+    }
+
     // Luister naar alle invoervelden
     Object.keys(inputs).forEach(key => {
       const el = inputs[key];
-      if (el && key !== 'smeerpunten' && key !== 'smeerpuntenSlider') {
+      if (el && !['smeerpunten', 'smeerpuntenSlider', 'reductiePct', 'reductiePctSlider'].includes(key)) {
         el.addEventListener('input', updateView);
       }
     });
@@ -451,6 +451,8 @@
         if (inputs.smeerpuntenSlider) inputs.smeerpuntenSlider.value = BENCHMARKS.smeerpunten;
         if (inputs.stilstandKost) inputs.stilstandKost.value = BENCHMARKS.stilstandKostUur;
         if (inputs.voorvallen) inputs.voorvallen.value = BENCHMARKS.risicoVoorvallen;
+        if (inputs.reductiePct) inputs.reductiePct.value = BENCHMARKS.reductiePercentage;
+        if (inputs.reductiePctSlider) inputs.reductiePctSlider.value = BENCHMARKS.reductiePercentage;
         if (inputs.vetFrequentie) inputs.vetFrequentie.value = BENCHMARKS.vetFrequentie;
         if (inputs.olieFrequentie) inputs.olieFrequentie.value = BENCHMARKS.olieFrequentie;
         if (inputs.hersteltijd) inputs.hersteltijd.value = BENCHMARKS.hersteltijdUur;
@@ -462,7 +464,7 @@
       });
     }
 
-    // Preset knoppen (bijv. 1 wagen, 4 wagens, 12 wagens, 30 wagens)
+    // Preset knoppen
     const presetButtons = document.querySelectorAll('[data-calc-preset]');
     presetButtons.forEach(btn => {
       btn.addEventListener('click', function () {
@@ -497,20 +499,22 @@
       btnCopy.addEventListener('click', function () {
         if (!latestRes) return;
         const text = `BUSINESS CASE OVERSTAP NAAR DROGE OLIE (OLIESMEERNIPPEL)
+Bedragen zijn exclusief BTW
 Organisatie / Machine: ${latestRes.smeerpunten} smeerpunt(en)
+Vermijdingspercentage defecten: ${latestRes.reductiePct}%
 -----------------------------------------------------------
-• Jaarlijkse kostenbesparing (OPEX): ${formatEuro(latestRes.jaarlijkseBesparing)}
+• Jaarlijkse kostenbesparing (OPEX): ${formatEuro(latestRes.jaarlijkseBesparing)} excl. BTW
 • Terugverdientijd investering: ${latestRes.terugverdientijdDagen < 1 ? Math.round(latestRes.terugverdientijdUren * 10) / 10 + ' uur' : Math.round(latestRes.terugverdientijdDagen) + ' dagen'}
-• Netto 5-jaars voordeel (TCO): ${formatEuro(latestRes.nettoWinstHorizon)}
-• Eenmalige investering: ${formatEuro(latestRes.eenmaligeInvestering)}
+• Netto 5-jaars voordeel (TCO): ${formatEuro(latestRes.nettoWinstHorizon)} excl. BTW
+• Eenmalige investering: ${formatEuro(latestRes.eenmaligeInvestering)} excl. BTW (€ 25,50 / stuk)
 
-KOSTENVERGELIJKING PER JAAR:
+KOSTENVERGELIJKING PER JAAR (excl. BTW):
 - Smeermiddel: ${formatEuro(latestRes.productKostVetJaar)} (Vet) vs ${formatEuro(latestRes.productKostOlieJaar)} (Droge olie)
 - Smeertijd/Arbeid: ${formatEuro(latestRes.arbeidKostVetJaar)} vs ${formatEuro(latestRes.arbeidKostOlieJaar)}
-- Vermeden Lijnstilstand: ${formatEuro(latestRes.downtimeKostVetJaar)} per jaar
-- Vermeden Lagerschades: ${formatEuro(latestRes.sparePartsKostVetJaar)} per jaar
+- Vermeden Lijnstilstand: ${formatEuro(latestRes.besparingDowntimeJaar)} per jaar
+- Vermeden Lagerschades: ${formatEuro(latestRes.besparingSparePartsJaar)} per jaar
 
-Gegenereerd via https://appkengit.github.io/DMS-OSN/test.html`;
+Gegenereerd via https://appkengit.github.io/DMS-OSN/calculator.html`;
 
         navigator.clipboard.writeText(text).then(() => {
           const lbl = document.getElementById('btnCopyText');
@@ -561,7 +565,7 @@ Gegenereerd via https://appkengit.github.io/DMS-OSN/test.html`;
       }
 
       if (btnCta) {
-        btnCta.href = `test.html?smeerpunten=${points}#opbrengstmodel`;
+        btnCta.href = `calculator.html?smeerpunten=${points}`;
       }
     }
 

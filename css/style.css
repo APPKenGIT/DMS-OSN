@@ -3267,6 +3267,26 @@ footer {
   }
 }
 
+/* Navigatie Highlight Knop 'Doe de test' (Rood gekleurd) */
+#siteNav a.nav-highlight-red,
+.nav-highlight-red {
+  background: #D9381E !important;
+  color: #FFFFFF !important;
+  padding: 6px 14px !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(217, 56, 30, 0.35) !important;
+  transition: all 0.2s ease !important;
+}
+
+#siteNav a.nav-highlight-red:hover,
+.nav-highlight-red:hover {
+  background: #B82B14 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(217, 56, 30, 0.5) !important;
+}
+
 /* Teaser sectie op index.html */
 .teaser-test-grid {
   display: grid;

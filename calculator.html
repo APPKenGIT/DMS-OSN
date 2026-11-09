@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opbrengstmodel & ROI Calculator — Oliesmeernippel | De Meester Industries</title>
+  <meta name="description" content="Bereken direct uw besparing op smeermiddel, arbeid, lijnstilstand en lagerschades met het interactieve opbrengstmodel van de Oliesmeernippel. Cijfers excl. BTW.">
+  <link rel="canonical" href="https://appkengit.github.io/DMS-OSN/calculator.html">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+  <link rel="alternate icon" type="image/png" href="assets/images/favicon.png">
+  <link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png">
+
+  <!-- Fonts & Stylesheet -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800;900&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="top-bar">
+    <div class="wrap">
+      <div class="top-bar-badge">
+        <span>Gepatenteerde afdichting · Schroefdraad M5, M6, M8 & M10 · RVS304 & RVS316</span>
+      </div>
+      <div class="top-bar-links">
+        <a href="mailto:demeestersolutions@gmail.com">demeestersolutions@gmail.com</a>
+        <span>·</span>
+        <a href="offerte.html">Vraag staffelofferte aan</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="Oliesmeernippel startpagina">
+        <svg class="mark" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#181B1F" stroke-width="2"/>
+          <circle cx="12" cy="12" r="3.2" fill="#E5A024"/>
+        </svg>
+        <span class="brand-text">
+          Oliesmeernippel
+          <small>De Meester Industries</small>
+        </span>
+      </a>
+
+      <nav id="siteNav" aria-label="Hoofdnavigatie">
+        <a href="index.html#werking">Werking</a>
+        <a href="index.html#kenmerken">Kenmerken</a>
+        <a href="index.html#toepassingen">Toepassingen</a>
+        <a href="index.html#specificaties">Specificaties</a>
+        <a href="test.html" class="nav-highlight-red">Doe de test</a>
+        <a href="calculator.html" class="active">Opbrengstmodel</a>
+        <a href="montage.html">3D Montage</a>
+        <a href="verdelers.html">Verdelers</a>
+      </nav>
+
+      <div class="header-right">
+        <a class="header-cta" href="offerte.html">
+          <span>Offerte aanvragen</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu openen" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke="#181B1F" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Subpage Hero Header -->
+  <section class="subpage-hero">
+    <div class="wrap subpage-hero-inner">
+      <div class="breadcrumb-trail">
+        <a href="index.html">Home</a>
+        <span>/</span>
+        <span style="color:var(--steel-900);">Opbrengstmodel & ROI Calculator</span>
+      </div>
+
+      <div class="tag tag-signal">
+        <span>Financiële Business Case · Indicatief excl. BTW</span>
+      </div>
+
+      <h1>Interactief Opbrengstmodel & ROI Calculator</h1>
+      
+      <p class="lead">
+        Bereken hieronder nauwkeurig wat de overstap naar gerichte droge-oliesmering uw onderneming oplevert. Gebaseerd op fabrieksbenchmarks voor smeermiddel, manuren van technici, productiestilstand en lagerschades.
+      </p>
+
+      <div style="margin-top:14px; display:inline-flex; align-items:center; gap:8px; background:rgba(217,56,30,0.1); border:1px solid rgba(217,56,30,0.3); padding:8px 14px; border-radius:var(--radius-sm); font-size:0.84rem; color:#B82B14; font-weight:700;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>Belangrijk: Alle weergegeven bedragen, kosten en besparingen zijn indicatief en exclusief BTW.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Calculator Section -->
+  <section id="opbrengstmodel" style="padding: 60px 0 80px 0; background: #FFFFFF; border-top: 1px solid var(--line);">
+    <div class="wrap">
+      
+      <!-- Calculator App Container -->
+      <div class="calc-app-wrap" id="roiCalculatorApp">
+        <!-- Top Control Bar -->
+        <div class="calc-top-header">
+          <div class="calc-title-box">
+            <h3>Financiële Business Case & ROI Simulator</h3>
+            <p>Stukprijs Oliesmeernippel inclusief dop: € 25,50 excl. BTW · Pas de parameters naar wens aan</p>
+          </div>
+          <button type="button" class="calc-reset-btn" id="btnResetCalc" title="Zet alle velden terug naar de fabrieksbenchmark">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+            <span>Herstel fabrieksbenchmark</span>
+          </button>
+        </div>
+
+        <div class="calc-layout-grid">
+          <!-- Linkerzijde: Invoerpanelen -->
+          <div class="calc-inputs-pane">
+            
+            <!-- Groep 1: Machine & Smeerpunten -->
+            <div>
+              <div class="calc-group-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <line x1="3" y1="9" x2="21" y2="9"/>
+                  <line x1="9" y1="21" x2="9" y2="9"/>
+                </svg>
+                <span>1. Smeerpunten & Machinepark</span>
+              </div>
+
+              <div class="calc-field-row">
+                <div class="calc-label-bar">
+                  <label for="calcSmeerpunten">Aantal smeerpunten / wagens</label>
+                  <span class="calc-label-hint">stuks</span>
+                </div>
+                <div class="calc-slider-box">
+                  <input type="range" class="calc-range-slider" id="calcSmeerpuntenSlider" min="1" max="100" value="1" step="1">
+                  <div class="calc-num-input-wrap">
+                    <input type="number" class="calc-num-input" id="calcSmeerpunten" min="1" max="500" value="1">
+                  </div>
+                </div>
+                <div class="calc-preset-pills">
+                  <button type="button" class="preset-pill active" data-calc-preset="1">1 wagen (benchmark)</button>
+                  <button type="button" class="preset-pill" data-calc-preset="4">4 wagens</button>
+                  <button type="button" class="preset-pill" data-calc-preset="12">12 wagens</button>
+                  <button type="button" class="preset-pill" data-calc-preset="32">32 wagens</button>
+                </div>
+              </div>
+
+              <div class="calc-field-row" style="margin-top:12px;">
+                <div class="calc-label-bar">
+                  <label for="calcNippelPrijs">Aanschafprijs Oliesmeernippel incl. dop</label>
+                  <span class="calc-label-hint">€ / stuk (excl. BTW)</span>
+                </div>
+                <input type="number" class="calc-num-input" style="width:100%;" id="calcNippelPrijs" value="25.50" step="0.5" min="5">
+              </div>
+            </div>
+
+            <!-- Groep 2: Smeerregime & Arbeid -->
+            <div>
+              <div class="calc-group-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>2. Smeerinterval & Arbeid</span>
+              </div>
+
+              <div class="calc-fields-grid-2">
+                <div class="calc-field-row">
+                  <div class="calc-label-bar">
+                    <label for="calcVetFrequentie">Interval Vet</label>
+                    <span class="calc-label-hint">dagen</span>
+                  </div>
+                  <input type="number" class="calc-num-input" style="width:100%;" id="calcVetFrequentie" value="14" min="1">
+                </div>
+
+                <div class="calc-field-row">
+                  <div class="calc-label-bar">
+                    <label for="calcOlieFrequentie">Interval Droge Olie</label>
+                    <span class="calc-label-hint">dagen</span>
+                  </div>
+                  <input type="number" class="calc-num-input" style="width:100%;" id="calcOlieFrequentie" value="90" min="1">
+                </div>
+              </div>
+
+              <div class="calc-field-row">
+                <div class="calc-label-bar">
+                  <label for="calcTariefSmeerder">Uurtarief smeertechnicus</label>
+                  <span class="calc-label-hint">€ / uur (excl. BTW)</span>
+                </div>
+                <input type="number" class="calc-num-input" style="width:100%;" id="calcTariefSmeerder" value="52" min="10" step="1">
+              </div>
+            </div>
+
+            <!-- Groep 3: Stilstand, Storingen & Vermijdingspercentage -->
+            <div>
+              <div class="calc-group-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>3. Productiestilstand & Lagerschade</span>
+              </div>
+
+              <div class="calc-field-row">
+                <div class="calc-label-bar">
+                  <label for="calcStilstandKost">Kostprijs productiestilstand</label>
+                  <span class="calc-label-hint">€ / uur (excl. BTW)</span>
+                </div>
+                <input type="number" class="calc-num-input" style="width:100%;" id="calcStilstandKost" value="10000" min="0" step="500">
+              </div>
+
+              <div class="calc-fields-grid-2">
+                <div class="calc-field-row">
+                  <div class="calc-label-bar">
+                    <label for="calcVoorvallen">Defecten / jaar op vet</label>
+                    <span class="calc-label-hint">voorvallen</span>
+                  </div>
+                  <input type="number" class="calc-num-input" style="width:100%;" id="calcVoorvallen" value="2" min="0" step="1">
+                </div>
+
+                <div class="calc-field-row">
+                  <div class="calc-label-bar">
+                    <label for="calcHersteltijd">Hersteltijd / defect</label>
+                    <span class="calc-label-hint">uren</span>
+                  </div>
+                  <input type="number" class="calc-num-input" style="width:100%;" id="calcHersteltijd" value="3" min="0.5" step="0.5">
+                </div>
+              </div>
+
+              <!-- Nieuwe parameter: Vermijdingspercentage defecten -->
+              <div class="calc-field-row" style="background:#FFFFFF; border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px; margin-top:6px;">
+                <div class="calc-label-bar">
+                  <label for="calcReductiePct" style="color:var(--steel-950); font-weight:700;">
+                    Vermeden defecten met droge olie
+                  </label>
+                  <span style="font-family:var(--font-mono); font-weight:800; font-size:0.95rem; color:var(--signal-dark);" id="reductiePctDisplay">100%</span>
+                </div>
+                <div class="calc-slider-box">
+                  <input type="range" class="calc-range-slider" id="calcReductiePctSlider" min="0" max="100" value="100" step="5">
+                  <div class="calc-num-input-wrap">
+                    <input type="number" class="calc-num-input" id="calcReductiePct" min="0" max="100" value="100" style="width:75px;">
+                  </div>
+                </div>
+                <p style="font-size:0.75rem; color:var(--steel-500); margin-top:4px;">
+                  100% = alle defecten door vervuild vet vermeden. Pas aan voor conservatieve scenario's (bijv. 80% of 90%).
+                </p>
+              </div>
+
+              <div class="calc-fields-grid-2" style="margin-top:10px;">
+                <div class="calc-field-row">
+                  <div class="calc-label-bar">
+                    <label for="calcSparePartsKost">Kostprijs nieuwe wagen</label>
+                    <span class="calc-label-hint">€ / schade (excl. BTW)</span>
+                  </div>
+                  <input type="number" class="calc-num-input" style="width:100%;" id="calcSparePartsKost" value="150" min="0" step="25">
+                </div>
+
+                <div class="calc-field-row">
+                  <div class="calc-label-bar">
+                    <label for="calcTariefMonteur">Uurtarief monteur</label>
+                    <span class="calc-label-hint">€ / uur (excl. BTW)</span>
+                  </div>
+                  <input type="number" class="calc-num-input" style="width:100%;" id="calcTariefMonteur" value="65" min="20" step="5">
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Rechterzijde: Live Dashboard & KPI's -->
+          <div class="calc-results-pane">
+            
+            <!-- Tabbladen Navigatie -->
+            <div class="calc-nav-tabs">
+              <button type="button" class="calc-tab-btn active" data-calc-tab="tabOverview">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                <span>1. Dashboard & Visuals</span>
+              </button>
+              <button type="button" class="calc-tab-btn" data-calc-tab="tabTable">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="8" y1="6" x2="21" y2="6"/>
+                  <line x1="8" y1="12" x2="21" y2="12"/>
+                  <line x1="8" y1="18" x2="21" y2="18"/>
+                  <line x1="3" y1="6" x2="3.01" y2="6"/>
+                  <line x1="3" y1="12" x2="3.01" y2="12"/>
+                  <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+                <span>2. Kosten-uitsplitsing</span>
+              </button>
+              <button type="button" class="calc-tab-btn" data-calc-tab="tab5y">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="20" x2="18" y2="10"/>
+                  <line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span>3. 5-Jaars TCO Prognose</span>
+              </button>
+            </div>
+
+            <!-- TAB 1: DASHBOARD & VISUALS -->
+            <div class="calc-tab-pane active" id="tabOverview">
+              <!-- KPI Tegels Grid -->
+              <div class="calc-kpi-grid">
+                <!-- Hero KPI: Jaarlijkse besparing -->
+                <div class="calc-kpi-card hero-kpi">
+                  <div class="calc-kpi-label">Totale Jaarlijkse Kostenbesparing (OPEX) · excl. BTW</div>
+                  <div class="calc-kpi-val" id="kpiJaarBesparing">€ 60.763</div>
+                  <div class="calc-kpi-sub">Minder smeermiddel, minder uren & vermeden productiestilstand</div>
+                </div>
+
+                <!-- KPI 2: Terugverdientijd -->
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Terugverdientijd (ROI)</div>
+                  <div class="calc-kpi-val" style="color:var(--signal-dark);" id="kpiTerugverdientijd">3.7 uur</div>
+                  <div class="calc-kpi-sub" id="kpiTerugverdientijdSub">op basis van € 25,50 aanschaf</div>
+                </div>
+
+                <!-- KPI 3: 5-Jaars Netto Voordeel -->
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Netto Voordeel (5 Jaar TCO) · excl. BTW</div>
+                  <div class="calc-kpi-val text-savings" id="kpiNettoWinst5j">€ 303.791</div>
+                  <div class="calc-kpi-sub">Na aftrek eenmalige aanschaf</div>
+                </div>
+
+                <!-- KPI 4: Investering -->
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Eenmalige Investering (excl. BTW)</div>
+                  <div class="calc-kpi-val" style="font-size:1.8rem;" id="kpiInvestering">€ 25,50</div>
+                  <div class="calc-kpi-sub">Oliesmeernippels incl. doppen</div>
+                </div>
+
+                <!-- KPI 5: ROI Percentage -->
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Rendement op Investering</div>
+                  <div class="calc-kpi-val" style="font-size:1.8rem; color:var(--steel-900);" id="kpiRoiPercentage">> 100.000%</div>
+                  <div class="calc-kpi-sub">Verhouding winst vs. aanschaf</div>
+                </div>
+              </div>
+
+              <!-- Radial Payback Gauge Widget -->
+              <div class="calc-gauge-container">
+                <div class="calc-radial-gauge">
+                  <svg viewBox="0 0 100 100">
+                    <circle class="calc-gauge-circle-bg" cx="50" cy="50" r="40" />
+                    <circle class="calc-gauge-circle-val" id="gaugeCircleVal" cx="50" cy="50" r="40" />
+                  </svg>
+                  <div class="calc-gauge-center-text">
+                    <div class="calc-gauge-center-num" id="gaugeCenterNum">3.7h</div>
+                    <div class="calc-gauge-center-unit">Payback</div>
+                  </div>
+                </div>
+                <div class="calc-gauge-info">
+                  <h4>Razendsnelle terugverdientijd</h4>
+                  <p>
+                    Bij een aanschaf van € 25,50 excl. BTW per nippel en het vermijden van stilstand is de investering al binnen enkele uren volledig terugverdiend.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Gestapelde Kostenvergelijking (Stacked Bars) -->
+              <div class="calc-stacked-wrap">
+                <div class="calc-stacked-header">
+                  <span class="calc-stacked-title">Jaarlijkse Kostenverdeling: Waar lekt het geld weg?</span>
+                  <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--steel-600);">Bedragen excl. BTW per jaar</span>
+                </div>
+
+                <div class="stacked-bar-container">
+                  <!-- Balk Vet -->
+                  <div class="stacked-bar-row">
+                    <div class="stacked-bar-label">
+                      <span>Traditioneel Smeervet</span>
+                      <span id="stackedVetTotal">€ 60.771,86 / jr</span>
+                    </div>
+                    <div class="stacked-track">
+                      <div class="stacked-seg seg-downtime" id="segVetDowntime" style="width: 99.3%;" title="Productiestilstand"></div>
+                      <div class="stacked-seg seg-spare" id="segVetSpare" style="width: 0.5%;" title="Spare parts / assen"></div>
+                      <div class="stacked-seg seg-arbeid" id="segVetArbeid" style="width: 0.15%;" title="Smeertijd arbeid"></div>
+                      <div class="stacked-seg seg-product" id="segVetProduct" style="width: 0.05%;" title="Vetverbruik"></div>
+                    </div>
+                  </div>
+
+                  <!-- Balk Oliesmeernippel -->
+                  <div class="stacked-bar-row">
+                    <div class="stacked-bar-label">
+                      <span style="color:var(--signal-dark);">Met Oliesmeernippel & Droge Olie</span>
+                      <span style="color:var(--signal-dark);" id="stackedOlieTotal">€ 8,49 / jr</span>
+                    </div>
+                    <div class="stacked-track">
+                      <div class="stacked-seg seg-clean-oil" id="segOlieClean" style="width: 2%;" title="Minimale operationele kosten"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="stacked-legend">
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#D9381E;"></span>
+                    <span>Lijnstilstand & Herstel</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#E5A024;"></span>
+                    <span>Vervangende Wagens/Assen</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#1A73E8;"></span>
+                    <span>Arbeid Smeertechnicus</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#7E8794;"></span>
+                    <span>Productverbruik</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#1E8E3E;"></span>
+                    <span>Oliesmeernippel OPEX</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 2: GEDETAILLEERDE TABEL -->
+            <div class="calc-tab-pane" id="tabTable">
+              <div class="calc-table-wrap">
+                <table class="calc-table">
+                  <thead>
+                    <tr>
+                      <th>Kostenpost per jaar (excl. BTW)</th>
+                      <th>Huidig (Vet)</th>
+                      <th>Met Oliesmeernippel</th>
+                      <th>Uw Besparing</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Smeermiddel verbruik</td>
+                      <td id="rowProductVet">€ 14,08</td>
+                      <td id="rowProductOlie">€ 1,46</td>
+                      <td class="text-savings" id="rowProductDiff">- € 12,62</td>
+                    </tr>
+                    <tr>
+                      <td>Tijdsbesteding smering</td>
+                      <td id="rowArbeidVet">€ 67,79</td>
+                      <td id="rowArbeidOlie">€ 7,03</td>
+                      <td class="text-savings" id="rowArbeidDiff">- € 60,76</td>
+                    </tr>
+                    <tr>
+                      <td>Productiestilstand & herstel</td>
+                      <td id="rowDowntimeVet">€ 60.390</td>
+                      <td id="rowDowntimeOlie">€ 0</td>
+                      <td class="text-savings" id="rowDowntimeDiff">- € 60.390</td>
+                    </tr>
+                    <tr>
+                      <td>Vervangende wagens / spare parts</td>
+                      <td id="rowSpareVet">€ 300</td>
+                      <td id="rowSpareOlie">€ 0</td>
+                      <td class="text-savings" id="rowSpareDiff">- € 300</td>
+                    </tr>
+                    <tr class="total-row">
+                      <td>Totale Jaarkosten (excl. BTW)</td>
+                      <td id="rowTotaalVet">€ 60.771,86</td>
+                      <td id="rowTotaalOlie">€ 8,49</td>
+                      <td id="rowTotaalDiff">- € 60.763,37</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="background:var(--paper-light); border:1px solid var(--line); border-radius:var(--radius-sm); padding:16px; font-size:0.84rem; color:var(--steel-700);">
+                <strong>Opmerking BTW & Tarieven:</strong> Alle kosten, uurtarieven en materiaalprijzen zijn exclusief BTW en gebaseerd op gemiddelde industriële benchmarks.
+              </div>
+            </div>
+
+            <!-- TAB 3: 5-JAARS TCO PROGNOSE -->
+            <div class="calc-tab-pane" id="tab5y">
+              <div class="calc-5y-chart-container">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <h4 style="font-size:0.92rem; font-weight:800; text-transform:uppercase; color:var(--steel-900);">Cumulatieve Kostenopbouw excl. BTW (Jaar 1 t/m Jaar 5)</h4>
+                  <div style="display:flex; gap:12px; font-size:0.75rem; font-family:var(--font-mono);">
+                    <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#D9381E; border-radius:2px;"></span> Vet</span>
+                    <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--signal); border-radius:2px;"></span> Oliesmeernippel</span>
+                  </div>
+                </div>
+
+                <div class="tco-5y-columns" id="tco5yColumns">
+                  <!-- Jaar 1 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY1">+ €60k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY1" style="height: 20%;" title="Vet Jaar 1"></div>
+                      <div class="bar-5y olie" id="barOlieY1" style="height: 2%;" title="Olie Jaar 1"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 1</span>
+                  </div>
+
+                  <!-- Jaar 2 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY2">+ €121k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY2" style="height: 40%;" title="Vet Jaar 2"></div>
+                      <div class="bar-5y olie" id="barOlieY2" style="height: 3%;" title="Olie Jaar 2"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 2</span>
+                  </div>
+
+                  <!-- Jaar 3 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY3">+ €182k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY3" style="height: 60%;" title="Vet Jaar 3"></div>
+                      <div class="bar-5y olie" id="barOlieY3" style="height: 4%;" title="Olie Jaar 3"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 3</span>
+                  </div>
+
+                  <!-- Jaar 4 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY4">+ €243k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY4" style="height: 80%;" title="Vet Jaar 4"></div>
+                      <div class="bar-5y olie" id="barOlieY4" style="height: 4%;" title="Olie Jaar 4"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 4</span>
+                  </div>
+
+                  <!-- Jaar 5 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY5">+ €303k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY5" style="height: 100%;" title="Vet Jaar 5"></div>
+                      <div class="bar-5y olie" id="barOlieY5" style="height: 5%;" title="Olie Jaar 5"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 5</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TCO 5-jaars visualisatie balken -->
+              <div class="calc-tco-visual">
+                <div class="tco-header-bar">
+                  <span class="tco-title">5-Jaars TCO Eindstand (excl. BTW)</span>
+                  <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--steel-500);">Inclusief € 25,50 eenmalige aanschaf / wagen</span>
+                </div>
+                
+                <div class="tco-bar-group">
+                  <!-- Vet balk -->
+                  <div class="tco-bar-row">
+                    <div class="tco-bar-label">
+                      <span>Traditioneel Smeervet (5 jaar)</span>
+                      <strong id="barVetVal">€ 303.859</strong>
+                    </div>
+                    <div class="tco-bar-track">
+                      <div class="tco-bar-fill bar-vet" id="barVetTco" style="width: 100%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Olie balk -->
+                  <div class="tco-bar-row">
+                    <div class="tco-bar-label">
+                      <span>Oliesmeernippel + Droge Olie (5 jaar)</span>
+                      <strong style="color:var(--signal-dark);" id="barOlieVal">€ 68</strong>
+                    </div>
+                    <div class="tco-bar-track">
+                      <div class="tco-bar-fill bar-olie" id="barOlieTco" style="width: 2%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Utility Action Bar (Kopieer samenvatting & Print) -->
+            <div class="calc-action-bar">
+              <button type="button" class="btn-utility" id="btnCopySummary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span id="btnCopyText">Kopieer samenvatting voor directie (excl. BTW)</span>
+              </button>
+              <button type="button" class="btn-utility" onclick="window.print()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span>Afdrukken ⎙</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Calculator Footer CTA -->
+        <div class="calc-footer-cta">
+          <div class="calc-footer-cta-text">
+            <strong>Overtuigd van het rendement?</strong> Vraag direct een staffelofferte aan voor uw aantal smeerpunten (€ 25,50 excl. BTW / stuk).
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <a href="test.html" class="btn-secondary">
+              <span>Bekijk ook de werkplaatsproeven</span>
+            </a>
+            <a href="offerte.html" class="btn-primary" id="btnCalcToOfferte">
+              <span>Offerte aanvragen met deze configuratie</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation Hub -->
+  <section class="hub-section">
+    <div class="wrap">
+      <div class="section-head" style="text-align:center; max-width:760px; margin:0 auto 40px auto;">
+        <span class="index">VERVOLGSTAPPEN & TOEPASSING</span>
+        <h2>Ontdek de werkplaatsproeven, 3D montage of officiële verdelers.</h2>
+      </div>
+
+      <div class="hub-grid">
+        <a href="test.html" class="hub-card">
+          <div class="hub-card-icon" style="color:#D9381E;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M8 12h8M12 8v8"/>
+            </svg>
+          </div>
+          <div class="hub-card-tag" style="background:rgba(217,56,30,0.15); color:#D9381E;">Zelf testen</div>
+          <h3 class="hub-card-title">3 Werkplaatsproeven</h3>
+          <p class="hub-card-desc">Voer zelf de stof- en schuurtest, rietje-afdichtingstest en stick-slip proef uit in uw eigen werkplaats.</p>
+          <div class="hub-card-cta">
+            <span>Naar werkplaatsproeven</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </a>
+
+        <a href="montage.html" class="hub-card">
+          <div class="hub-card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+            </svg>
+          </div>
+          <div class="hub-card-tag">Stap-voor-stap</div>
+          <h3 class="hub-card-title">3D Montage & Smering</h3>
+          <p class="hub-card-desc">Interactieve technische simulatie met inbussleutel montage, afsluitdop en aerosol spuitrietje smering.</p>
+          <div class="hub-card-cta">
+            <span>Bekijk 3D instructies</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </a>
+
+        <a href="offerte.html" class="hub-card featured">
+          <div class="hub-card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="hub-card-tag" style="background:var(--signal); color:var(--steel-900);">Direct bestellen</div>
+          <h3 class="hub-card-title">Offerte & Bestellen</h3>
+          <p class="hub-card-desc">Stel uw staffel samen per schroefdraad (M5-M10) en legering (304/316) vanaf € 25,50 excl. BTW.</p>
+          <div class="hub-card-cta">
+            <span>Configureer bestelling</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compact Footer -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-inner-compact">
+        <div class="footer-brand-compact">
+          <svg class="mark" viewBox="0 0 24 24" fill="none" style="width:24px; height:24px;">
+            <circle cx="12" cy="12" r="10" stroke="#181B1F" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3.2" fill="#E5A024"/>
+          </svg>
+          <span style="font-family:var(--font-display); font-weight:800; font-size:1.02rem;">
+            Oliesmeernippel
+            <small style="font-family:var(--font-body); font-weight:600; font-size:0.68rem; color:var(--steel-600); text-transform:uppercase; margin-left:6px;">De Meester Industries</small>
+          </span>
+        </div>
+
+        <div class="footer-nav-compact">
+          <a href="index.html#werking">Werking</a>
+          <a href="index.html#kenmerken">Kenmerken</a>
+          <a href="index.html#toepassingen">Toepassingen</a>
+          <a href="index.html#specificaties">Specificaties</a>
+          <a href="test.html">Doe de test</a>
+          <a href="calculator.html">Opbrengstmodel</a>
+          <a href="montage.html">3D Montage</a>
+          <a href="verdelers.html">Verdelers</a>
+          <a href="offerte.html">Offerte</a>
+          <a href="#termsModal" class="open-terms-modal">Algemene Voorwaarden</a>
+        </div>
+
+        <div class="footer-contact-compact">
+          <span>Contact:</span>
+          <a href="mailto:demeestersolutions@gmail.com">demeestersolutions@gmail.com</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 Oliesmeernippel — De Meester Industries. Alle bedragen indicatief en exclusief BTW.</span>
+        <span><a href="#termsModal" class="open-terms-modal" style="color:var(--steel-600); text-decoration:underline;">Algemene Verkoopsvoorwaarden</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/calculator.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
