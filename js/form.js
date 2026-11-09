@@ -45,7 +45,7 @@
             <div>
               <label for="qty_${idNum}">Gewenste verpakking</label>
               <select id="qty_${idNum}" class="item-qty" name="Artikel_${idNum}_Verpakking">
-                <option value="10 stuks">10 stuks</option>
+                <option value="10 stuks">10 stuks (Proefset)</option>
                 <option value="50 stuks" selected>50 stuks</option>
                 <option value="100 stuks">100 stuks</option>
                 <option value="500 stuks">500 stuks</option>
@@ -398,7 +398,7 @@
         const firstQty = document.getElementById('qty_1');
         if (firstQty) firstQty.value = '10 stuks';
         if (remarksField && !remarksField.value) {
-          remarksField.value = 'Betreft aanvraag proefexemplaar / testset voor 1 machine (werkplaatsproef).';
+          remarksField.value = 'Betreft aankoop / bestelling van een proefexemplaar (testset voor 1 machine).';
         }
         updateLiveConfig();
       } else if (!isNaN(aantal) && aantal > 0) {
