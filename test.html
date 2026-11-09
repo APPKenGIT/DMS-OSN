@@ -307,6 +307,25 @@
                   <button type="button" class="preset-pill" data-calc-preset="12">12 wagens</button>
                   <button type="button" class="preset-pill" data-calc-preset="32">32 wagens</button>
                 </div>
+
+                <!-- Live Geleiding & Wagens Visualisator -->
+                <div class="calc-rail-visual">
+                  <div class="calc-rail-header">
+                    <span class="calc-rail-title">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="4" y1="9" x2="20" y2="9"/>
+                        <line x1="4" y1="15" x2="20" y2="15"/>
+                        <rect x="9" y="6" width="6" height="12" rx="1"/>
+                      </svg>
+                      Machine Geleiding Visual
+                    </span>
+                    <span class="calc-rail-status-pill" id="railStatusPill">1 smeerpunt beschermd</span>
+                  </div>
+                  <div class="calc-rail-track-line"></div>
+                  <div class="calc-carriages-container" id="carriagesContainer">
+                    <!-- Dynamisch gegenereerde wagentjes via JS -->
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -411,120 +430,323 @@
           <!-- Rechterzijde: Live Dashboard & KPI's -->
           <div class="calc-results-pane">
             
-            <!-- KPI Tegels Grid -->
-            <div class="calc-kpi-grid">
-              <!-- Hero KPI: Jaarlijkse besparing -->
-              <div class="calc-kpi-card hero-kpi">
-                <div class="calc-kpi-label">Totale Jaarlijkse Kostenbesparing (OPEX)</div>
-                <div class="calc-kpi-val" id="kpiJaarBesparing">€ 60.763</div>
-                <div class="calc-kpi-sub">Minder smeermiddel, minder uren & vermeden productiestilstand</div>
-              </div>
-
-              <!-- KPI 2: Terugverdientijd -->
-              <div class="calc-kpi-card">
-                <div class="calc-kpi-label">Terugverdientijd (ROI)</div>
-                <div class="calc-kpi-val" style="color:var(--signal-dark);" id="kpiTerugverdientijd">5.0 uur</div>
-                <div class="calc-kpi-sub" id="kpiTerugverdientijdSub">ca. 0,21 kalenderdag</div>
-              </div>
-
-              <!-- KPI 3: 5-Jaars Netto Voordeel -->
-              <div class="calc-kpi-card">
-                <div class="calc-kpi-label">Netto Voordeel (5 Jaar TCO)</div>
-                <div class="calc-kpi-val text-savings" id="kpiNettoWinst5j">€ 303.782</div>
-                <div class="calc-kpi-sub">Na aftrek eenmalige aanschaf</div>
-              </div>
-
-              <!-- KPI 4: Investering -->
-              <div class="calc-kpi-card">
-                <div class="calc-kpi-label">Eenmalige Investering</div>
-                <div class="calc-kpi-val" style="font-size:1.8rem;" id="kpiInvestering">€ 35</div>
-                <div class="calc-kpi-sub">Oliesmeernippels incl. doppen</div>
-              </div>
-
-              <!-- KPI 5: ROI Percentage -->
-              <div class="calc-kpi-card">
-                <div class="calc-kpi-label">Rendement op Investering</div>
-                <div class="calc-kpi-val" style="font-size:1.8rem; color:var(--steel-900);" id="kpiRoiPercentage">> 100.000%</div>
-                <div class="calc-kpi-sub">Verhouding winst vs. aanschaf</div>
-              </div>
+            <!-- Tabbladen Navigatie -->
+            <div class="calc-nav-tabs">
+              <button type="button" class="calc-tab-btn active" data-calc-tab="tabOverview">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                <span>1. Dashboard & Visuals</span>
+              </button>
+              <button type="button" class="calc-tab-btn" data-calc-tab="tabTable">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="8" y1="6" x2="21" y2="6"/>
+                  <line x1="8" y1="12" x2="21" y2="12"/>
+                  <line x1="8" y1="18" x2="21" y2="18"/>
+                  <line x1="3" y1="6" x2="3.01" y2="6"/>
+                  <line x1="3" y1="12" x2="3.01" y2="12"/>
+                  <line x1="3" y1="18" x2="3.01" y2="18"/>
+                </svg>
+                <span>2. Kosten-uitsplitsing</span>
+              </button>
+              <button type="button" class="calc-tab-btn" data-calc-tab="tab5y">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="20" x2="18" y2="10"/>
+                  <line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span>3. 5-Jaars TCO Prognose</span>
+              </button>
             </div>
 
-            <!-- Gedetailleerde Breakdown Tabel -->
-            <div class="calc-table-wrap">
-              <table class="calc-table">
-                <thead>
-                  <tr>
-                    <th>Kostenpost per jaar</th>
-                    <th>Huidig (Vet)</th>
-                    <th>Met Oliesmeernippel</th>
-                    <th>Uw Besparing</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Smeermiddel verbruik</td>
-                    <td id="rowProductVet">€ 14,08</td>
-                    <td id="rowProductOlie">€ 1,46</td>
-                    <td class="text-savings" id="rowProductDiff">- € 12,62</td>
-                  </tr>
-                  <tr>
-                    <td>Tijdsbesteding smering</td>
-                    <td id="rowArbeidVet">€ 67,79</td>
-                    <td id="rowArbeidOlie">€ 7,03</td>
-                    <td class="text-savings" id="rowArbeidDiff">- € 60,76</td>
-                  </tr>
-                  <tr>
-                    <td>Productiestilstand & herstel</td>
-                    <td id="rowDowntimeVet">€ 60.390</td>
-                    <td id="rowDowntimeOlie">€ 0</td>
-                    <td class="text-savings" id="rowDowntimeDiff">- € 60.390</td>
-                  </tr>
-                  <tr>
-                    <td>Vervangende wagens / spare parts</td>
-                    <td id="rowSpareVet">€ 300</td>
-                    <td id="rowSpareOlie">€ 0</td>
-                    <td class="text-savings" id="rowSpareDiff">- € 300</td>
-                  </tr>
-                  <tr class="total-row">
-                    <td>Totale Jaarkosten</td>
-                    <td id="rowTotaalVet">€ 60.771,86</td>
-                    <td id="rowTotaalOlie">€ 8,49</td>
-                    <td id="rowTotaalDiff">- € 60.763,37</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <!-- TAB 1: DASHBOARD & VISUALS -->
+            <div class="calc-tab-pane active" id="tabOverview">
+              <!-- KPI Tegels Grid -->
+              <div class="calc-kpi-grid">
+                <!-- Hero KPI: Jaarlijkse besparing -->
+                <div class="calc-kpi-card hero-kpi">
+                  <div class="calc-kpi-label">Totale Jaarlijkse Kostenbesparing (OPEX)</div>
+                  <div class="calc-kpi-val" id="kpiJaarBesparing">€ 60.763</div>
+                  <div class="calc-kpi-sub">Minder smeermiddel, minder uren & vermeden productiestilstand</div>
+                </div>
 
-            <!-- TCO 5-jaars visualisatie balken -->
-            <div class="calc-tco-visual">
-              <div class="tco-header-bar">
-                <span class="tco-title">5-Jaars Cumulatieve Kostenvergelijking (TCO)</span>
-                <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--steel-500);">Inclusief eenmalige aanschaf</span>
+                <!-- KPI 2: Terugverdientijd -->
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Terugverdientijd (ROI)</div>
+                  <div class="calc-kpi-val" style="color:var(--signal-dark);" id="kpiTerugverdientijd">5.0 uur</div>
+                  <div class="calc-kpi-sub" id="kpiTerugverdientijdSub">ca. 0,21 kalenderdag</div>
+                </div>
+
+                <!-- KPI 3: 5-Jaars Netto Voordeel -->
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Netto Voordeel (5 Jaar TCO)</div>
+                  <div class="calc-kpi-val text-savings" id="kpiNettoWinst5j">€ 303.782</div>
+                  <div class="calc-kpi-sub">Na aftrek eenmalige aanschaf</div>
+                </div>
+
+                <!-- KPI 4: Investering -->
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Eenmalige Investering</div>
+                  <div class="calc-kpi-val" style="font-size:1.8rem;" id="kpiInvestering">€ 35</div>
+                  <div class="calc-kpi-sub">Oliesmeernippels incl. doppen</div>
+                </div>
+
+                <!-- KPI 5: ROI Percentage -->
+                <div class="calc-kpi-card">
+                  <div class="calc-kpi-label">Rendement op Investering</div>
+                  <div class="calc-kpi-val" style="font-size:1.8rem; color:var(--steel-900);" id="kpiRoiPercentage">> 100.000%</div>
+                  <div class="calc-kpi-sub">Verhouding winst vs. aanschaf</div>
+                </div>
               </div>
-              
-              <div class="tco-bar-group">
-                <!-- Vet balk -->
-                <div class="tco-bar-row">
-                  <div class="tco-bar-label">
-                    <span>Traditioneel Smeervet (5 jaar)</span>
-                    <strong id="barVetVal">€ 303.859</strong>
+
+              <!-- Radial Payback Gauge Widget -->
+              <div class="calc-gauge-container">
+                <div class="calc-radial-gauge">
+                  <svg viewBox="0 0 100 100">
+                    <circle class="calc-gauge-circle-bg" cx="50" cy="50" r="40" />
+                    <circle class="calc-gauge-circle-val" id="gaugeCircleVal" cx="50" cy="50" r="40" />
+                  </svg>
+                  <div class="calc-gauge-center-text">
+                    <div class="calc-gauge-center-num" id="gaugeCenterNum">5h</div>
+                    <div class="calc-gauge-center-unit">Payback</div>
                   </div>
-                  <div class="tco-bar-track">
-                    <div class="tco-bar-fill bar-vet" id="barVetTco" style="width: 100%;"></div>
+                </div>
+                <div class="calc-gauge-info">
+                  <h4>Ultra-snelle terugverdientijd</h4>
+                  <p>
+                    Dankzij het vermijden van stilstand en dure smeeruren is de investering van de Oliesmeernippel vrijwel direct na montage volledig terugverdiend.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Gestapelde Kostenvergelijking (Stacked Bars) -->
+              <div class="calc-stacked-wrap">
+                <div class="calc-stacked-header">
+                  <span class="calc-stacked-title">Jaarlijkse Kostenverdeling: Waar lekt het geld weg?</span>
+                  <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--steel-600);">Per jaar op basis van uw instellingen</span>
+                </div>
+
+                <div class="stacked-bar-container">
+                  <!-- Balk Vet -->
+                  <div class="stacked-bar-row">
+                    <div class="stacked-bar-label">
+                      <span>Traditioneel Smeervet</span>
+                      <span id="stackedVetTotal">€ 60.771,86 / jr</span>
+                    </div>
+                    <div class="stacked-track">
+                      <div class="stacked-seg seg-downtime" id="segVetDowntime" style="width: 99.3%;" title="Productiestilstand"></div>
+                      <div class="stacked-seg seg-spare" id="segVetSpare" style="width: 0.5%;" title="Spare parts / assen"></div>
+                      <div class="stacked-seg seg-arbeid" id="segVetArbeid" style="width: 0.15%;" title="Smeertijd arbeid"></div>
+                      <div class="stacked-seg seg-product" id="segVetProduct" style="width: 0.05%;" title="Vetverbruik"></div>
+                    </div>
+                  </div>
+
+                  <!-- Balk Oliesmeernippel -->
+                  <div class="stacked-bar-row">
+                    <div class="stacked-bar-label">
+                      <span style="color:var(--signal-dark);">Met Oliesmeernippel & Droge Olie</span>
+                      <span style="color:var(--signal-dark);" id="stackedOlieTotal">€ 8,49 / jr</span>
+                    </div>
+                    <div class="stacked-track">
+                      <div class="stacked-seg seg-clean-oil" style="width: 100%;" title="Minimale operationele kosten"></div>
+                    </div>
                   </div>
                 </div>
 
-                <!-- Olie balk -->
-                <div class="tco-bar-row">
-                  <div class="tco-bar-label">
-                    <span>Oliesmeernippel + Droge Olie (5 jaar)</span>
-                    <strong style="color:var(--signal-dark);" id="barOlieVal">€ 77</strong>
+                <div class="stacked-legend">
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#D9381E;"></span>
+                    <span>Lijnstilstand & Herstel</span>
                   </div>
-                  <div class="tco-bar-track">
-                    <div class="tco-bar-fill bar-olie" id="barOlieTco" style="width: 4%;"></div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#E5A024;"></span>
+                    <span>Vervangende Wagens/Assen</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#1A73E8;"></span>
+                    <span>Arbeid Smeertechnicus</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#7E8794;"></span>
+                    <span>Productverbruik</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot" style="background:#1E8E3E;"></span>
+                    <span>Oliesmeernippel OPEX</span>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- TAB 2: GEDETAILLEERDE TABEL -->
+            <div class="calc-tab-pane" id="tabTable">
+              <div class="calc-table-wrap">
+                <table class="calc-table">
+                  <thead>
+                    <tr>
+                      <th>Kostenpost per jaar</th>
+                      <th>Huidig (Vet)</th>
+                      <th>Met Oliesmeernippel</th>
+                      <th>Uw Besparing</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Smeermiddel verbruik</td>
+                      <td id="rowProductVet">€ 14,08</td>
+                      <td id="rowProductOlie">€ 1,46</td>
+                      <td class="text-savings" id="rowProductDiff">- € 12,62</td>
+                    </tr>
+                    <tr>
+                      <td>Tijdsbesteding smering</td>
+                      <td id="rowArbeidVet">€ 67,79</td>
+                      <td id="rowArbeidOlie">€ 7,03</td>
+                      <td class="text-savings" id="rowArbeidDiff">- € 60,76</td>
+                    </tr>
+                    <tr>
+                      <td>Productiestilstand & herstel</td>
+                      <td id="rowDowntimeVet">€ 60.390</td>
+                      <td id="rowDowntimeOlie">€ 0</td>
+                      <td class="text-savings" id="rowDowntimeDiff">- € 60.390</td>
+                    </tr>
+                    <tr>
+                      <td>Vervangende wagens / spare parts</td>
+                      <td id="rowSpareVet">€ 300</td>
+                      <td id="rowSpareOlie">€ 0</td>
+                      <td class="text-savings" id="rowSpareDiff">- € 300</td>
+                    </tr>
+                    <tr class="total-row">
+                      <td>Totale Jaarkosten</td>
+                      <td id="rowTotaalVet">€ 60.771,86</td>
+                      <td id="rowTotaalOlie">€ 8,49</td>
+                      <td id="rowTotaalDiff">- € 60.763,37</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="background:var(--paper-light); border:1px solid var(--line); border-radius:var(--radius-sm); padding:16px; font-size:0.84rem; color:var(--steel-700);">
+                <strong>Toelichting berekening:</strong> Vet veroorzaakt continue ophoping van stof en spanen, wat leidt tot vastlopers en noodreparaties. Droge olie laat een droge microfilm achter waardoor geleidingen schoon blijven en stilstand tot het nulpunt daalt.
+              </div>
+            </div>
+
+            <!-- TAB 3: 5-JAARS TCO PROGNOSE -->
+            <div class="calc-tab-pane" id="tab5y">
+              <div class="calc-5y-chart-container">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <h4 style="font-size:0.92rem; font-weight:800; text-transform:uppercase; color:var(--steel-900);">Cumulatieve Kostenopbouw (Jaar 1 t/m Jaar 5)</h4>
+                  <div style="display:flex; gap:12px; font-size:0.75rem; font-family:var(--font-mono);">
+                    <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#D9381E; border-radius:2px;"></span> Vet</span>
+                    <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--signal); border-radius:2px;"></span> Oliesmeernippel</span>
+                  </div>
+                </div>
+
+                <div class="tco-5y-columns" id="tco5yColumns">
+                  <!-- Jaar 1 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY1">+ €60k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY1" style="height: 20%;" title="Vet Jaar 1"></div>
+                      <div class="bar-5y olie" id="barOlieY1" style="height: 2%;" title="Olie Jaar 1"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 1</span>
+                  </div>
+
+                  <!-- Jaar 2 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY2">+ €121k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY2" style="height: 40%;" title="Vet Jaar 2"></div>
+                      <div class="bar-5y olie" id="barOlieY2" style="height: 3%;" title="Olie Jaar 2"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 2</span>
+                  </div>
+
+                  <!-- Jaar 3 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY3">+ €182k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY3" style="height: 60%;" title="Vet Jaar 3"></div>
+                      <div class="bar-5y olie" id="barOlieY3" style="height: 4%;" title="Olie Jaar 3"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 3</span>
+                  </div>
+
+                  <!-- Jaar 4 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY4">+ €243k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY4" style="height: 80%;" title="Vet Jaar 4"></div>
+                      <div class="bar-5y olie" id="barOlieY4" style="height: 4%;" title="Olie Jaar 4"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 4</span>
+                  </div>
+
+                  <!-- Jaar 5 -->
+                  <div class="tco-year-col">
+                    <span class="tco-col-saving" id="saveY5">+ €303k</span>
+                    <div class="tco-bars-pair">
+                      <div class="bar-5y vet" id="barVetY5" style="height: 100%;" title="Vet Jaar 5"></div>
+                      <div class="bar-5y olie" id="barOlieY5" style="height: 5%;" title="Olie Jaar 5"></div>
+                    </div>
+                    <span class="tco-year-label">Jaar 5</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TCO 5-jaars visualisatie balken -->
+              <div class="calc-tco-visual">
+                <div class="tco-header-bar">
+                  <span class="tco-title">5-Jaars TCO Eindstand</span>
+                  <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--steel-500);">Inclusief eenmalige aanschaf</span>
+                </div>
+                
+                <div class="tco-bar-group">
+                  <!-- Vet balk -->
+                  <div class="tco-bar-row">
+                    <div class="tco-bar-label">
+                      <span>Traditioneel Smeervet (5 jaar)</span>
+                      <strong id="barVetVal">€ 303.859</strong>
+                    </div>
+                    <div class="tco-bar-track">
+                      <div class="tco-bar-fill bar-vet" id="barVetTco" style="width: 100%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Olie balk -->
+                  <div class="tco-bar-row">
+                    <div class="tco-bar-label">
+                      <span>Oliesmeernippel + Droge Olie (5 jaar)</span>
+                      <strong style="color:var(--signal-dark);" id="barOlieVal">€ 77</strong>
+                    </div>
+                    <div class="tco-bar-track">
+                      <div class="tco-bar-fill bar-olie" id="barOlieTco" style="width: 4%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Utility Action Bar (Kopieer samenvatting & Print) -->
+            <div class="calc-action-bar">
+              <button type="button" class="btn-utility" id="btnCopySummary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span id="btnCopyText">Kopieer samenvatting voor directie</span>
+              </button>
+              <button type="button" class="btn-utility" onclick="window.print()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span>Afdrukken ⎙</span>
+              </button>
             </div>
 
           </div>

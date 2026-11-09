@@ -4,6 +4,8 @@
  * 
  * Gebaseerd op het geverifieerde industriële rekenmodel (OM - Oliesmeernippel v1.xlsx).
  * Berekent de besparing op productverbruik, smeertijd, productiestilstand en spare parts.
+ * Inclusief geavanceerde visuals: machine geleiding visualisator, radial payback gauge,
+ * gestapelde kostenverdeling, 5-jaars TCO staafdiagram en directie-export.
  */
 
 (function () {
@@ -62,12 +64,17 @@
     }).format(num);
   }
 
+  function formatShortK(amount) {
+    if (amount >= 1000000) return `€ ${(amount / 1000000).toFixed(1)}M`;
+    if (amount >= 1000) return `€ ${Math.round(amount / 1000)}k`;
+    return `€ ${Math.round(amount)}`;
+  }
+
   /**
    * Kerncalculatie volgens geverifieerd Excel-model
    */
   function calculateROI(params) {
     const p = Object.assign({}, BENCHMARKS, params);
-
     const n = Math.max(1, parseInt(p.smeerpunten, 10) || 1);
 
     // 1. Smeermiddel
@@ -84,10 +91,8 @@
     const besparingArbeidJaar = arbeidKostVetJaar - arbeidKostOlieJaar;
 
     // 3. Downtime & Herstel (per machine / productielijn)
-    // Stilstand + arbeid mechanieker per voorval * aantal voorvallen
     const stilstandEnHerstelKostVoorval = (p.stilstandKostUur * p.hersteltijdUur) + (p.hersteltijdUur * p.tariefMonteur);
     const downtimeKostVetJaar = stilstandEnHerstelKostVoorval * p.risicoVoorvallen;
-    // Met oliesmeernippel en droge microfilm: geen vetblokkades/schuurpasta
     const downtimeKostOlieJaar = 0.0;
     const besparingDowntimeJaar = downtimeKostVetJaar - downtimeKostOlieJaar;
 
@@ -105,7 +110,6 @@
     const eenmaligeInvestering = p.nippelPrijs * n;
 
     // 7. Terugverdientijd
-    // Dagen = Eenmalige Investering / (Jaarlijkse Besparing / 365)
     let terugverdientijdDagen = 0;
     let terugverdientijdUren = 0;
     if (jaarlijkseBesparing > 0) {
@@ -207,9 +211,121 @@
       barOlieTco: document.getElementById('barOlieTco'),
       barOlieVal: document.getElementById('barOlieVal'),
 
+      // Nieuwe visuele elementen
+      carriagesContainer: document.getElementById('carriagesContainer'),
+      railStatusPill: document.getElementById('railStatusPill'),
+      gaugeCircleVal: document.getElementById('gaugeCircleVal'),
+      gaugeCenterNum: document.getElementById('gaugeCenterNum'),
+
+      // Gestapelde balken
+      stackedVetTotal: document.getElementById('stackedVetTotal'),
+      stackedOlieTotal: document.getElementById('stackedOlieTotal'),
+      segVetDowntime: document.getElementById('segVetDowntime'),
+      segVetSpare: document.getElementById('segVetSpare'),
+      segVetArbeid: document.getElementById('segVetArbeid'),
+      segVetProduct: document.getElementById('segVetProduct'),
+
       // CTA offerte button
       btnToOfferte: document.getElementById('btnCalcToOfferte')
     };
+
+    let latestRes = null;
+
+    // Render visuele wagentjes op de rail
+    function renderCarriages(n) {
+      if (!displays.carriagesContainer) return;
+      displays.carriagesContainer.innerHTML = '';
+
+      if (displays.railStatusPill) {
+        displays.railStatusPill.textContent = `${n} ${n === 1 ? 'smeerpunt' : 'smeerpunten'} beschermd`;
+      }
+
+      const maxIcons = 14;
+      const count = Math.min(n, maxIcons);
+
+      for (let i = 1; i <= count; i++) {
+        const item = document.createElement('div');
+        item.className = 'calc-carriage-icon';
+        item.title = `Geleidewagen #${i} voorzien van Oliesmeernippel`;
+        item.textContent = i;
+        displays.carriagesContainer.appendChild(item);
+      }
+
+      if (n > maxIcons) {
+        const more = document.createElement('span');
+        more.className = 'calc-carriage-overflow';
+        more.textContent = `+ nog ${n - maxIcons} wagens`;
+        displays.carriagesContainer.appendChild(more);
+      }
+    }
+
+    // Update Radial Payback Gauge
+    function updateGauge(res) {
+      if (!displays.gaugeCircleVal || !displays.gaugeCenterNum) return;
+
+      const totalCirc = 251.2; // 2 * pi * 40
+
+      if (res.terugverdientijdDagen < 1) {
+        const uren = Math.round(res.terugverdientijdUren * 10) / 10;
+        displays.gaugeCenterNum.textContent = `${uren}h`;
+        // Zeer snelle ROI: ring bijna vol
+        displays.gaugeCircleVal.style.strokeDashoffset = '20';
+      } else {
+        const dagen = Math.round(res.terugverdientijdDagen);
+        displays.gaugeCenterNum.textContent = `${dagen}d`;
+        const offset = Math.min(220, Math.max(30, dagen * 10));
+        displays.gaugeCircleVal.style.strokeDashoffset = `${offset}`;
+      }
+    }
+
+    // Update Gestapelde Kostenbalken
+    function updateStackedBars(res) {
+      if (displays.stackedVetTotal) displays.stackedVetTotal.textContent = `${formatEuro(res.totaleKostenVetJaar, 2)} / jr`;
+      if (displays.stackedOlieTotal) displays.stackedOlieTotal.textContent = `${formatEuro(res.totaleKostenOlieJaar, 2)} / jr`;
+
+      const tot = Math.max(res.totaleKostenVetJaar, 1);
+      const pctDown = Math.max(0, (res.downtimeKostVetJaar / tot) * 100);
+      const pctSpare = Math.max(0, (res.sparePartsKostVetJaar / tot) * 100);
+      const pctArb = Math.max(0, (res.arbeidKostVetJaar / tot) * 100);
+      const pctProd = Math.max(0, (res.productKostVetJaar / tot) * 100);
+
+      if (displays.segVetDowntime) displays.segVetDowntime.style.width = `${pctDown}%`;
+      if (displays.segVetSpare) displays.segVetSpare.style.width = `${pctSpare}%`;
+      if (displays.segVetArbeid) displays.segVetArbeid.style.width = `${pctArb}%`;
+      if (displays.segVetProduct) displays.segVetProduct.style.width = `${pctProd}%`;
+    }
+
+    // Update 5-Jaars Kolomgrafiek
+    function update5yChart(res) {
+      const max5yVet = res.totaleKostenVetJaar * 5;
+      const maxTco = Math.max(max5yVet, 1);
+
+      for (let y = 1; y <= 5; y++) {
+        const vetCol = document.getElementById(`barVetY${y}`);
+        const olieCol = document.getElementById(`barOlieY${y}`);
+        const saveLbl = document.getElementById(`saveY${y}`);
+
+        const cumVet = res.totaleKostenVetJaar * y;
+        const cumOlie = (res.totaleKostenOlieJaar * y) + res.eenmaligeInvestering;
+        const cumBesparing = cumVet - cumOlie;
+
+        if (vetCol) {
+          const pct = Math.min(100, Math.max(8, (cumVet / maxTco) * 100));
+          vetCol.style.height = `${pct}%`;
+          vetCol.title = `Vet Jaar ${y}: ${formatEuro(cumVet)}`;
+        }
+
+        if (olieCol) {
+          const pctOlie = Math.min(100, Math.max(2, (cumOlie / maxTco) * 100));
+          olieCol.style.height = `${pctOlie}%`;
+          olieCol.title = `Oliesmeernippel Jaar ${y}: ${formatEuro(cumOlie)}`;
+        }
+
+        if (saveLbl) {
+          saveLbl.textContent = `+ ${formatShortK(cumBesparing)}`;
+        }
+      }
+    }
 
     function updateView() {
       const currentParams = {
@@ -226,6 +342,13 @@
       };
 
       const res = calculateROI(currentParams);
+      latestRes = res;
+
+      // Render visuals
+      renderCarriages(res.smeerpunten);
+      updateGauge(res);
+      updateStackedBars(res);
+      update5yChart(res);
 
       // KPI updates
       if (displays.kpiJaarBesparing) {
@@ -354,6 +477,58 @@
       });
     });
 
+    // Tabbladen navigatie
+    const tabButtons = document.querySelectorAll('[data-calc-tab]');
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-calc-tab');
+        tabButtons.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        document.querySelectorAll('.calc-tab-pane').forEach(p => p.classList.remove('active'));
+        const targetPane = document.getElementById(targetId);
+        if (targetPane) targetPane.classList.add('active');
+      });
+    });
+
+    // Klembord samenvatting kopiëren voor directie / management
+    const btnCopy = document.getElementById('btnCopySummary');
+    if (btnCopy) {
+      btnCopy.addEventListener('click', function () {
+        if (!latestRes) return;
+        const text = `BUSINESS CASE OVERSTAP NAAR DROGE OLIE (OLIESMEERNIPPEL)
+Organisatie / Machine: ${latestRes.smeerpunten} smeerpunt(en)
+-----------------------------------------------------------
+• Jaarlijkse kostenbesparing (OPEX): ${formatEuro(latestRes.jaarlijkseBesparing)}
+• Terugverdientijd investering: ${latestRes.terugverdientijdDagen < 1 ? Math.round(latestRes.terugverdientijdUren * 10) / 10 + ' uur' : Math.round(latestRes.terugverdientijdDagen) + ' dagen'}
+• Netto 5-jaars voordeel (TCO): ${formatEuro(latestRes.nettoWinstHorizon)}
+• Eenmalige investering: ${formatEuro(latestRes.eenmaligeInvestering)}
+
+KOSTENVERGELIJKING PER JAAR:
+- Smeermiddel: ${formatEuro(latestRes.productKostVetJaar)} (Vet) vs ${formatEuro(latestRes.productKostOlieJaar)} (Droge olie)
+- Smeertijd/Arbeid: ${formatEuro(latestRes.arbeidKostVetJaar)} vs ${formatEuro(latestRes.arbeidKostOlieJaar)}
+- Vermeden Lijnstilstand: ${formatEuro(latestRes.downtimeKostVetJaar)} per jaar
+- Vermeden Lagerschades: ${formatEuro(latestRes.sparePartsKostVetJaar)} per jaar
+
+Gegenereerd via https://appkengit.github.io/DMS-OSN/test.html`;
+
+        navigator.clipboard.writeText(text).then(() => {
+          const lbl = document.getElementById('btnCopyText');
+          if (lbl) {
+            const old = lbl.textContent;
+            lbl.textContent = 'Gekopieerd naar klembord! ✓';
+            btnCopy.classList.add('copied');
+            setTimeout(() => {
+              lbl.textContent = old;
+              btnCopy.classList.remove('copied');
+            }, 3000);
+          }
+        }).catch(err => {
+          alert('Kopiëren niet toegestaan door browser. Selecteer handmatig.');
+        });
+      });
+    }
+
     // Initiële weergave
     updateView();
   }
@@ -407,7 +582,7 @@
     initTeaserCalculator();
   }
 
-  // Exposeer globally voor unit testing / inspectie
+  // Exposeer globally voor inspectie
   window.OSN_ROI = {
     BENCHMARKS,
     calculateROI,
