@@ -199,6 +199,9 @@
       kpiInvestering: document.getElementById('kpiInvestering'),
 
       // Tabel cellen
+      rowSubtotalVet: document.getElementById('rowSubtotalVet'),
+      rowSubtotalOlie: document.getElementById('rowSubtotalOlie'),
+      rowSubtotalDiff: document.getElementById('rowSubtotalDiff'),
       rowProductVet: document.getElementById('rowProductVet'),
       rowProductOlie: document.getElementById('rowProductOlie'),
       rowProductDiff: document.getElementById('rowProductDiff'),
@@ -246,6 +249,8 @@
       segVetArbeid: document.getElementById('segVetArbeid'),
       segVetProduct: document.getElementById('segVetProduct'),
       segOlieClean: document.getElementById('segOlieClean'),
+      segOlieNippel: document.getElementById('segOlieNippel'),
+      legendNippelText: document.getElementById('legendNippelText'),
 
       // CTA offerte button
       btnToOfferte: document.getElementById('btnCalcToOfferte')
@@ -257,7 +262,9 @@
     // Update Gestapelde Kostenbalken
     function updateStackedBars(res) {
       if (displays.stackedVetTotal) displays.stackedVetTotal.textContent = `${formatEuro(res.totaleKostenVetJaar, 2)} / jr`;
-      if (displays.stackedOlieTotal) displays.stackedOlieTotal.textContent = `${formatEuro(res.totaleKostenOlieJaar, 2)} / jr`;
+      if (displays.stackedOlieTotal) {
+        displays.stackedOlieTotal.textContent = `${formatEuro(res.totaleKostenOlieJaar, 2)} / jr (+ ${formatEuro(res.eenmaligeInvestering, 2)} aanschaf)`;
+      }
 
       const tot = Math.max(res.totaleKostenVetJaar, 1);
       const pctDown = Math.max(0, (res.downtimeKostVetJaar / tot) * 100);
@@ -271,8 +278,15 @@
       if (displays.segVetProduct) displays.segVetProduct.style.width = `${pctProd}%`;
 
       if (displays.segOlieClean) {
-        const olieTotPct = Math.min(100, Math.max(2, (res.totaleKostenOlieJaar / tot) * 100));
+        const olieTotPct = Math.min(100, Math.max(1, (res.totaleKostenOlieJaar / tot) * 100));
         displays.segOlieClean.style.width = `${olieTotPct}%`;
+      }
+      if (displays.segOlieNippel) {
+        const nippelPct = Math.min(100, Math.max(1.5, (res.eenmaligeInvestering / tot) * 100));
+        displays.segOlieNippel.style.width = `${nippelPct}%`;
+      }
+      if (displays.legendNippelText) {
+        displays.legendNippelText.textContent = `Aanschaf ${res.smeerpunten} nippel(s) (${formatEuro(res.eenmaligeInvestering, 2)})`;
       }
     }
 
@@ -379,6 +393,10 @@
 
 
       // Tabel rijen
+      if (displays.rowSubtotalVet) displays.rowSubtotalVet.textContent = formatEuro(res.totaleKostenVetJaar, 2);
+      if (displays.rowSubtotalOlie) displays.rowSubtotalOlie.textContent = formatEuro(res.totaleKostenOlieJaar, 2);
+      if (displays.rowSubtotalDiff) displays.rowSubtotalDiff.textContent = `- ${formatEuro(res.jaarlijkseBesparing, 2)} / jr`;
+
       if (displays.rowProductVet) displays.rowProductVet.textContent = formatEuro(res.productKostVetJaar, 2);
       if (displays.rowProductOlie) displays.rowProductOlie.textContent = formatEuro(res.productKostOlieJaar, 2);
       if (displays.rowProductDiff) displays.rowProductDiff.textContent = `- ${formatEuro(res.besparingProductJaar, 2)}`;
@@ -401,7 +419,7 @@
       if (displays.rowNippelDiff) displays.rowNippelDiff.textContent = `+ ${formatEuro(res.eenmaligeInvestering, 2)} (eenmalig)`;
 
       if (displays.rowTotalLabel) {
-        displays.rowTotalLabel.textContent = `Totale Kosten na ${res.horizon} jaar (TCO incl. aanschaf)`;
+        displays.rowTotalLabel.textContent = `C. Totale Kosten na ${res.horizon} jaar (TCO incl. aanschaf)`;
       }
 
       if (displays.rowTotaalVet) displays.rowTotaalVet.textContent = formatEuro(res.tcoVetHorizon, 2);
