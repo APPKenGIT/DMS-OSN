@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Opbrengstmodel & ROI Calculator — Oliesmeernippel | De Meester Industries</title>
+  <title>Doe de test — Opbrengstmodel & ROI Calculator | De Meester Industries</title>
   <meta name="description" content="Bereken direct uw besparing op smeermiddel, arbeid, lijnstilstand en lagerschades met het interactieve opbrengstmodel van de Oliesmeernippel. Cijfers excl. BTW.">
   <link rel="canonical" href="https://appkengit.github.io/DMS-OSN/calculator.html">
 
@@ -53,8 +53,8 @@
         <a href="index.html#kenmerken">Kenmerken</a>
         <a href="index.html#toepassingen">Toepassingen</a>
         <a href="index.html#specificaties">Specificaties</a>
-        <a href="test.html" class="nav-highlight-red">Doe de test</a>
-        <a href="calculator.html" class="active">Opbrengstmodel</a>
+        <a href="test.html">Werkplaatsproeven</a>
+        <a href="calculator.html" class="nav-highlight-red active">Doe de test</a>
         <a href="montage.html">3D Montage</a>
         <a href="verdelers.html">Verdelers</a>
       </nav>
@@ -83,14 +83,14 @@
       <div class="breadcrumb-trail">
         <a href="index.html">Home</a>
         <span>/</span>
-        <span style="color:var(--steel-900);">Opbrengstmodel & ROI Calculator</span>
+        <span style="color:var(--steel-900);">Doe de test (Opbrengstmodel)</span>
       </div>
 
       <div class="tag tag-signal">
         <span>Financiële Business Case · Indicatief excl. BTW</span>
       </div>
 
-      <h1>Interactief Opbrengstmodel & ROI Calculator</h1>
+      <h1>Doe de test: Bereken direct uw opbrengst en ROI</h1>
       
       <p class="lead">
         Bereken hieronder nauwkeurig wat de overstap naar gerichte droge-oliesmering uw onderneming oplevert. Gebaseerd op fabrieksbenchmarks voor smeermiddel, manuren van technici, productiestilstand en lagerschades.
@@ -264,6 +264,25 @@
                 </p>
               </div>
 
+              <!-- Tijdshorizon slider -->
+              <div class="calc-field-row" style="background:#FFFFFF; border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px; margin-top:10px;">
+                <div class="calc-label-bar">
+                  <label for="calcJarenHorizon" style="color:var(--steel-950); font-weight:700;">
+                    Tijdshorizon terugverdienberekening (TCO)
+                  </label>
+                  <span style="font-family:var(--font-mono); font-weight:800; font-size:0.95rem; color:var(--signal-dark);" id="jarenHorizonDisplay">5 jaar</span>
+                </div>
+                <div class="calc-slider-box">
+                  <input type="range" class="calc-range-slider" id="calcJarenHorizonSlider" min="1" max="10" value="5" step="1">
+                  <div class="calc-num-input-wrap">
+                    <input type="number" class="calc-num-input" id="calcJarenHorizon" min="1" max="10" value="5" style="width:75px;">
+                  </div>
+                </div>
+                <p style="font-size:0.75rem; color:var(--steel-500); margin-top:4px;">
+                  Kies over hoeveel jaar (1 tot 10 jaar) u de totale netto besparing en TCO wilt berekenen.
+                </p>
+              </div>
+
               <div class="calc-fields-grid-2" style="margin-top:10px;">
                 <div class="calc-field-row">
                   <div class="calc-label-bar">
@@ -341,7 +360,7 @@
 
                 <!-- KPI 3: 5-Jaars Netto Voordeel -->
                 <div class="calc-kpi-card">
-                  <div class="calc-kpi-label">Netto Voordeel (5 Jaar TCO) · excl. BTW</div>
+                  <div class="calc-kpi-label" id="kpiNettoWinstLabel">Netto Voordeel (5 Jaar TCO) · excl. BTW</div>
                   <div class="calc-kpi-val text-savings" id="kpiNettoWinst5j">€ 303.791</div>
                   <div class="calc-kpi-sub">Na aftrek eenmalige aanschaf</div>
                 </div>
@@ -477,11 +496,17 @@
                       <td id="rowSpareOlie">€ 0</td>
                       <td class="text-savings" id="rowSpareDiff">- € 300</td>
                     </tr>
+                    <tr style="background: rgba(229,160,36,0.06); font-weight: 600;">
+                      <td>Aanschaf Oliesmeernippel(s) incl. dop (eenmalig)</td>
+                      <td id="rowNippelVet">€ 0,00</td>
+                      <td id="rowNippelOlie">€ 25,50</td>
+                      <td id="rowNippelDiff" style="color: var(--steel-800);">+ € 25,50 (eenmalig)</td>
+                    </tr>
                     <tr class="total-row">
-                      <td>Totale Jaarkosten (excl. BTW)</td>
-                      <td id="rowTotaalVet">€ 60.771,86</td>
-                      <td id="rowTotaalOlie">€ 8,49</td>
-                      <td id="rowTotaalDiff">- € 60.763,37</td>
+                      <td id="rowTotalLabel">Totale Kosten na 5 jaar (TCO incl. aanschaf)</td>
+                      <td id="rowTotaalVet">€ 303.859,32</td>
+                      <td id="rowTotaalOlie">€ 67,95</td>
+                      <td id="rowTotaalDiff">- € 303.791,37</td>
                     </tr>
                   </tbody>
                 </table>
@@ -496,7 +521,7 @@
             <div class="calc-tab-pane" id="tab5y">
               <div class="calc-5y-chart-container">
                 <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                  <h4 style="font-size:0.92rem; font-weight:800; text-transform:uppercase; color:var(--steel-900);">Cumulatieve Kostenopbouw excl. BTW (Jaar 1 t/m Jaar 5)</h4>
+                  <h4 style="font-size:0.92rem; font-weight:800; text-transform:uppercase; color:var(--steel-900);" id="tcoChartTitle">Cumulatieve Kostenopbouw excl. BTW (Jaar 1 t/m Jaar 5)</h4>
                   <div style="display:flex; gap:12px; font-size:0.75rem; font-family:var(--font-mono);">
                     <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#D9381E; border-radius:2px;"></span> Vet</span>
                     <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:var(--signal); border-radius:2px;"></span> Oliesmeernippel</span>
@@ -504,62 +529,14 @@
                 </div>
 
                 <div class="tco-5y-columns" id="tco5yColumns">
-                  <!-- Jaar 1 -->
-                  <div class="tco-year-col">
-                    <span class="tco-col-saving" id="saveY1">+ €60k</span>
-                    <div class="tco-bars-pair">
-                      <div class="bar-5y vet" id="barVetY1" style="height: 20%;" title="Vet Jaar 1"></div>
-                      <div class="bar-5y olie" id="barOlieY1" style="height: 2%;" title="Olie Jaar 1"></div>
-                    </div>
-                    <span class="tco-year-label">Jaar 1</span>
-                  </div>
-
-                  <!-- Jaar 2 -->
-                  <div class="tco-year-col">
-                    <span class="tco-col-saving" id="saveY2">+ €121k</span>
-                    <div class="tco-bars-pair">
-                      <div class="bar-5y vet" id="barVetY2" style="height: 40%;" title="Vet Jaar 2"></div>
-                      <div class="bar-5y olie" id="barOlieY2" style="height: 3%;" title="Olie Jaar 2"></div>
-                    </div>
-                    <span class="tco-year-label">Jaar 2</span>
-                  </div>
-
-                  <!-- Jaar 3 -->
-                  <div class="tco-year-col">
-                    <span class="tco-col-saving" id="saveY3">+ €182k</span>
-                    <div class="tco-bars-pair">
-                      <div class="bar-5y vet" id="barVetY3" style="height: 60%;" title="Vet Jaar 3"></div>
-                      <div class="bar-5y olie" id="barOlieY3" style="height: 4%;" title="Olie Jaar 3"></div>
-                    </div>
-                    <span class="tco-year-label">Jaar 3</span>
-                  </div>
-
-                  <!-- Jaar 4 -->
-                  <div class="tco-year-col">
-                    <span class="tco-col-saving" id="saveY4">+ €243k</span>
-                    <div class="tco-bars-pair">
-                      <div class="bar-5y vet" id="barVetY4" style="height: 80%;" title="Vet Jaar 4"></div>
-                      <div class="bar-5y olie" id="barOlieY4" style="height: 4%;" title="Olie Jaar 4"></div>
-                    </div>
-                    <span class="tco-year-label">Jaar 4</span>
-                  </div>
-
-                  <!-- Jaar 5 -->
-                  <div class="tco-year-col">
-                    <span class="tco-col-saving" id="saveY5">+ €303k</span>
-                    <div class="tco-bars-pair">
-                      <div class="bar-5y vet" id="barVetY5" style="height: 100%;" title="Vet Jaar 5"></div>
-                      <div class="bar-5y olie" id="barOlieY5" style="height: 5%;" title="Olie Jaar 5"></div>
-                    </div>
-                    <span class="tco-year-label">Jaar 5</span>
-                  </div>
+                  <!-- Dynamisch gegenereerd door JS o.b.v. gekozen horizon -->
                 </div>
               </div>
 
-              <!-- TCO 5-jaars visualisatie balken -->
+              <!-- TCO visualisatie balken -->
               <div class="calc-tco-visual">
                 <div class="tco-header-bar">
-                  <span class="tco-title">5-Jaars TCO Eindstand (excl. BTW)</span>
+                  <span class="tco-title" id="tcoVisualTitle">5-Jaars TCO Eindstand (excl. BTW)</span>
                   <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--steel-500);">Inclusief € 25,50 eenmalige aanschaf / wagen</span>
                 </div>
                 
@@ -567,7 +544,7 @@
                   <!-- Vet balk -->
                   <div class="tco-bar-row">
                     <div class="tco-bar-label">
-                      <span>Traditioneel Smeervet (5 jaar)</span>
+                      <span id="barVetLabel">Traditioneel Smeervet (5 jaar)</span>
                       <strong id="barVetVal">€ 303.859</strong>
                     </div>
                     <div class="tco-bar-track">
@@ -578,7 +555,7 @@
                   <!-- Olie balk -->
                   <div class="tco-bar-row">
                     <div class="tco-bar-label">
-                      <span>Oliesmeernippel + Droge Olie (5 jaar)</span>
+                      <span id="barOlieLabel">Oliesmeernippel + Droge Olie (5 jaar)</span>
                       <strong style="color:var(--signal-dark);" id="barOlieVal">€ 68</strong>
                     </div>
                     <div class="tco-bar-track">
@@ -714,8 +691,8 @@
           <a href="index.html#kenmerken">Kenmerken</a>
           <a href="index.html#toepassingen">Toepassingen</a>
           <a href="index.html#specificaties">Specificaties</a>
-          <a href="test.html">Doe de test</a>
-          <a href="calculator.html">Opbrengstmodel</a>
+          <a href="test.html">Werkplaatsproeven</a>
+          <a href="calculator.html">Doe de test</a>
           <a href="montage.html">3D Montage</a>
           <a href="verdelers.html">Verdelers</a>
           <a href="offerte.html">Offerte</a>

@@ -3287,6 +3287,13 @@ footer {
   box-shadow: 0 4px 14px rgba(217, 56, 30, 0.5) !important;
 }
 
+#siteNav a.nav-highlight-red.active,
+.nav-highlight-red.active {
+  background: #B82B14 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 4px 12px rgba(217, 56, 30, 0.45) !important;
+}
+
 /* Teaser sectie op index.html */
 .teaser-test-grid {
   display: grid;

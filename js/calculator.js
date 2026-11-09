@@ -4,7 +4,8 @@
  * 
  * Berekent de besparing op productverbruik, smeertijd, productiestilstand en spare parts.
  * Stukprijs Oliesmeernippel: € 25,50 excl. BTW per stuk.
- * Inclusief aanpasbaar vermijdingspercentage defecten (0 - 100%).
+ * Inclusief aanpasbaar vermijdingspercentage defecten (0 - 100%)
+ * en dynamische terugverdienhorizon slider (1 - 10 jaar).
  */
 
 (function () {
@@ -43,7 +44,7 @@
     // Percentage vermeden defecten met droge olie (0 - 100%)
     reductiePercentage: 100,
 
-    // Horizon
+    // Horizon in jaren (1 - 10 jaar)
     jarenHorizon: 5
   };
 
@@ -72,7 +73,7 @@
   }
 
   /**
-   * Kerncalculatie volgens gecorrigeerd model (€ 25,50 / nippel + defectreductie)
+   * Kerncalculatie volgens gecorrigeerd model
    */
   function calculateROI(params) {
     const p = Object.assign({}, BENCHMARKS, params);
@@ -122,8 +123,8 @@
       terugverdientijdUren = terugverdientijdDagen * 24.0;
     }
 
-    // 8. Meerjaren TCO (standaard 5 jaar)
-    const horizon = Math.max(1, parseInt(p.jarenHorizon, 10) || 5);
+    // 8. Meerjaren TCO op basis van gekozen horizon
+    const horizon = Math.min(10, Math.max(1, parseInt(p.jarenHorizon, 10) || 5));
     const tcoVetHorizon = totaleKostenVetJaar * horizon;
     const tcoOlieHorizon = (totaleKostenOlieJaar * horizon) + eenmaligeInvestering;
     const nettoWinstHorizon = tcoVetHorizon - tcoOlieHorizon;
@@ -176,6 +177,9 @@
       reductiePct: document.getElementById('calcReductiePct'),
       reductiePctSlider: document.getElementById('calcReductiePctSlider'),
       reductiePctDisplay: document.getElementById('reductiePctDisplay'),
+      jarenHorizon: document.getElementById('calcJarenHorizon'),
+      jarenHorizonSlider: document.getElementById('calcJarenHorizonSlider'),
+      jarenHorizonDisplay: document.getElementById('jarenHorizonDisplay'),
       vetFrequentie: document.getElementById('calcVetFrequentie'),
       olieFrequentie: document.getElementById('calcOlieFrequentie'),
       hersteltijd: document.getElementById('calcHersteltijd'),
@@ -191,6 +195,7 @@
       kpiTerugverdientijd: document.getElementById('kpiTerugverdientijd'),
       kpiTerugverdientijdSub: document.getElementById('kpiTerugverdientijdSub'),
       kpiNettoWinst5j: document.getElementById('kpiNettoWinst5j'),
+      kpiNettoWinstLabel: document.getElementById('kpiNettoWinstLabel'),
       kpiInvestering: document.getElementById('kpiInvestering'),
       kpiRoiPercentage: document.getElementById('kpiRoiPercentage'),
 
@@ -211,11 +216,22 @@
       rowSpareOlie: document.getElementById('rowSpareOlie'),
       rowSpareDiff: document.getElementById('rowSpareDiff'),
 
+      // Nieuwe nippel-aanschaf in tabel
+      rowNippelVet: document.getElementById('rowNippelVet'),
+      rowNippelOlie: document.getElementById('rowNippelOlie'),
+      rowNippelDiff: document.getElementById('rowNippelDiff'),
+
+      rowTotalLabel: document.getElementById('rowTotalLabel'),
       rowTotaalVet: document.getElementById('rowTotaalVet'),
       rowTotaalOlie: document.getElementById('rowTotaalOlie'),
       rowTotaalDiff: document.getElementById('rowTotaalDiff'),
 
-      // 5-jaars balken
+      // 5-jaars / horizon balken en titels
+      tcoChartTitle: document.getElementById('tcoChartTitle'),
+      tco5yColumns: document.getElementById('tco5yColumns'),
+      tcoVisualTitle: document.getElementById('tcoVisualTitle'),
+      barVetLabel: document.getElementById('barVetLabel'),
+      barOlieLabel: document.getElementById('barOlieLabel'),
       barVetTco: document.getElementById('barVetTco'),
       barVetVal: document.getElementById('barVetVal'),
       barOlieTco: document.getElementById('barOlieTco'),
@@ -278,35 +294,38 @@
       }
     }
 
-    // Update 5-Jaars Kolomgrafiek
-    function update5yChart(res) {
-      const max5yVet = res.totaleKostenVetJaar * 5;
-      const maxTco = Math.max(max5yVet, 1);
+    // Dynamisch renderen van de TCO Kolomgrafiek gebaseerd op de gekozen horizon (1 - 10 jaar)
+    function updateDynamicTcoChart(res) {
+      if (displays.tcoChartTitle) {
+        displays.tcoChartTitle.textContent = `Cumulatieve Kostenopbouw excl. BTW (Jaar 1 t/m Jaar ${res.horizon})`;
+      }
 
-      for (let y = 1; y <= 5; y++) {
-        const vetCol = document.getElementById(`barVetY${y}`);
-        const olieCol = document.getElementById(`barOlieY${y}`);
-        const saveLbl = document.getElementById(`saveY${y}`);
+      if (!displays.tco5yColumns) return;
+      displays.tco5yColumns.innerHTML = '';
+      displays.tco5yColumns.style.gridTemplateColumns = `repeat(${res.horizon}, 1fr)`;
 
+      const maxCumVet = res.totaleKostenVetJaar * res.horizon;
+      const maxTco = Math.max(maxCumVet, 1);
+
+      for (let y = 1; y <= res.horizon; y++) {
         const cumVet = res.totaleKostenVetJaar * y;
         const cumOlie = (res.totaleKostenOlieJaar * y) + res.eenmaligeInvestering;
         const cumBesparing = cumVet - cumOlie;
 
-        if (vetCol) {
-          const pct = Math.min(100, Math.max(8, (cumVet / maxTco) * 100));
-          vetCol.style.height = `${pct}%`;
-          vetCol.title = `Vet Jaar ${y}: ${formatEuro(cumVet)}`;
-        }
+        const pctVet = Math.min(100, Math.max(8, (cumVet / maxTco) * 100));
+        const pctOlie = Math.min(100, Math.max(2, (cumOlie / maxTco) * 100));
 
-        if (olieCol) {
-          const pctOlie = Math.min(100, Math.max(2, (cumOlie / maxTco) * 100));
-          olieCol.style.height = `${pctOlie}%`;
-          olieCol.title = `Oliesmeernippel Jaar ${y}: ${formatEuro(cumOlie)}`;
-        }
-
-        if (saveLbl) {
-          saveLbl.textContent = `+ ${formatShortK(cumBesparing)}`;
-        }
+        const col = document.createElement('div');
+        col.className = 'tco-year-col';
+        col.innerHTML = `
+          <span class="tco-col-saving">+ ${formatShortK(cumBesparing)}</span>
+          <div class="tco-bars-pair">
+            <div class="bar-5y vet" style="height: ${pctVet}%;" title="Vet Jaar ${y}: ${formatEuro(cumVet)}"></div>
+            <div class="bar-5y olie" style="height: ${pctOlie}%;" title="Oliesmeernippel Jaar ${y}: ${formatEuro(cumOlie)}"></div>
+          </div>
+          <span class="tco-year-label">J${y}</span>
+        `;
+        displays.tco5yColumns.appendChild(col);
       }
     }
 
@@ -316,11 +335,17 @@
         inputs.reductiePctDisplay.textContent = `${Math.round(redVal)}%`;
       }
 
+      const horVal = inputs.jarenHorizon ? parseInt(inputs.jarenHorizon.value, 10) : BENCHMARKS.jarenHorizon;
+      if (inputs.jarenHorizonDisplay) {
+        inputs.jarenHorizonDisplay.textContent = `${horVal} ${horVal === 1 ? 'jaar' : 'jaar'}`;
+      }
+
       const currentParams = {
         smeerpunten: inputs.smeerpunten ? parseInt(inputs.smeerpunten.value, 10) : BENCHMARKS.smeerpunten,
         stilstandKost: inputs.stilstandKost ? parseFloat(inputs.stilstandKost.value) : BENCHMARKS.stilstandKostUur,
         risicoVoorvallen: inputs.voorvallen ? parseFloat(inputs.voorvallen.value) : BENCHMARKS.risicoVoorvallen,
         reductiePercentage: redVal,
+        jarenHorizon: horVal,
         vetFrequentie: inputs.vetFrequentie ? parseFloat(inputs.vetFrequentie.value) : BENCHMARKS.vetFrequentie,
         olieFrequentie: inputs.olieFrequentie ? parseFloat(inputs.olieFrequentie.value) : BENCHMARKS.olieFrequentie,
         hersteltijdUur: inputs.hersteltijd ? parseFloat(inputs.hersteltijd.value) : BENCHMARKS.hersteltijdUur,
@@ -336,7 +361,7 @@
       // Render visuals
       updateGauge(res);
       updateStackedBars(res);
-      update5yChart(res);
+      updateDynamicTcoChart(res);
 
       // KPI updates
       if (displays.kpiJaarBesparing) {
@@ -348,7 +373,7 @@
           const uren = Math.round(res.terugverdientijdUren * 10) / 10;
           displays.kpiTerugverdientijd.textContent = `${uren} uur`;
           if (displays.kpiTerugverdientijdSub) {
-            displays.kpiTerugverdientijdSub.textContent = `ca. ${formatNumber(res.terugverdientijdDagen, 2)} kalenderdag`;
+            displays.kpiTerugverdientijdSub.textContent = `op basis van ${formatEuro(res.eenmaligeInvestering, 2)} aanschaf`;
           }
         } else {
           const dagen = Math.round(res.terugverdientijdDagen);
@@ -359,12 +384,16 @@
         }
       }
 
+      if (displays.kpiNettoWinstLabel) {
+        displays.kpiNettoWinstLabel.textContent = `Netto Voordeel (${res.horizon} Jaar TCO) · excl. BTW`;
+      }
+
       if (displays.kpiNettoWinst5j) {
         displays.kpiNettoWinst5j.textContent = formatEuro(res.nettoWinstHorizon);
       }
 
       if (displays.kpiInvestering) {
-        displays.kpiInvestering.textContent = formatEuro(res.eenmaligeInvestering);
+        displays.kpiInvestering.textContent = formatEuro(res.eenmaligeInvestering, 2);
       }
 
       if (displays.kpiRoiPercentage) {
@@ -388,11 +417,30 @@
       if (displays.rowSpareOlie) displays.rowSpareOlie.textContent = formatEuro(res.sparePartsKostOlieJaar, 0);
       if (displays.rowSpareDiff) displays.rowSpareDiff.textContent = `- ${formatEuro(res.besparingSparePartsJaar, 0)}`;
 
-      if (displays.rowTotaalVet) displays.rowTotaalVet.textContent = formatEuro(res.totaleKostenVetJaar, 2);
-      if (displays.rowTotaalOlie) displays.rowTotaalOlie.textContent = formatEuro(res.totaleKostenOlieJaar, 2);
-      if (displays.rowTotaalDiff) displays.rowTotaalDiff.textContent = `- ${formatEuro(res.jaarlijkseBesparing, 2)}`;
+      // Aanschaf oliesmeernippel in de tabel
+      if (displays.rowNippelVet) displays.rowNippelVet.textContent = '€ 0,00';
+      if (displays.rowNippelOlie) displays.rowNippelOlie.textContent = formatEuro(res.eenmaligeInvestering, 2);
+      if (displays.rowNippelDiff) displays.rowNippelDiff.textContent = `+ ${formatEuro(res.eenmaligeInvestering, 2)} (eenmalig)`;
+
+      if (displays.rowTotalLabel) {
+        displays.rowTotalLabel.textContent = `Totale Kosten na ${res.horizon} jaar (TCO incl. aanschaf)`;
+      }
+
+      if (displays.rowTotaalVet) displays.rowTotaalVet.textContent = formatEuro(res.tcoVetHorizon, 2);
+      if (displays.rowTotaalOlie) displays.rowTotaalOlie.textContent = formatEuro(res.tcoOlieHorizon, 2);
+      if (displays.rowTotaalDiff) displays.rowTotaalDiff.textContent = `- ${formatEuro(res.nettoWinstHorizon, 2)}`;
 
       // Visuele TCO balken vergelijking
+      if (displays.tcoVisualTitle) {
+        displays.tcoVisualTitle.textContent = `${res.horizon}-Jaars TCO Eindstand (excl. BTW)`;
+      }
+      if (displays.barVetLabel) {
+        displays.barVetLabel.textContent = `Traditioneel Smeervet (${res.horizon} jaar)`;
+      }
+      if (displays.barOlieLabel) {
+        displays.barOlieLabel.textContent = `Oliesmeernippel + Droge Olie (${res.horizon} jaar)`;
+      }
+
       if (displays.barVetTco && displays.barOlieTco) {
         const maxTco = Math.max(res.tcoVetHorizon, res.tcoOlieHorizon, 1);
         const pctVet = Math.min(100, Math.max(10, (res.tcoVetHorizon / maxTco) * 100));
@@ -435,10 +483,22 @@
       });
     }
 
+    // Koppel slider en numeriek veld voor horizon jaren
+    if (inputs.jarenHorizon && inputs.jarenHorizonSlider) {
+      inputs.jarenHorizonSlider.addEventListener('input', function () {
+        inputs.jarenHorizon.value = this.value;
+        updateView();
+      });
+      inputs.jarenHorizon.addEventListener('input', function () {
+        inputs.jarenHorizonSlider.value = this.value;
+        updateView();
+      });
+    }
+
     // Luister naar alle invoervelden
     Object.keys(inputs).forEach(key => {
       const el = inputs[key];
-      if (el && !['smeerpunten', 'smeerpuntenSlider', 'reductiePct', 'reductiePctSlider'].includes(key)) {
+      if (el && !['smeerpunten', 'smeerpuntenSlider', 'reductiePct', 'reductiePctSlider', 'jarenHorizon', 'jarenHorizonSlider'].includes(key)) {
         el.addEventListener('input', updateView);
       }
     });
@@ -453,6 +513,8 @@
         if (inputs.voorvallen) inputs.voorvallen.value = BENCHMARKS.risicoVoorvallen;
         if (inputs.reductiePct) inputs.reductiePct.value = BENCHMARKS.reductiePercentage;
         if (inputs.reductiePctSlider) inputs.reductiePctSlider.value = BENCHMARKS.reductiePercentage;
+        if (inputs.jarenHorizon) inputs.jarenHorizon.value = BENCHMARKS.jarenHorizon;
+        if (inputs.jarenHorizonSlider) inputs.jarenHorizonSlider.value = BENCHMARKS.jarenHorizon;
         if (inputs.vetFrequentie) inputs.vetFrequentie.value = BENCHMARKS.vetFrequentie;
         if (inputs.olieFrequentie) inputs.olieFrequentie.value = BENCHMARKS.olieFrequentie;
         if (inputs.hersteltijd) inputs.hersteltijd.value = BENCHMARKS.hersteltijdUur;
@@ -501,18 +563,20 @@
         const text = `BUSINESS CASE OVERSTAP NAAR DROGE OLIE (OLIESMEERNIPPEL)
 Bedragen zijn exclusief BTW
 Organisatie / Machine: ${latestRes.smeerpunten} smeerpunt(en)
+Berekende tijdshorizon: ${latestRes.horizon} jaar
 Vermijdingspercentage defecten: ${latestRes.reductiePct}%
 -----------------------------------------------------------
-• Jaarlijkse kostenbesparing (OPEX): ${formatEuro(latestRes.jaarlijkseBesparing)} excl. BTW
+• Jaarlijkse kostenbesparing (OPEX): ${formatEuro(latestRes.jaarlijkseBesparing)} excl. BTW / jaar
 • Terugverdientijd investering: ${latestRes.terugverdientijdDagen < 1 ? Math.round(latestRes.terugverdientijdUren * 10) / 10 + ' uur' : Math.round(latestRes.terugverdientijdDagen) + ' dagen'}
-• Netto 5-jaars voordeel (TCO): ${formatEuro(latestRes.nettoWinstHorizon)} excl. BTW
-• Eenmalige investering: ${formatEuro(latestRes.eenmaligeInvestering)} excl. BTW (€ 25,50 / stuk)
+• Netto ${latestRes.horizon}-jaars voordeel (TCO): ${formatEuro(latestRes.nettoWinstHorizon)} excl. BTW
+• Eenmalige investering: ${formatEuro(latestRes.eenmaligeInvestering, 2)} excl. BTW (€ 25,50 / stuk)
 
-KOSTENVERGELIJKING PER JAAR (excl. BTW):
-- Smeermiddel: ${formatEuro(latestRes.productKostVetJaar)} (Vet) vs ${formatEuro(latestRes.productKostOlieJaar)} (Droge olie)
-- Smeertijd/Arbeid: ${formatEuro(latestRes.arbeidKostVetJaar)} vs ${formatEuro(latestRes.arbeidKostOlieJaar)}
+KOSTENVERGELIJKING (excl. BTW):
+- Smeermiddel: ${formatEuro(latestRes.productKostVetJaar)} (Vet) vs ${formatEuro(latestRes.productKostOlieJaar)} (Droge olie) per jaar
+- Smeertijd/Arbeid: ${formatEuro(latestRes.arbeidKostVetJaar)} vs ${formatEuro(latestRes.arbeidKostOlieJaar)} per jaar
 - Vermeden Lijnstilstand: ${formatEuro(latestRes.besparingDowntimeJaar)} per jaar
 - Vermeden Lagerschades: ${formatEuro(latestRes.besparingSparePartsJaar)} per jaar
+- Eenmalige aanschaf Oliesmeernippel(s): ${formatEuro(latestRes.eenmaligeInvestering, 2)}
 
 Gegenereerd via https://appkengit.github.io/DMS-OSN/calculator.html`;
 
