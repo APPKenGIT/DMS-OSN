@@ -386,6 +386,43 @@
     }
   }
 
+  // Initialiseer eventuele URL-parameters (bijv. vanaf ROI calculator of testpagina)
+  function handleUrlParams() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isProef = urlParams.get('proef');
+      const aantal = parseInt(urlParams.get('aantal'), 10);
+      const remarksField = document.getElementById('extraRemarks');
+
+      if (isProef === '1') {
+        const firstQty = document.getElementById('qty_1');
+        if (firstQty) firstQty.value = '10 stuks';
+        if (remarksField && !remarksField.value) {
+          remarksField.value = 'Betreft aanvraag proefexemplaar / testset voor 1 machine (werkplaatsproef).';
+        }
+        updateLiveConfig();
+      } else if (!isNaN(aantal) && aantal > 0) {
+        const firstQty = document.getElementById('qty_1');
+        if (firstQty) {
+          if (aantal <= 10) firstQty.value = '10 stuks';
+          else if (aantal <= 50) firstQty.value = '50 stuks';
+          else if (aantal <= 100) firstQty.value = '100 stuks';
+          else if (aantal <= 500) firstQty.value = '500 stuks';
+          else firstQty.value = '1000 stuks';
+        }
+        if (remarksField && !remarksField.value) {
+          remarksField.value = `Geconfigureerd via Opbrengstmodel & ROI-calculator voor ${aantal} smeerpunt(en).`;
+        }
+        updateLiveConfig();
+      }
+    } catch (e) {
+      console.warn('URL params kon niet worden verwerkt:', e);
+    }
+  }
+
+  // Roep aan na initiële render
+  handleUrlParams();
+
   // Reset form button to allow sending another quote
   const resetBtn = document.getElementById('btnNewQuote');
   if (resetBtn) {

@@ -61,6 +61,7 @@
         <a href="#kenmerken">Kenmerken</a>
         <a href="#toepassingen">Toepassingen</a>
         <a href="#specificaties">Specificaties</a>
+        <a href="test.html">Doe de test</a>
         <a href="montage.html">3D Montage</a>
         <a href="verdelers.html">Verdelers</a>
       </nav>
@@ -270,6 +271,100 @@
               <span><strong>Food & Pharma safe:</strong> geleverd met metaaldetecteerbare afsluitdop.</span>
             </li>
           </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Test & ROI Teaser Section -->
+  <section id="doe-de-test-teaser" style="background: var(--paper-light); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 70px 0;">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="index">00B — PROEFONDERVINDELIJK & OPBRENGSTMODEL</span>
+        <h2>Doe zelf de test. Overtuig uzelf in de werkplaats én op de balans.</h2>
+        <p>Ervaar zelf waarom toonaangevende machinebouwers afstappen van vet. Voer 3 snelle werkplaatsproeven uit of bereken direct hoeveel u bespaart op stilstand en smeertijd.</p>
+      </div>
+
+      <div class="teaser-test-grid">
+        <!-- Linkerkaart: De 3 Werkplaatsproeven Preview -->
+        <div class="teaser-test-card">
+          <div>
+            <div class="tag tag-signal" style="margin-bottom: 14px;">
+              <span>3 Praktische Tests</span>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 12px; color: var(--steel-950);">
+              Zelf testen in uw eigen werkplaats
+            </h3>
+            <p style="font-size: 0.92rem; color: var(--steel-600); line-height: 1.55; margin-bottom: 20px;">
+              U heeft enkel een spuitbus droge olie en een metalen as of geleidewagen nodig om binnen 2 minuten de waarheid te zien:
+            </p>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem; color: var(--steel-800); margin-bottom: 24px;">
+              <li style="display: flex; align-items: center; gap: 10px;">
+                <span style="color: var(--signal-dark); font-weight: 800;">01.</span>
+                <span><strong>Stof- & Schuurtest:</strong> ontdek hoe vet stof vasthoudt tot schuurpasta.</span>
+              </li>
+              <li style="display: flex; align-items: center; gap: 10px;">
+                <span style="color: var(--signal-dark); font-weight: 800;">02.</span>
+                <span><strong>Rietje-Afdichting:</strong> ervaar 100% lekvrije injectie onder aerosol-druk.</span>
+              </li>
+              <li style="display: flex; align-items: center; gap: 10px;">
+                <span style="color: var(--signal-dark); font-weight: 800;">03.</span>
+                <span><strong>Stick-Slip Test:</strong> voel het verschil tussen klevend vet en vrije loop.</span>
+              </li>
+            </ul>
+          </div>
+
+          <a href="test.html" class="btn-secondary" style="align-self: flex-start;">
+            <span>Bekijk de werkplaatsproeven</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Rechterkaart: Live ROI Calculator Teaser -->
+        <div class="teaser-test-card calc-card" id="teaserRoiWidget">
+          <div>
+            <div class="badge-benchmark" style="margin-bottom: 14px;">
+              <span>Gevalideerde Benchmark</span>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 8px;">
+              Snelcalculator Opbrengstmodel
+            </h3>
+            <p style="font-size: 0.88rem; line-height: 1.5;">
+              Verschuif het aantal wagens / smeerpunten en zie direct de verwachte besparing per jaar op smeermiddel, arbeid en lijnstilstand.
+            </p>
+
+            <div class="teaser-calc-widget">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                <label for="teaserPointsSlider" style="font-size: 0.84rem; font-weight: 600; color: #FFFFFF;">
+                  Aantal wagens / smeerpunten:
+                </label>
+                <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1.1rem; color: var(--signal);">
+                  <span id="teaserPointsVal">1</span> stuks
+                </span>
+              </div>
+              <input type="range" id="teaserPointsSlider" min="1" max="50" value="1" step="1" style="width: 100%; height: 6px; accent-color: var(--signal); cursor: pointer;">
+
+              <div class="teaser-calc-result-box">
+                <div>
+                  <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--steel-400); text-transform: uppercase;">Jaarlijkse besparing (OPEX)</div>
+                  <div class="teaser-saving-number" id="teaserSavingVal">€ 60.763</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--steel-400); text-transform: uppercase;">Terugverdientijd</div>
+                  <div style="font-family: var(--font-mono); font-weight: 700; font-size: 1.1rem; color: #FFFFFF;" id="teaserRoiDaysVal">&lt; 1 dag (5u)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="test.html#opbrengstmodel" class="btn-primary" id="teaserBtnCta" style="align-self: flex-start;">
+            <span>Open het volledige opbrengstmodel</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
         </div>
       </div>
     </div>
@@ -632,6 +727,7 @@
           <a href="#kenmerken">Kenmerken</a>
           <a href="#toepassingen">Toepassingen</a>
           <a href="#specificaties">Specificaties</a>
+        <a href="test.html">Doe de test</a>
           <a href="montage.html">3D Montage</a>
           <a href="verdelers.html">Verdelers</a>
           <a href="offerte.html">Offerte</a>
@@ -702,6 +798,7 @@
 
   <!-- Scripts -->
   <script src="js/viewer3d.js"></script>
+  <script src="js/calculator.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
